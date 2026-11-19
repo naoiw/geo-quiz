@@ -1,0 +1,27 @@
+name: Generate Capacitor lockfile (temporary)
+
+on:
+  push:
+    branches: [feature/15-capacitor-android]
+    paths:
+      - '.github/workflows/prepare-capacitor-lock.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "26"
+      - name: Generate reproducible npm dependency lock
+        run: npm install --package-lock-only --no-audit --no-fund
+      - name: Record generated package-lock.json for integration
+        run: |
+          echo 'CAPACITOR_LOCK_BEGIN'
+          base64 --wrap=0 package-lock.json
+          echo
+          echo 'CAPACITOR_LOCK_END'

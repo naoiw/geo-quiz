@@ -1,0 +1,42 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import test from "node:test";
+
+const world = JSON.parse(readFileSync("src/map/world-50m.json", "utf8"));
+const countries = JSON.parse(readFileSync("src/country-data/countries.json", "utf8"));
+
+test("every playable country is represented by exactly one mapped feature", () => {
+  const mapped = world.features.filter((feature) => feature.id);
+  assert.equal(mapped.length, countries.length);
+  const ids = mapped.map((feature) => feature.id);
+  assert.deepEqual([...ids].sort(), countries.map((country) => country.id));
+  assert.equal(new Set(ids).size, 197);
+});
+
+test("SVG path data, bounds and markers are finite and valid", () => {
+  assert.equal(world.features.length, 242);
+  for (const feature of world.features) {
+    assert.ok(feature.d.startsWith("M"));
+    assert.ok(feature.d.endsWith("Z"));
+    assert.match(feature.d, /^[-.0-9, MLZ]+$/);
+    assert.equal(feature.bounds.length, 4);
+    assert.equal(feature.center.length, 2);
+    assert.ok(feature.bounds.every(Number.isFinite));
+    assert.ok(feature.center.every(Number.isFinite));
+    assert.ok(feature.bounds[0] <= feature.bounds[2]);
+    assert.ok(feature.bounds[1] <= feature.bounds[3]);
+    assert.ok(feature.bounds[0] >= 0 && feature.bounds[2] <= 360);
+    assert.ok(feature.bounds[1] >= 0 && feature.bounds[3] <= 180);
+  }
+});
+
+test("known naming mismatches and tiny countries are mapped", () => {
+  const byId = new Map(world.features.filter((f) => f.id).map((f) => [f.id, f]));
+  for (const id of ["TW", "XK", "PS", "SS", "JP", "US", "VA", "MC", "NR", "TV", "KI"]) {
+    assert.ok(byId.has(id), "Missing country " + id);
+  }
+  assert.equal(byId.get("VA").tiny, true);
+  assert.equal(byId.get("MC").tiny, true);
+  assert.equal(byId.get("NR").tiny, true);
+  assert.ok(world.features.some((f) => f.id === null), "Background polygons should remain visible");
+});

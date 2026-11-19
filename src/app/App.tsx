@@ -1,11 +1,39 @@
+import { useState } from "react";
 import { ModeCard } from "../components/ModeCard";
+import { countries, findCountry, getCountryName } from "../country-data";
 import { quizModes } from "../features/quiz/modes";
 import { translate, type MessageKey } from "../i18n/messages";
 import { useLocale } from "../i18n/useLocale";
+import { WorldMap } from "../map/WorldMap";
+
+type MapDemoMode = "explore" | "highlight" | "answer";
 
 export function App() {
   const { locale, setLocale } = useLocale();
   const t = (key: MessageKey) => translate(locale, key);
+  const [mapMode, setMapMode] = useState<MapDemoMode>("explore");
+  const [targetId, setTargetId] = useState("JP");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const target = findCountry(targetId);
+  const selection = selectedId ? findCountry(selectedId) : undefined;
+
+  const selectMode = (mode: MapDemoMode) => {
+    setMapMode(mode);
+    setSelectedId(null);
+  };
+
+  const changeTarget = (id: string) => {
+    setTargetId(id);
+    setSelectedId(null);
+  };
+
+  const selectionText = mapMode === "answer"
+    ? selectedId
+      ? selectedId === targetId ? t("mapCorrect") : t("mapIncorrect")
+      : t("mapAnswerHelp")
+    : selection
+      ? t("mapSelected") + getCountryName(selection, locale)
+      : t("mapExploreHelp");
 
   return (
     <div className="app-shell">
@@ -32,6 +60,63 @@ export function App() {
               <p>{t("foundationBody")}</p>
             </div>
           </div>
+        </section>
+
+        <section className="map-demo" aria-labelledby="map-title">
+          <div className="section-heading">
+            <div>
+              <h2 id="map-title">{t("mapSection")}</h2>
+              <p>{t("mapSectionBody")}</p>
+            </div>
+            <span className="section-count">2D / 197</span>
+          </div>
+          <div className="map-demo__settings">
+            <div className="map-demo__modes" role="group" aria-label={t("mapModeLabel")}>
+              {(["explore", "highlight", "answer"] as const).map((mode) => (
+                <button
+                  type="button"
+                  key={mode}
+                  aria-pressed={mapMode === mode}
+                  className={mapMode === mode ? "is-active" : ""}
+                  onClick={() => selectMode(mode)}
+                >
+                  {t(mode === "explore" ? "mapExplore" : mode === "highlight" ? "mapHighlight" : "mapAnswer")}
+                </button>
+              ))}
+            </div>
+            {mapMode !== "explore" && (
+              <label className="map-demo__target">
+                {t("mapTarget")}
+                <select value={targetId} onChange={(event) => changeTarget(event.target.value)}>
+                  {countries.map((country) => (
+                    <option key={country.id} value={country.id}>{getCountryName(country, locale)}</option>
+                  ))}
+                </select>
+              </label>
+            )}
+          </div>
+          {mapMode === "answer" && target && (
+            <p className="map-demo__question">
+              {locale === "ja"
+                ? "地図から「" + getCountryName(target, locale) + "」を選択してください。"
+                : "Select " + getCountryName(target, locale) + " on the map."}
+            </p>
+          )}
+          {mapMode === "highlight" && (
+            <p className="map-demo__question">{t("mapHighlightHelp")}</p>
+          )}
+          <WorldMap
+            locale={locale}
+            mode={mapMode}
+            highlightedCountryId={mapMode === "highlight" ? targetId : null}
+            selectedCountryId={selectedId}
+            focusCountryId={mapMode === "highlight" ? targetId : null}
+            onCountrySelect={setSelectedId}
+          />
+          <div className="map-demo__feedback" role="status" aria-live="polite">
+            {selectionText}
+          </div>
+          <p className="map-demo__notice">{t("mapNotice")}</p>
         </section>
 
         <section aria-labelledby="modes-title">

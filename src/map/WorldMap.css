@@ -1,0 +1,142 @@
+.world-map {
+  overflow: hidden;
+  border: 1px solid #d9e5f1;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.world-map__toolbar,
+.world-map__bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+}
+
+.world-map__hint {
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.world-map__controls {
+  display: flex;
+  flex-shrink: 0;
+  gap: 5px;
+}
+
+.world-map__controls button {
+  min-width: 35px;
+  min-height: 35px;
+  border: 1px solid #dce5ef;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #203c60;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.world-map__controls button:hover {
+  border-color: #6a9ddc;
+  background: #e8f1fc;
+}
+
+.world-map__viewport {
+  overflow: hidden;
+  background: #e7f2fa;
+}
+
+.world-map__svg {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  touch-action: none;
+  user-select: none;
+  cursor: grab;
+}
+
+.world-map__svg:active {
+  cursor: grabbing;
+}
+
+.world-map__country {
+  stroke: #fff;
+  stroke-width: 0.65;
+  stroke-linejoin: round;
+  transition: fill 120ms ease;
+}
+
+.world-map__country--inactive {
+  fill: #d6dee7;
+  stroke: #f1f5f9;
+}
+
+.world-map__country--selectable {
+  fill: #aebfd2;
+  cursor: pointer;
+}
+
+.world-map__country--selectable:hover,
+.world-map__country--selectable:focus {
+  fill: #75a9d6;
+}
+
+.world-map__country--selected {
+  fill: #2563eb;
+  stroke: #1e40af;
+  cursor: pointer;
+}
+
+.world-map__country--highlighted {
+  fill: #f59e0b;
+  stroke: #a65f0c;
+  cursor: pointer;
+}
+
+.world-map__pin {
+  fill: #2364a9;
+  stroke: white;
+  stroke-width: 0.65;
+  paint-order: stroke;
+  cursor: pointer;
+}
+
+.world-map__pin--highlighted {
+  fill: #f59e0b;
+  stroke: #8a4b08;
+}
+
+.world-map__pin--selected {
+  fill: #1d4ed8;
+  stroke: #0b2b80;
+}
+
+.world-map__country:focus-visible,
+.world-map__pin:focus-visible {
+  outline: none;
+  stroke: #0f172a;
+  stroke-width: 2;
+}
+
+.world-map__bottom {
+  color: #687b94;
+  font-size: 11px;
+}
+
+@media (max-width: 720px) {
+  .world-map__toolbar {
+    align-items: flex-start;
+    flex-direction: column-reverse;
+    padding: 10px 12px;
+  }
+
+  .world-map__hint {
+    font-size: 11px;
+  }
+
+  .world-map__controls {
+    align-self: flex-end;
+  }
+}

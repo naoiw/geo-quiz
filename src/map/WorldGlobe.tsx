@@ -241,7 +241,6 @@ export function WorldGlobe({
       runtimeRef.current = null;
     };
   // Renderer lifetime is independent from changing quiz questions and timer updates.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

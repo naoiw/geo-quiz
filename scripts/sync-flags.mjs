@@ -41,4 +41,3 @@ for (const filename of expected) {
   copyFileSync(join(sourceDir, filename), join(targetDir, filename));
 }
 copyFileSync(licensePath, join(targetDir, "LICENSE.txt"));
-console.log("Synced " + expected.size + " local SVG flags to public/flags.");

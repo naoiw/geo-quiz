@@ -49,6 +49,7 @@ npm run preview
 | テスト | 対象 |
 | --- | --- |
 | `tests/game-engine.test.mjs` | 6回答形式、進行ルール、スコア、時間境界、重複防止 |
+| `tests/quality-matrix.test.mjs` | 全7地域×6回答形式×日英×3ルールの完走・採点・候補整合性、197件の国旗・地図データ照合 |
 | `tests/quiz-refactor.test.mjs` | 共通セッション、ルール設定、題型固有の操作を維持する構成契約 |
 | `tests/quiz-ui.test.mjs` | モード導線、共通結果UI、フォーカス、地図のキーボード操作 |
 | `tests/regions.test.mjs` | 全7選択地域×6回答形式、越境国、候補不足 |
@@ -62,4 +63,4 @@ npm run preview
 
 ## 未実施の確認
 
-GitHub Actionsの静的/ロジック検証は行えますが、Android/iOS/PCのブラウザごとのIME・タップ・縦横表示・スクリーンリーダー実機テストは別途必要です（品質Issue #17等）。2D/3D切替は3D地球儀（#19）実装後に確認します。
+GitHub Actionsで静的/ロジック検証および全題型・全地域の回帰マトリクスは確認できますが、Android/iOS/PCのブラウザごとのIME・タップ・縦横表示・スクリーンリーダー実機テストは別途必要です。実機で確認すべき手順・結果の記録方法は [QA_CHECKLIST.md](QA_CHECKLIST.md) に記載しています（品質Issue #17等）。2D/3D切替は3D地球儀（#19）実装後に確認します。

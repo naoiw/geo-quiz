@@ -41,6 +41,8 @@ export function NameQuiz({ locale, kind }: Props) {
   const [clockMs, setClockMs] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const composing = useRef(false);
+  // Some mobile IMEs dispatch compositionend just before the Enter key event.
+  const suppressCompositionEnter = useRef(false);
 
   const question = session?.currentQuestion;
   const country = session ? getQuestionCountry(session) : null;
@@ -94,6 +96,7 @@ export function NameQuiz({ locale, kind }: Props) {
       ...(sessionRule === "ten-untimed" ? {} : { durationMs: durationSeconds * 1000 }),
     }));
     composing.current = false;
+    suppressCompositionEnter.current = false;
     setAnswerText("");
     setClockMs(now);
   };
@@ -131,12 +134,14 @@ export function NameQuiz({ locale, kind }: Props) {
       : previous);
     setAnswerText("");
     composing.current = false;
+    suppressCompositionEnter.current = false;
   };
 
   const changeToSetup = () => {
     setSession(null);
     setAnswerText("");
     composing.current = false;
+    suppressCompositionEnter.current = false;
   };
 
   return (
@@ -262,22 +267,47 @@ export function NameQuiz({ locale, kind }: Props) {
               <label htmlFor={kind + "-answer-name"}>
                 {isJa ? "国名を入力" : "Enter country name"}
               </label>
+              <p className="quiz__input-help" id={kind + "-answer-help"}>
+                {isJa
+                  ? "ひらがな・カタカナ・正式名・通称に対応。変換を確定してから回答してください。"
+                  : "Official and accepted alternative names are supported. Confirm your text before submitting."}
+              </p>
               <div className="quiz__answer-input-row">
                 <input
                   id={kind + "-answer-name"}
+                  aria-describedby={kind + "-answer-help"}
                   ref={inputRef}
                   value={answerText}
                   onChange={(event) => setAnswerText(event.target.value)}
-                  onCompositionStart={() => { composing.current = true; }}
-                  onCompositionEnd={() => { composing.current = false; }}
+                  onCompositionStart={() => {
+                    composing.current = true;
+                    suppressCompositionEnter.current = false;
+                  }}
+                  onCompositionEnd={() => {
+                    composing.current = false;
+                    suppressCompositionEnter.current = true;
+                  }}
                   onKeyDown={(event) => {
-                    if (event.key === "Enter" && (composing.current || event.nativeEvent.isComposing)) {
+                    if (event.key !== "Enter") {
+                      if (!composing.current) suppressCompositionEnter.current = false;
+                      return;
+                    }
+                    if (composing.current || event.nativeEvent.isComposing ||
+                      event.nativeEvent.keyCode === 229 || suppressCompositionEnter.current) {
                       event.preventDefault();
+                      suppressCompositionEnter.current = false;
+                    }
+                  }}
+                  onKeyUp={(event) => {
+                    if (event.key === "Enter" && !composing.current) {
+                      suppressCompositionEnter.current = false;
                     }
                   }}
                   disabled={session.status !== "asking"}
-                  placeholder={isJa ? "例：日本" : "e.g. Japan"}
+                  placeholder={isJa ? "例：にほん / 日本" : "e.g. Japan"}
                   autoComplete="off"
+                  autoCapitalize="off"
+                  enterKeyHint="done"
                   spellCheck={false}
                 />
                 <button

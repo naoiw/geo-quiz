@@ -85,7 +85,7 @@
 
 .world-map__country--selected {
   fill: #2563eb;
-  stroke: #1e40af;
+  stroke: none;
   cursor: pointer;
 }
 
@@ -110,7 +110,7 @@
 
 .world-map__pin--selected {
   fill: #1d4ed8;
-  stroke: #0b2b80;
+  stroke: none;
 }
 
 .world-map__country:focus-visible,
@@ -118,6 +118,13 @@
   outline: none;
   stroke: #0f172a;
   stroke-width: 2;
+}
+
+/* A selected country keeps its fill, without an extra selection border. */
+.world-map__country--selected:focus-visible,
+.world-map__pin--selected:focus-visible {
+  stroke: none;
+  filter: brightness(0.85);
 }
 
 .world-map__bottom {

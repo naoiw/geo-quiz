@@ -2,7 +2,7 @@
 
 ## 目的と構成
 
-`src/game-engine/types.ts` は共通の型を、`src/game-engine/engine.ts` はReact・DOM・地図・国旗描画に依存しないロジックを定義します。ゲームエンジンは純粋関数のままとし、画面遷移・四択候補生成・タイマー制御はUI層が担当します。最初の題型はIssue #6で接続済み（[MAP_TO_NAME_QUIZ.md](MAP_TO_NAME_QUIZ.md)）。
+`src/game-engine/types.ts` は共通の型を、`src/game-engine/engine.ts` はReact・DOM・地図・国旗描画に依存しないロジックを定義します。ゲームエンジンは純粋関数のままとします。Reactのセッション/タイマー状態は `src/features/quiz/useQuizSession.ts`、ゲームルール/制限時間のUIは `QuizRuleFields.tsx`、四択候補生成は題型別のヘルパーが担当します。最初の題型はIssue #6で接続済み（[MAP_TO_NAME_QUIZ.md](MAP_TO_NAME_QUIZ.md)）。
 
 **題型と回答形式（6バリエーション）**
 
@@ -28,7 +28,7 @@
 - 1ラウンド内の同一国は出題しません。タイムアタックは候補をすべて使い切ると再シャッフルし、可能な限り直前の国が連続しないようにします。
 - 回答後は必ず `review` 状態を挟みます。この間にUIで正誤を示し、`advanceSession()` で次問へ進みます。
 - 10問制では対象地域が10か国以上なら10問、4〜9か国等の小地域では対象国数まで自動短縮します。終了判定は `GameSession.questionLimit` で行い、完了は `completed`、時間切れは `timeout`。期限後の正答は記録されません。
-- `skipQuestion()` は共通エンジンに用意していますが、プレイヤーにスキップ操作を提供するかは未決定です。
+- `skipQuestion()` は共通エンジンと各題型のUIで使用でき、回答確定後のレビューを経て次問に進みます。
 
 ## 状態遷移
 
@@ -79,7 +79,14 @@ if (session.status === "finished") {
 
 ## 未決定・後続
 
-制限時間、最終得点配分、スキップのUX、結果保存・ランキングは未決定です。これらを決定する前でもセッションや採点方針を差し替えられる実装にしています。4題型すべてを実装済み（#6～#9）。地域選択（#11）は `regionIds` の包含判定を用い、越境国は複数地域で出題可能、同一地域内では重複しません。将来の小地域は10問制の出題数を安全に短縮し、国名四択は4件未満の候補を明示的に拒否します（[REGION_PLAY.md](REGION_PLAY.md)）。地図→国名と国旗→国名は `NameQuiz.tsx`、国名→地図は `NameToMapQuiz.tsx`、国名→国旗は `NameToFlagQuiz.tsx` から共通エンジンを利用します。四択のボタン部品は `CountryChoiceGrid.tsx` で共有し、出題候補生成は国名／国旗で独立しています。画面共通化の仕上げは#13/#18、表記ゆれ改善は#10で実装済み、地域選択の拡充は#11で対応します。
+制限時間・最終得点配分、結果保存・ランキングは未決定です。これらを決定する前でもセッションや採点方針を差し替えられる実装にしています。4題型すべてを実装済み（#6～#9）。地域選択（#11）は `regionIds` の包含判定を用い、越境国は複数地域で出題可能、同一地域内では重複しません。将来の小地域は10問制の出題数を安全に短縮し、国名四択は4件未満の候補を明示的に拒否します（[REGION_PLAY.md](REGION_PLAY.md)）。地図→国名と国旗→国名は `NameQuiz.tsx`、国名→地図は `NameToMapQuiz.tsx`、国名→国旗は `NameToFlagQuiz.tsx` から共通エンジンを利用します。四択のボタン部品は `CountryChoiceGrid.tsx` で共有し、出題候補生成は国名／国旗で独立しています。画面共通化の仕上げは#13/#18、表記ゆれ改善は#10で実装済み、地域選択の拡充は#11で対応します。
 
 ## 国名テキスト入力
 正答判定は getAcceptedTextAnswers() が国マスタの表示名・別名・読みを言語別に正規化した一覧で行います。normalizeTextAnswer() はNFKC、空白、限定的な記号、英字大小、ひらがな／カタカナを統一します。読み仮名は自動推測せず、国別登録のもののみ採用。UIから独立して両国名回答題型に共通適用します。詳しくは [TEXT_ANSWER.md](TEXT_ANSWER.md)。
+
+
+## React画面への接続（現行リファクタリング）
+
+`src/features/quiz/useQuizSession.ts` は純粋エンジンをReactへ接続する**唯一のセッション管理フック**です。`startRound(config, durationSeconds)`、`submit(answer)`、`skip()`、`advance()`、`reset()`を各題型へ提供し、現在の問題・レビュー・結果・残り時間も返します。時間制限があるときだけ250msごとに`tickSession()`を呼びます。時計の所有者はフックであり、エンジンは常に外部からの時刻値のみで動作します。
+
+各題型は `QuizRuleFields` からルールと時間を選び、`RegionSelector` で対象地域を定めます。回答形式固有のドラフト（IME入力中のテキスト、地図の選択候補、国旗の四択候補）は画面だけが保持し、セッションの状態遷移は重複実装しません。新規UIは `tests/quiz-refactor.test.mjs` と `tests/quiz-ui.test.mjs` の契約も検証します。出題と採点の純粋APIは変更していません。

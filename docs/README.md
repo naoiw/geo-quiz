@@ -1,17 +1,27 @@
-# Documents
+# ドキュメント一覧
 
-- [ARCHITECTURE.md](ARCHITECTURE.md): 構造とコード共通化
-- [DEVELOPMENT.md](DEVELOPMENT.md): ローカル開発、CI、GitHub Flow
-- [DEPLOYMENT.md](DEPLOYMENT.md): mainからのGitHub Pages
-- [DATA.md](DATA.md): 国データ、国旗・地図、外部ライセンス
-- [MAP.md](MAP.md): インタラクティブ2D地図の描画、操作、データ出典
-- [FLAGS.md](FLAGS.md): 国旗SVGの生成、表示、ライセンスと注意点
-- [GAME_ENGINE.md](GAME_ENGINE.md): 出題・採点・時間制限・結果集計と呼び出し契約
-- [MAP_TO_NAME_QUIZ.md](MAP_TO_NAME_QUIZ.md): 地図 → 国名の出題・入力・四択UI・結果表示
-- [FLAG_TO_NAME_QUIZ.md](FLAG_TO_NAME_QUIZ.md): 国旗 → 国名の出題・入力・四択UI・類似国旗の方針
-- [NAME_TO_MAP_QUIZ.md](NAME_TO_MAP_QUIZ.md): 国名 → 地図の回答操作、地域切替と小国対応
-- [NAME_TO_FLAG_QUIZ.md](NAME_TO_FLAG_QUIZ.md): 国名 → 国旗の四択、地域別誤答候補、重複対策
-- [UI_UX.md](UI_UX.md): クイズ画面導線・スマホ/PC操作・アクセシビリティ
-- [LOCALIZATION.md](LOCALIZATION.md): 言語設定、ブラウザの優先言語・保存、翻訳データと拡張方法
-- [TEXT_ANSWER.md](TEXT_ANSWER.md): 正答判定、日本語の読み、IME入力
-- [REGION_PLAY.md](REGION_PLAY.md): 地域別プレイ、越境国、出題数不足への対応
+## 設計・開発
+
+- [ARCHITECTURE.md](ARCHITECTURE.md) — 4題型共通のレイヤ構成、Reactフックと純粋エンジンの責務分離
+- [DEVELOPMENT.md](DEVELOPMENT.md) — 開発環境、GitHub Flow、品質確認、テスト構成
+- [DEPLOYMENT.md](DEPLOYMENT.md) — mainからGitHub Pagesへのデプロイ
+- [GAME_ENGINE.md](GAME_ENGINE.md) — 4題型/6回答形式、セッション状態、時間・採点・結果
+
+## UI・ゲーム仕様
+
+- [UI_UX.md](UI_UX.md) — モード選択、共通進捗・正誤・結果、スマホ/PC・アクセシビリティ
+- [REGION_PLAY.md](REGION_PLAY.md) — 地域別出題、越境国、小地域での問題数
+- [LOCALIZATION.md](LOCALIZATION.md) — 日英の言語設定・翻訳
+- [TEXT_ANSWER.md](TEXT_ANSWER.md) — 国名入力の読み仮名・別名・表記ゆれ・IME
+- [MAP_TO_NAME_QUIZ.md](MAP_TO_NAME_QUIZ.md) — 地図→国名
+- [FLAG_TO_NAME_QUIZ.md](FLAG_TO_NAME_QUIZ.md) — 国旗→国名
+- [NAME_TO_MAP_QUIZ.md](NAME_TO_MAP_QUIZ.md) — 国名→地図
+- [NAME_TO_FLAG_QUIZ.md](NAME_TO_FLAG_QUIZ.md) — 国名→国旗
+
+## データ・アセット
+
+- [DATA.md](DATA.md) — 197か国・地域のマスタ、ライセンス
+- [MAP.md](MAP.md) — 2D地図のSVG描画・操作・出典
+- [FLAGS.md](FLAGS.md) — 国旗SVG生成、表示、ライセンス
+
+共通のセッション処理は `src/features/quiz/useQuizSession.ts`、ルール設定は `QuizRuleFields.tsx`、共通結果UIは `QuizStatus.tsx` を参照してください。

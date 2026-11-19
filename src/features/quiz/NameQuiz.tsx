@@ -1,10 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { countries, findCountry, getCountryName, regions } from "../../country-data";
-import {
-  advanceSession, getQuestionCountry, getRemainingMs, getResult,
-  skipQuestion, startSession, submitAnswer, tickSession,
-} from "../../game-engine/engine";
-import type { AnswerFormat, GameSession, SessionRule } from "../../game-engine/types";
+import { findCountry, getCountryName, regions } from "../../country-data";
+import { QuizRuleFields } from "./QuizRuleFields";
+import { useQuizSession } from "./useQuizSession";
+import type { AnswerFormat, SessionRule } from "../../game-engine/types";
 import type { Locale } from "../../i18n/messages";
 import { quizText, type QuizTextKey } from "../../i18n/quizMessages";
 import { QuizFeedback, QuizProgress, QuizResultSummary } from "./QuizStatus";
@@ -22,10 +20,7 @@ interface Props {
   kind: "map-to-name" | "flag-to-name";
 }
 
-const durations = [60, 120, 180, 300] as const;
-
 export function NameQuiz({ locale, kind }: Props) {
-  const isJa = locale === "ja";
   const qt = (key: QuizTextKey) => quizText(locale, key);
   const isFlag = kind === "flag-to-name";
   const [answerFormat, setAnswerFormat] = useState<NameAnswerFormat>("text");
@@ -34,22 +29,21 @@ export function NameQuiz({ locale, kind }: Props) {
   const [durationSeconds, setDurationSeconds] = useState<number>(120);
   const insufficientCountries = countRegionCountries(regionId) <
     (answerFormat === "multiple-choice" ? 4 : 1);
-  const [session, setSession] = useState<GameSession | null>(null);
+  const {
+    session, questionCountry: country, review, result, remainingMs: timeLeft,
+    startRound, submit, skip: skipRound, advance: advanceRound, reset,
+  } = useQuizSession(locale);
   const [answerText, setAnswerText] = useState("");
-  const [clockMs, setClockMs] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const composing = useRef(false);
   // Some mobile IMEs dispatch compositionend just before the Enter key event.
   const suppressCompositionEnter = useRef(false);
 
   const question = session?.currentQuestion;
-  const country = session ? getQuestionCountry(session) : null;
   const flagRegion = isFlag && country
     ? regions.find((region) => region.id === country.regionIds[0])
     : null;
-  const review = session?.status === "review" ? session.lastReview : null;
   const correctCountry = review ? findCountry(review.correctCountryId) : null;
-  const result = session?.status === "finished" ? getResult(session) : null;
 
   const choices = useMemo(() => {
     if (!session?.currentQuestion || session.configuration.answerFormat !== "multiple-choice") {
@@ -61,83 +55,42 @@ export function NameQuiz({ locale, kind }: Props) {
   }, [question?.number, question?.countryId, session?.countryPool, session?.configuration.answerFormat, locale]);
 
   useEffect(() => {
-    if (!session || session.deadlineMs === null || session.status === "finished") return;
-    const interval = window.setInterval(() => {
-      const now = Date.now();
-      setClockMs(now);
-      setSession((previous) => previous && previous.status !== "finished"
-        ? tickSession(previous, now)
-        : previous);
-    }, 250);
-    return () => window.clearInterval(interval);
-  }, [session?.deadlineMs, session?.status]);
-
-  useEffect(() => {
     if (session?.status === "asking" && session.configuration.answerFormat === "text") {
       inputRef.current?.focus();
     }
   }, [session?.status, question?.number, session?.configuration.answerFormat]);
 
-  const timeLeft = session && session.deadlineMs !== null
-    ? getRemainingMs(session, Math.max(clockMs, session.startedAtMs))
-    : null;
-
   const start = () => {
     if (insufficientCountries) return;
-    const now = Date.now();
-    setSession(startSession({
+    startRound({
       quizKind: kind,
       answerFormat,
       sessionRule,
       regionId: regionId === "world" ? null : regionId,
-    }, countries, {
-      nowMs: now,
-      ...(sessionRule === "ten-untimed" ? {} : { durationMs: durationSeconds * 1000 }),
-    }));
+    }, durationSeconds);
     composing.current = false;
     suppressCompositionEnter.current = false;
     setAnswerText("");
-    setClockMs(now);
   };
 
   const answerWithText = () => {
     if (!answerText.trim() || composing.current) return;
-    const now = Date.now();
-    setClockMs(now);
-    setSession((previous) => previous?.status === "asking"
-      ? submitAnswer(previous, { format: "text", value: answerText }, locale, now)
-      : previous);
+    submit({ format: "text", value: answerText });
   };
 
   const answerWithChoice = (countryId: string) => {
-    const now = Date.now();
-    setClockMs(now);
-    setSession((previous) => previous?.status === "asking"
-      ? submitAnswer(previous, { format: "multiple-choice", countryId }, locale, now)
-      : previous);
+    submit({ format: "multiple-choice", countryId });
   };
 
-  const skip = () => {
-    const now = Date.now();
-    setClockMs(now);
-    setSession((previous) => previous?.status === "asking"
-      ? skipQuestion(previous, now)
-      : previous);
-  };
-
+  const skip = () => skipRound();
   const next = () => {
-    const now = Date.now();
-    setClockMs(now);
-    setSession((previous) => previous?.status === "review"
-      ? advanceSession(previous, now)
-      : previous);
+    advanceRound();
     setAnswerText("");
     composing.current = false;
     suppressCompositionEnter.current = false;
   };
-
   const changeToSetup = () => {
-    setSession(null);
+    reset();
     setAnswerText("");
     composing.current = false;
     suppressCompositionEnter.current = false;
@@ -175,30 +128,15 @@ export function NameQuiz({ locale, kind }: Props) {
               sessionRule={sessionRule}
               minimumCountries={answerFormat === "multiple-choice" ? 4 : 1}
             />
-            <label className="quiz__label">
-              {qt("gameRule")}
-              <select value={sessionRule} onChange={(event) =>
-                setSessionRule(event.target.value as SessionRule)}>
-                <option value="ten-untimed">{qt("tenUntimed")}</option>
-                <option value="ten-timed">{qt("tenTimed")}</option>
-                <option value="time-attack">{qt("timeAttack")}</option>
-              </select>
-            </label>
-            {sessionRule !== "ten-untimed" && (
-              <label className="quiz__label">
-                {qt("timeLimit")}
-                <select value={durationSeconds} onChange={(event) =>
-                  setDurationSeconds(Number(event.target.value))}>
-                  {durations.map((seconds) => (
-                    <option key={seconds} value={seconds}>
-                      {seconds / 60} {isJa ? "分" : seconds === 60 ? "minute" : "minutes"}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            )}
+            <QuizRuleFields
+              locale={locale}
+              sessionRule={sessionRule}
+              onSessionRuleChange={setSessionRule}
+              durationSeconds={durationSeconds}
+              onDurationChange={setDurationSeconds}
+            />
           </div>
-          <p className="quiz__note">{qt("scoring_is_provisional_100_for_correct_0_otherwise_time")}</p>
+          <p className="quiz__note">{qt("scoringNote")}</p>
           <button type="button" className="quiz__primary" onClick={start}
             disabled={insufficientCountries}>
             {qt("startQuiz")}
@@ -219,8 +157,8 @@ export function NameQuiz({ locale, kind }: Props) {
           />
           <p className="quiz__prompt">
             {isFlag
-              ? (qt("which_country_does_this_flag_represent"))
-              : (qt("which_country_is_highlighted"))}
+              ? (qt("flagQuestion"))
+              : (qt("mapQuestion"))}
           </p>
           {isFlag ? (
             <div className="quiz__flag-prompt">
@@ -255,7 +193,7 @@ export function NameQuiz({ locale, kind }: Props) {
                 {qt("enterCountry")}
               </label>
               <p className="quiz__input-help" id={kind + "-answer-help"}>
-                {qt("official_and_accepted_alternative_names_are_supported_confirm_your")}
+                {qt("textAnswerHelp")}
               </p>
               <div className="quiz__answer-input-row">
                 <input

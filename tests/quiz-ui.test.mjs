@@ -56,8 +56,9 @@ test("all four quiz modes share progress, keyboard-aware feedback and result pre
     assert.ok(screen.includes("<QuizProgress"), "missing shared progress");
     assert.ok(screen.includes("<QuizFeedback"), "missing feedback");
     assert.ok(screen.includes("<QuizResultSummary"), "missing results");
-    assert.ok(screen.includes("advanceSession("), "engine progress no longer connected");
-    assert.ok(screen.includes("getResult("), "result engine disconnected");
+    assert.ok(screen.includes("useQuizSession(locale)"), "session adapter disconnected");
+    assert.ok(screen.includes("startRound("), "start action disconnected");
+    assert.ok(screen.includes("advanceRound()"), "next-question action disconnected");
   }
   assert.ok(status.includes('role="progressbar"'));
   assert.ok(status.includes("aria-valuenow={completed}"));

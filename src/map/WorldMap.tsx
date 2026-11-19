@@ -244,8 +244,8 @@ export function WorldMap({
   const focusId = mode === "answer" ? null : focusCountryId ?? selectedCountryId;
   const focusFeature = focusId ? featureById.get(focusId) : null;
   const instructions = readOnly
-    ? qt("identify_the_highlighted_country_drag_and_zoom_to_inspect")
-    : qt("tap_or_click_to_select_a_country_drag_to");
+    ? qt("mapHighlightHelp")
+    : qt("mapInteractionHelp");
 
   return (
     <div className={"world-map" + (readOnly ? " world-map--quiz" : "")}>

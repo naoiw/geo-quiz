@@ -87,7 +87,7 @@ test("quiz map hides country labels and adds no marker overlay", () => {
   assert.ok(styles.includes('world-map--quiz .world-map__country--highlighted[data-tiny="true"]'));
   assert.ok(quiz.includes("<WorldMap"));
   assert.ok(quiz.includes("readOnly"));
-  assert.ok(quiz.includes("submitAnswer("));
-  assert.ok(quiz.includes("getResult("));
+  assert.ok(quiz.includes("useQuizSession(locale)"));
+  assert.ok(quiz.includes("submit({ format: \"text\", value: answerText })"));
   assert.ok(wrapper.includes('kind="map-to-name"'));
 });

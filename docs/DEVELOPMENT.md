@@ -1,52 +1,65 @@
-# 開発とGitHub Flow
+# 開発手順・GitHub Flow
 
-geo-quizのWeb版は、1人＋AIで小さく開発し、動作可能な機能を頻繁に公開する方針です。`main`を常に公開可能に保ちます。旧`develop`・`release/*`中心のGitflowから移行します。
+## ローカル実行
 
-## ローカル開発
+Node.js 26推奨。利用可能バージョンは `package.json` の `engines.node`（22.12以上・27未満）を参照。
 
-Node.js 26推奨（最低22.12を想定）。
-
-~~~bash
+```bash
 git clone https://github.com/naoiw/geo-quiz.git
 cd geo-quiz
 npm install
 npm run dev
+```
+
+本番同等の確認:
+
+```bash
 npm run lint
 npm run typecheck
-npm run build
 npm test
-~~~
+npm run build
+npm run build:pages:main
+npm run preview
+```
 
-## ブランチとIssue
+開発・テスト・ビルド時には `scripts/sync-flags.mjs` が `flag-icons` のSVGを197件抽出します。`public/flags` は生成物です。CDNを使わずGitHub Pagesで配信します。lockfileは現時点で未導入なので `npm install` を使用。導入後にCIを `npm ci` へ切替予定です。
 
-| ブランチ | 分岐元 | PR先 | 用途 |
-| --- | --- | --- | --- |
-| `main` | — | — | Web本番 |
-| `feature/<issue>-<topic>` | main | main | 機能 |
-| `fix/<issue>-<topic>` | main | main | 修正 |
-| `chore/<issue>-<topic>` | main | main | 設定・文書 |
+## ブランチ・PR
 
-- Issueを作成し、短命ブランチで実装、PRで`main`へ統合、完了したIssueをClose。
-- PRではCI成功とIssueの完了条件を確認する。AIの実装も例外ではない。
-- 公開してよい状態でない機能はFeature Flagで無効にするか、明確に「開発予定」と表示する。
-- PRマージ後にPagesへ自動公開。公開後の不具合は`fix/*`で修正。
-- リリースタグ（例`v0.1.0`）は節目に作成。Webの毎回のデプロイにリリースブランチは不要。
-- Android版はWebの安定後、ストア公開を別のバージョン／配信手順で管理（Issue #15）。
+`main` を常に公開可能に保つGitHub Flowを採用します。通常は `feature/<issue>-...`、不具合は `fix/...`、整理・既存仕様維持は `refactor/...`、文書のみは `chore/...` の短命ブランチを `main` から作成し、PRで変更を統合します。常設 `develop`／`release` は不要。
 
-## CIと品質確認
+- PR作成後にLint・型チェック・自動テスト・本番ビルドを実行する
+- 完了条件を満たし、テストがすべて成功した変更を `main` に統合
+- `main` へのpushで GitHub Actions `Deploy GitHub Pages` が公開
+- PRマージ後に`main`のCIとPagesワークフローの成功を確認する
+- Web版の節目にタグを付ける。AndroidはWeb版の安定後に別の公開サイクルで管理
 
-`.github/workflows/ci.yml`は`main`向けPRと`main`へのpushでlint・typecheck・buildを実行します。Pages公開ワークフローもlintとビルドに成功した成果物だけを公開します。
+## コードの追加・変更
 
-確認項目：Issueの完了条件、PC・スマホ表示、日本語/英語、既存機能への影響、未完成機能の公開防止。国マスタの197件の整合性テストはnpm testで実行します。国旗・地図アセットとの照合に加え、共通ゲームエンジンの6種類の題型/回答形式、時間制限、得点、重複防止、地域絞り込みを`tests/game-engine.test.mjs`で検証します。地図→国名クイズでは `tests/map-to-name-quiz.test.mjs` により197国の四択候補（日本語／英語）、6地域での重複防止、小国の表示設定を検証します。国名→国旗は `tests/name-to-flag-quiz.test.mjs` で197件の画像ハッシュ重複、全地域の四択候補、切替可能な誤答候補戦略、共通セッション・採点・制限時間を検証します。国名の正答表記・読み・衝突検査はtests/text-answer.test.mjsで検証します。ブラウザのIME実機E2EはIssue #17で拡充します。
+`src/game-engine/engine.ts` はReact、DOM、`Date.now()`、タイマーへ依存させない。問題数、正誤、履歴、スコアは純粋関数として検証します。
 
-初期構成はlockfile未生成です。依存固定後に`package-lock.json`を追加し、`npm ci`へ切り替えてください。
+各題型の画面 `NameQuiz`／`NameToMapQuiz`／`NameToFlagQuiz` では `useQuizSession(locale)` を必ず経由してセッションを操作します。タイマー、回答提出・スキップ・次問・終了処理を画面内に複製しないでください。国名入力時のIME、地図の選択→確定、国旗候補の生成はそれぞれの画面で管理します。
 
-旧`develop`ブランチは移行期間の履歴として残る場合がありますが、以後の開発の分岐元にはしません。
+ルール・制限時間の選択は `QuizRuleFields`、地域は `RegionSelector`、進捗/正誤/結果は `QuizStatus`、国名・国旗の四択は `CountryChoiceGrid` を再利用します。画面文言は `src/i18n/messages.ts`／`quizMessages.ts` に、受理する国名・読みは国マスタへ登録します。
 
-地域別プレイ（#11）の確認では `tests/regions.test.mjs` で全6回答形式×全7地域、越境国、地域外混入、少数地域での10問短縮、出題数不足による開始禁止、共通地域UIを検証します。
+新しい題型ではまずエンジン型、対応可能な回答形式と候補不足時の規則を定義し、次に独立した候補生成とUIを追加します。ゲームエンジン、コントローラー、画面の責務を跨がせないことが保守性の基本です。
 
-国名→地図（#8）の確認では `tests/name-to-map-quiz.test.mjs` で全197か国のポリゴン存在、地域・日英・採点・時間切れと選択確定UXの基本契約を検査します。タッチ操作の実機検証は後続の品質Issueでも継続します。
+## テストの担当
 
-## UI/UX・アクセシビリティ（Issue #13）
+| テスト | 対象 |
+| --- | --- |
+| `tests/game-engine.test.mjs` | 6回答形式、進行ルール、スコア、時間境界、重複防止 |
+| `tests/quiz-refactor.test.mjs` | 共通セッション、ルール設定、題型固有の操作を維持する構成契約 |
+| `tests/quiz-ui.test.mjs` | モード導線、共通結果UI、フォーカス、地図のキーボード操作 |
+| `tests/regions.test.mjs` | 全7選択地域×6回答形式、越境国、候補不足 |
+| `tests/text-answer.test.mjs` | 197件の日英名称・別名・読みと厳密一致・IME |
+| `tests/i18n.test.mjs` | 言語の初期値/保存、辞書、国名判定と言語連動 |
+| `tests/map-to-name-quiz.test.mjs`、`flag-to-name-quiz.test.mjs` | 入力/四択と出題アセット |
+| `tests/name-to-map-quiz.test.mjs`、`name-to-flag-quiz.test.mjs` | 地図選択/国旗選択の候補、進行、採点 |
+| `tests/country-master.test.mjs`、`flag-assets.test.mjs`、`world-map.test.mjs` | データの対応・SVGアセット/地図 |
 
-モード選択から1題型のみ表示する構成、共通進捗・採点レビュー・結果画面、キーボードでの地図移動/拡大縮小と44px以上のタッチ領域を実装しました。テストはtests/quiz-ui.test.mjsに集約しています。スマホ縦横・PCのブラウザ実機での動作・視覚的検証は別途実施が必要です（#17）。
+既存テストには実装の配線関係を静的に検証するものがあります。共通化で責務を移動した場合は旧コードの文字列を再導入せず、**新しい所有箇所と画面側の呼び出し**をそれぞれ検査するよう更新してください。
+
+## 未実施の確認
+
+GitHub Actionsの静的/ロジック検証は行えますが、Android/iOS/PCのブラウザごとのIME・タップ・縦横表示・スクリーンリーダー実機テストは別途必要です（品質Issue #17等）。2D/3D切替は3D地球儀（#19）実装後に確認します。

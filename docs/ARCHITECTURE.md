@@ -34,7 +34,7 @@ App (モード選択・言語設定・プレビュー)
 | `src/features/quiz/QuizStatus.tsx` | 問題番号、スコア、残り時間、レビューと結果 |
 | `src/features/quiz/RegionSelector.tsx` | 国マスタに基づく地域件数と候補不足の案内 |
 | `src/features/quiz/CountryChoiceGrid.tsx` | 国名・国旗の四択の汎用UI |
-| `src/features/quiz/name-choices.ts`, `flag-choices.ts` | 題型別の正解・誤答候補生成 |
+| `src/features/quiz/name-choices.ts`, `flag-choices.ts` | 題型別の正解・誤答候補生成。出題地域は固定し、四択の誤答候補を地域内／全世界から選択可能 |
 | `src/game-engine/types.ts`, `engine.ts` | Reactに依存しないセッション型と純粋関数 |
 | `src/country-data` | 全197件の国ID、名称・別名・読み、所属地域、国旗/ジオメトリID |
 | `src/map`, `src/flags` | 2D SVG地図（Natural Earth）とローカル国旗SVG |

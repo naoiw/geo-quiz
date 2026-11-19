@@ -1,6 +1,8 @@
 import type { Country } from "../../country-data";
 import type { Locale } from "../../i18n/messages";
 
+export type NameChoiceScope = "region" | "world";
+
 export interface CountryNameChoice {
   countryId: string;
   label: string;
@@ -21,23 +23,28 @@ function shuffle<T>(items: readonly T[], random: () => number): T[] {
 
 /**
  * Shareable by map-to-name and flag-to-name (#18).
- * All choices use the current region pool and have unique displayed names.
+ * Questions always come from the selected region. Distractors may use that region
+ * or the worldwide catalogue, and must have unique IDs and displayed names.
  */
 export function createCountryNameChoices(
   correctCountryId: string,
   pool: readonly Country[],
   locale: Locale,
   random: () => number = Math.random,
+  distractorPool: readonly Country[] = pool,
 ): CountryNameChoice[] {
   const correct = pool.find((country) => country.id === correctCountryId);
   if (!correct) throw new Error("Correct country is missing from the question pool.");
 
-  const labels = new Set([correct.names[locale].normalize("NFKC")]);
+  const normalize = (label: string) => label.normalize("NFKC").trim().toLocaleLowerCase(locale);
+  const labels = new Set([normalize(correct.names[locale])]);
+  const ids = new Set([correctCountryId]);
   const candidates: CountryNameChoice[] = [];
-  for (const country of pool) {
+  for (const country of distractorPool) {
     const label = country.names[locale];
-    const normalized = label.normalize("NFKC");
-    if (country.id !== correctCountryId && !labels.has(normalized)) {
+    const normalized = normalize(label);
+    if (!ids.has(country.id) && !labels.has(normalized)) {
+      ids.add(country.id);
       labels.add(normalized);
       candidates.push({ countryId: country.id, label });
     }

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { findCountry, getCountryName, regions } from "../../country-data";
+import { countries, findCountry, getCountryName, regions } from "../../country-data";
 import { QuizRuleFields } from "./QuizRuleFields";
 import { useQuizSession } from "./useQuizSession";
 import type { AnswerFormat, SessionRule } from "../../game-engine/types";
@@ -8,7 +8,7 @@ import { quizText, type QuizTextKey } from "../../i18n/quizMessages";
 import { QuizFeedback, QuizProgress, QuizResultSummary } from "./QuizStatus";
 import { WorldMap } from "../../map/WorldMap";
 import { CountryFlag } from "../../flags/CountryFlag";
-import { createCountryNameChoices } from "./name-choices";
+import { createCountryNameChoices, type NameChoiceScope } from "./name-choices";
 import { CountryChoiceGrid } from "./CountryChoiceGrid";
 import { RegionSelector, countRegionCountries, type RegionSelection } from "./RegionSelector";
 import "./NameQuiz.css";
@@ -24,6 +24,7 @@ export function NameQuiz({ locale, kind }: Props) {
   const qt = (key: QuizTextKey) => quizText(locale, key);
   const isFlag = kind === "flag-to-name";
   const [answerFormat, setAnswerFormat] = useState<NameAnswerFormat>("text");
+  const [nameChoiceScope, setNameChoiceScope] = useState<NameChoiceScope>("region");
   const [sessionRule, setSessionRule] = useState<SessionRule>("ten-untimed");
   const [regionId, setRegionId] = useState<RegionSelection>("world");
   const [durationSeconds, setDurationSeconds] = useState<number>(120);
@@ -51,8 +52,9 @@ export function NameQuiz({ locale, kind }: Props) {
     }
     return createCountryNameChoices(
       session.currentQuestion.countryId, session.countryPool, locale,
+      Math.random, nameChoiceScope === "region" ? session.countryPool : countries,
     );
-  }, [question?.number, question?.countryId, session?.countryPool, session?.configuration.answerFormat, locale]);
+  }, [question?.number, question?.countryId, session?.countryPool, session?.configuration.answerFormat, locale, nameChoiceScope]);
 
   useEffect(() => {
     if (session?.status === "asking" && session.configuration.answerFormat === "text") {
@@ -128,6 +130,16 @@ export function NameQuiz({ locale, kind }: Props) {
               sessionRule={sessionRule}
               minimumCountries={answerFormat === "multiple-choice" ? 4 : 1}
             />
+            {answerFormat === "multiple-choice" && (
+              <label className="quiz__label">
+                {qt("nameDistractorScope")}
+                <select value={nameChoiceScope} onChange={(event) =>
+                  setNameChoiceScope(event.target.value as NameChoiceScope)}>
+                  <option value="region">{qt("withinRegion")}</option>
+                  <option value="world">{qt("worldwide")}</option>
+                </select>
+              </label>
+            )}
             <QuizRuleFields
               locale={locale}
               sessionRule={sessionRule}

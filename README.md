@@ -26,7 +26,7 @@
 ```bash
 git clone https://github.com/naoiw/geo-quiz.git
 cd geo-quiz
-npm install
+npm ci
 npm run dev
 ```
 
@@ -40,7 +40,7 @@ npm run build
 npm run preview
 ```
 
-`npm run dev` / `npm test` / `npm run build` の前処理で `scripts/sync-flags.mjs` が必要な国旗SVGをローカルに配置します。アプリ利用時の国旗CDN依存はありません。現時点ではlockfile未導入のため `npm install` を使います。
+`npm run dev` / `npm test` / `npm run build` の前処理で `scripts/sync-flags.mjs` が必要な国旗SVGをローカルに配置します。アプリ利用時の国旗CDN依存はありません。`package-lock.json` で依存バージョンを固定し、CI・ローカルとも `npm ci` で再現可能なインストールを行います。依存関係を更新する場合は `npm install` でlockfileを更新してください。
 
 ## アーキテクチャ
 

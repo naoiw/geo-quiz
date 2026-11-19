@@ -7,7 +7,7 @@ Node.js 26推奨。利用可能バージョンは `package.json` の `engines.no
 ```bash
 git clone https://github.com/naoiw/geo-quiz.git
 cd geo-quiz
-npm install
+npm ci
 npm run dev
 ```
 
@@ -22,7 +22,7 @@ npm run build:pages:main
 npm run preview
 ```
 
-開発・テスト・ビルド時には `scripts/sync-flags.mjs` が `flag-icons` のSVGを197件抽出します。`public/flags` は生成物です。CDNを使わずGitHub Pagesで配信します。lockfileは現時点で未導入なので `npm install` を使用。導入後にCIを `npm ci` へ切替予定です。
+開発・テスト・ビルド時には `scripts/sync-flags.mjs` が `flag-icons` のSVGを197件抽出します。`public/flags` は生成物です。CDNを使わずGitHub Pagesで配信します。依存関係は `package-lock.json` に固定し、ローカルもCIも `npm ci` で同じ解決結果を使用します。依存の追加・更新時は `npm install` でlockfileを再生成し、`package.json` とセットでコミットします。
 
 ## ブランチ・PR
 

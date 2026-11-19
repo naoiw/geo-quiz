@@ -181,7 +181,7 @@ export function WorldMap({
     if (!pointers.current.size) gesture.current.candidate = null;
   };
 
-  const onCountryKey = (event: KeyboardEvent<SVGPathElement | SVGCircleElement>, id: string) => {
+  const onCountryKey = (event: KeyboardEvent<SVGPathElement>, id: string) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       onCountrySelect?.(id);
@@ -249,24 +249,19 @@ export function WorldMap({
               );
             })}
           </g>
-          <g className="world-map__microstates">
+          {/* Keep microstates tappable without drawing circles over the map. */}
+          <g className="world-map__microstate-hit-areas" aria-hidden="true">
             {mapData.features.filter((feature) => feature.tiny && feature.id && countriesById.has(feature.id)).map((feature) => {
               const id = feature.id as string;
-              const country = countriesById.get(id);
-              const selected = id === selectedCountryId;
-              const highlighted = id === highlightedCountryId;
               return (
                 <circle
                   key={id}
                   cx={feature.center[0]}
                   cy={feature.center[1]}
                   r={2.8 / zoomFactor}
-                  className={"world-map__pin" + (highlighted ? " world-map__pin--highlighted" : selected ? " world-map__pin--selected" : "")}
+                  className="world-map__microstate-hit-area"
                   data-country-id={id}
-                  role="button"
-                  tabIndex={0}
-                  aria-label={country?.names[locale]}
-                  onKeyDown={(event) => onCountryKey(event, id)}
+                  pointerEvents="all"
                 />
               );
             })}

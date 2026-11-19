@@ -155,6 +155,7 @@ export function NameToMapQuiz({ locale }: { locale: Locale }) {
             rule={session.configuration.sessionRule}
             score={session.score}
             remainingMs={remainingMs}
+            reviewed={session.status === "review"}
           />
           <p className="quiz__prompt">
             {qt("mapPromptStart")}<strong>

@@ -25,7 +25,7 @@ export function App() {
   const [activeMode, setActiveMode] = useState<QuizKind | null>(readModeFromHash);
   const quizPanelRef = useRef<HTMLDivElement>(null);
   const modeHeadingRef = useRef<HTMLHeadingElement>(null);
-  const navigationStarted = useRef(false);
+  const navigationStarted = useRef(readModeFromHash() !== null);
 
   useEffect(() => {
     const syncRoute = () => {
@@ -58,6 +58,7 @@ export function App() {
   const [targetId, setTargetId] = useState("JP");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [previewFlagId, setPreviewFlagId] = useState("JP");
+  const [showPreviews, setShowPreviews] = useState(false);
   const target = findCountry(targetId);
   const selection = selectedId ? findCountry(selectedId) : undefined;
   const previewFlagCountry = findCountry(previewFlagId);
@@ -171,9 +172,12 @@ export function App() {
           </section>
         )}
 
-        <details className="reference-demos">
+        <details
+          className="reference-demos"
+          onToggle={(event) => setShowPreviews(event.currentTarget.open)}
+        >
           <summary>{t("referenceDemos")}</summary>
-          <div className="reference-demos__content">
+          {showPreviews && <div className="reference-demos__content">
             <section className="map-demo" aria-labelledby="map-title">
               <div className="section-heading">
                 <div>
@@ -257,7 +261,7 @@ export function App() {
               </div>
               <p className="flag-demo__notice">{t("flagNotice")}</p>
             </section>
-          </div>
+          </div>}
         </details>
 
         <aside className="next-step">

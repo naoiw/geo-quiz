@@ -28,6 +28,8 @@ test("mode cards appear before the active quiz; only the selected mode mounts", 
   assert.ok(app.includes("activeMode === \"name-to-map\""));
   assert.ok(app.includes("activeMode === \"name-to-flag\""));
   assert.ok(app.includes("onPlay={openMode}"));
+  assert.ok(app.includes("setShowPreviews(event.currentTarget.open)"));
+  assert.ok(app.includes('{showPreviews && <div className="reference-demos__content">'));
   assert.ok(modeCard.includes('href={"#" + mode.id + "-quiz"}'));
   assert.ok(modeCard.includes("event.preventDefault()"));
   assert.ok(app.includes("readModeFromHash()"));
@@ -58,7 +60,8 @@ test("all four quiz modes share progress, keyboard-aware feedback and result pre
     assert.ok(screen.includes("getResult("), "result engine disconnected");
   }
   assert.ok(status.includes('role="progressbar"'));
-  assert.ok(status.includes("aria-valuenow={number - 1}"));
+  assert.ok(status.includes("aria-valuenow={completed}"));
+  assert.ok(status.includes("reviewed ? 1 : 0"));
   assert.ok(status.includes('role="status" aria-live="polite"'));
   assert.ok(status.includes("nextRef.current?.focus()"));
   assert.ok(status.includes("titleRef.current?.focus()"));

@@ -215,6 +215,7 @@ export function NameQuiz({ locale, kind }: Props) {
             rule={session.configuration.sessionRule}
             score={session.score}
             remainingMs={timeLeft}
+            reviewed={session.status === "review"}
           />
           <p className="quiz__prompt">
             {isFlag

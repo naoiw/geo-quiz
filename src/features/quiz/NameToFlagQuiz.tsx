@@ -163,6 +163,7 @@ export function NameToFlagQuiz({ locale }: { locale: Locale }) {
             rule={session.configuration.sessionRule}
             score={session.score}
             remainingMs={remainingMs}
+            reviewed={session.status === "review"}
           />
           <p className="quiz__prompt">
             {qt("flagPromptStart")}<strong>

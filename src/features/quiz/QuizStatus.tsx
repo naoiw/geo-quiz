@@ -17,12 +17,14 @@ interface ProgressProps {
   rule: SessionRule;
   score: number;
   remainingMs: number | null;
+  reviewed: boolean;
 }
 
-export function QuizProgress({ locale, number, limit, rule, score, remainingMs }: ProgressProps) {
+export function QuizProgress({ locale, number, limit, rule, score, remainingMs, reviewed }: ProgressProps) {
   const isJa = locale === "ja";
   const timed = rule === "time-attack";
-  const progress = timed ? null : Math.min(100, Math.round(100 * (number - 1) / limit));
+  const completed = number - 1 + (reviewed ? 1 : 0);
+  const progress = timed ? null : Math.min(100, Math.round(100 * completed / limit));
   return (
     <div className="quiz__progress">
       <div className="quiz__stats" aria-label={quizText(locale, "gameProgress")}>
@@ -45,7 +47,7 @@ export function QuizProgress({ locale, number, limit, rule, score, remainingMs }
           role="progressbar"
           aria-valuemin={0}
           aria-valuemax={limit}
-          aria-valuenow={number - 1}
+          aria-valuenow={completed}
           aria-label={quizText(locale, "gameProgress")}
         >
           <div className="quiz__progress-fill" style={{ width: progress + "%" }} />

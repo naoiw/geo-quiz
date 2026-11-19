@@ -31,7 +31,17 @@ export function getEligibleCountries(
   catalogue: readonly Country[],
   regionId: GameConfiguration["regionId"],
 ): Country[] {
+  // Membership is inclusive: transcontinental countries can belong to two regions,
+  // but each country appears only once in a given region's question pool.
   return catalogue.filter((country) => regionId === null || country.regionIds.includes(regionId));
+}
+
+/** Fixed-size modes shrink gracefully when a future region contains fewer than 10 countries. */
+export function getQuestionLimit(countryCount: number, rule: GameConfiguration["sessionRule"]): number {
+  if (!Number.isSafeInteger(countryCount) || countryCount < 0) {
+    throw new Error("Country count must be a non-negative integer.");
+  }
+  return rule === "time-attack" ? 0 : Math.min(QUESTIONS_PER_ROUND, countryCount);
 }
 
 /**
@@ -151,9 +161,15 @@ export function startSession(
   const eligible = getEligibleCountries(catalogue, configuration.regionId);
   const ids = eligible.map((country) => country.id);
   if (new Set(ids).size !== ids.length) throw new Error("Duplicate country IDs in catalogue.");
-  if (ids.length < (configuration.sessionRule === "time-attack" ? 1 : QUESTIONS_PER_ROUND)) {
-    throw new Error("Not enough countries in the selected region for this session.");
+  if (ids.length < 1) {
+    throw new Error("The selected region has no countries for this session.");
   }
+  if (configuration.answerFormat === "multiple-choice" && ids.length < 4) {
+    throw new Error("Multiple-choice sessions require at least four countries.");
+  }
+  // Flag answers may use worldwide distractors, so the UI validates regional
+  // flag-choice availability separately depending on its distractor scope.
+  const questionLimit = getQuestionLimit(ids.length, configuration.sessionRule);
   const shuffled = shuffle(ids, options.random ?? Math.random);
   const deadlineMs = timed ? options.nowMs + (options.durationMs ?? 0) : null;
   if (deadlineMs !== null && !Number.isSafeInteger(deadlineMs)) {
@@ -162,6 +178,7 @@ export function startSession(
   return {
     configuration: { ...configuration },
     countryPool: [...eligible],
+    questionLimit,
     eligibleCountryIds: ids,
     remainingCountryIds: shuffled.slice(1),
     currentQuestion: {
@@ -190,7 +207,7 @@ export function tickSession(session: GameSession, nowMs: number): GameSession {
   if (session.status === "finished" || session.deadlineMs === null || nowMs < session.deadlineMs) {
     return session;
   }
-  if (session.configuration.sessionRule === "ten-timed" && session.history.length === QUESTIONS_PER_ROUND) {
+  if (session.configuration.sessionRule === "ten-timed" && session.history.length === session.questionLimit) {
     return finish(session, "completed", session.history.at(-1)?.answeredAtMs ?? nowMs);
   }
   return finish(session, "timeout", session.deadlineMs);
@@ -241,7 +258,7 @@ export function advanceSession(
   session: GameSession, nowMs: number, random: () => number = Math.random,
 ): GameSession {
   if (session.status !== "review") throw new Error("Advance is only valid after reviewing an answer.");
-  if (session.configuration.sessionRule !== "time-attack" && session.history.length >= QUESTIONS_PER_ROUND) {
+  if (session.configuration.sessionRule !== "time-attack" && session.history.length >= session.questionLimit) {
     checkTime(nowMs, "nowMs");
     if (nowMs < session.startedAtMs) throw new Error("Time cannot precede session start.");
     return finish(session, "completed", nowMs);

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { countries, findCountry, getCountryName, regions } from "../../country-data";
-import type { RegionId } from "../../country-data";
+import { countries, findCountry, getCountryName } from "../../country-data";
 import {
   advanceSession, getQuestionCountry, getRemainingMs, getResult,
   skipQuestion, startSession, submitAnswer, tickSession,
@@ -8,10 +7,10 @@ import {
 import type { GameSession, SessionRule } from "../../game-engine/types";
 import type { Locale } from "../../i18n/messages";
 import { WorldMap } from "../../map/WorldMap";
+import { RegionSelector, countRegionCountries, type RegionSelection } from "./RegionSelector";
 import "./NameQuiz.css";
 import "./NameToMapQuiz.css";
 
-type RegionSelection = RegionId | "world";
 const durations = [60, 120, 180, 300] as const;
 
 function formatTime(milliseconds: number): string {
@@ -26,6 +25,7 @@ export function NameToMapQuiz({ locale }: { locale: Locale }) {
   const [regionId, setRegionId] = useState<RegionSelection>("world");
   const [sessionRule, setSessionRule] = useState<SessionRule>("ten-untimed");
   const [durationSeconds, setDurationSeconds] = useState(120);
+  const insufficientCountries = countRegionCountries(regionId) < 1;
   const [session, setSession] = useState<GameSession | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [clockMs, setClockMs] = useState(0);
@@ -52,6 +52,7 @@ export function NameToMapQuiz({ locale }: { locale: Locale }) {
     ? getRemainingMs(session, Math.max(clockMs, session.startedAtMs)) : null;
 
   const start = () => {
+    if (insufficientCountries) return;
     const now = Date.now();
     const configuration = {
       quizKind: "name-to-map",
@@ -113,21 +114,12 @@ export function NameToMapQuiz({ locale }: { locale: Locale }) {
       {!session && (
         <div className="quiz__setup">
           <div className="quiz__settings">
-            <label className="quiz__label">
-              {isJa ? "出題地域" : "Question region"}
-              <select value={regionId} onChange={(event) =>
-                setRegionId(event.target.value as RegionSelection)}>
-                <option value="world">{isJa ? "全世界（197）" : "World (197)"}</option>
-                {regions.map((region) => {
-                  const count = countries.filter((country) => country.regionIds.includes(region.id)).length;
-                  return (
-                    <option key={region.id} value={region.id}>
-                      {region.names[locale] + " (" + count + ")"}
-                    </option>
-                  );
-                })}
-              </select>
-            </label>
+            <RegionSelector
+              locale={locale}
+              value={regionId}
+              onChange={setRegionId}
+              sessionRule={sessionRule}
+            />
             <label className="quiz__label">
               {isJa ? "ゲームルール" : "Game rule"}
               <select value={sessionRule} onChange={(event) =>
@@ -154,7 +146,8 @@ export function NameToMapQuiz({ locale }: { locale: Locale }) {
           <p className="quiz__note">{isJa
             ? "スマホの誤タップを防ぐため、国を選んでから「回答を確定」を押します。配点は暫定で正解100点、誤答・パス0点です。"
             : "Select a country, then confirm to prevent accidental taps. Provisional scoring: +100 correct, 0 otherwise."}</p>
-          <button type="button" className="quiz__primary" onClick={start}>
+          <button type="button" className="quiz__primary" onClick={start}
+            disabled={insufficientCountries}>
             {isJa ? "クイズを開始" : "Start quiz"}
           </button>
         </div>
@@ -166,8 +159,8 @@ export function NameToMapQuiz({ locale }: { locale: Locale }) {
             <span>{session.configuration.sessionRule === "time-attack"
               ? (isJa ? "第" + session.currentQuestion?.number + "問" :
                 "Question " + session.currentQuestion?.number)
-              : (isJa ? "第" + session.currentQuestion?.number + "問 / 10問" :
-                "Question " + session.currentQuestion?.number + " / 10")}</span>
+              : (isJa ? "第" + session.currentQuestion?.number + "問 / " + session.questionLimit + "問" :
+                "Question " + session.currentQuestion?.number + " / " + session.questionLimit)}</span>
             <span>{isJa ? "スコア" : "Score"}: {session.score}</span>
             {remainingMs !== null && (
               <span role="timer" aria-label={isJa ? "残り時間" : "Remaining time"}>
@@ -262,7 +255,8 @@ export function NameToMapQuiz({ locale }: { locale: Locale }) {
           <p className="quiz__note">
             {result.finishReason === "timeout"
               ? (isJa ? "時間切れです。" : "Time is up.")
-              : (isJa ? "10問終了しました。" : "All 10 questions completed.")}
+              : (isJa ? result.answered + "問終了しました。" :
+                "All " + result.answered + " questions completed.")}
           </p>
           <ol className="quiz__history">
             {result.history.map((record) => {

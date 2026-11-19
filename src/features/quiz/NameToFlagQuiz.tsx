@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { countries, findCountry, getCountryName, regions } from "../../country-data";
-import type { RegionId } from "../../country-data";
+import { countries, findCountry, getCountryName } from "../../country-data";
 import {
   advanceSession, getQuestionCountry, getRemainingMs, getResult,
   skipQuestion, startSession, submitAnswer, tickSession,
@@ -9,11 +8,11 @@ import type { GameSession, SessionRule } from "../../game-engine/types";
 import { CountryFlag } from "../../flags/CountryFlag";
 import type { Locale } from "../../i18n/messages";
 import { CountryChoiceGrid } from "./CountryChoiceGrid";
+import { RegionSelector, countRegionCountries, type RegionSelection } from "./RegionSelector";
 import { createFlagChoices, type FlagChoiceScope } from "./flag-choices";
 import "./NameQuiz.css";
 import "./NameToFlagQuiz.css";
 
-type RegionSelection = RegionId | "world";
 const durations = [60, 120, 180, 300] as const;
 
 function formatTime(milliseconds: number): string {
@@ -29,6 +28,7 @@ export function NameToFlagQuiz({ locale }: { locale: Locale }) {
   const [scope, setScope] = useState<FlagChoiceScope>("region");
   const [sessionRule, setSessionRule] = useState<SessionRule>("ten-untimed");
   const [durationSeconds, setDurationSeconds] = useState(120);
+  const insufficientCountries = countRegionCountries(regionId) < (scope === "region" ? 4 : 1);
   const [session, setSession] = useState<GameSession | null>(null);
   const [clockMs, setClockMs] = useState(0);
 
@@ -63,6 +63,7 @@ export function NameToFlagQuiz({ locale }: { locale: Locale }) {
     : null;
 
   const start = () => {
+    if (insufficientCountries) return;
     const now = Date.now();
     setSession(startSession({
       quizKind: "name-to-flag",
@@ -113,21 +114,13 @@ export function NameToFlagQuiz({ locale }: { locale: Locale }) {
       {!session && (
         <div className="quiz__setup">
           <div className="quiz__settings">
-            <label className="quiz__label">
-              {isJa ? "出題地域" : "Question region"}
-              <select value={regionId} onChange={(event) =>
-                setRegionId(event.target.value as RegionSelection)}>
-                <option value="world">{isJa ? "全世界（197）" : "World (197)"}</option>
-                {regions.map((region) => {
-                  const count = countries.filter((country) => country.regionIds.includes(region.id)).length;
-                  return (
-                    <option key={region.id} value={region.id}>
-                      {region.names[locale] + " (" + count + ")"}
-                    </option>
-                  );
-                })}
-              </select>
-            </label>
+            <RegionSelector
+              locale={locale}
+              value={regionId}
+              onChange={setRegionId}
+              sessionRule={sessionRule}
+              minimumCountries={scope === "region" ? 4 : 1}
+            />
             <label className="quiz__label">
               {isJa ? "誤答国旗の範囲" : "Other flag choices"}
               <select value={scope} onChange={(event) => setScope(event.target.value as FlagChoiceScope)}>
@@ -161,7 +154,8 @@ export function NameToFlagQuiz({ locale }: { locale: Locale }) {
           <p className="quiz__note">{isJa
             ? "国旗をタップすると回答を確定します。配点は暫定で正答100点、誤答・パス0点です。"
             : "Tap a flag to submit. Provisional scoring: +100 correct, 0 for incorrect or skipped."}</p>
-          <button type="button" className="quiz__primary" onClick={start}>
+          <button type="button" className="quiz__primary" onClick={start}
+            disabled={insufficientCountries}>
             {isJa ? "クイズを開始" : "Start quiz"}
           </button>
         </div>
@@ -172,8 +166,8 @@ export function NameToFlagQuiz({ locale }: { locale: Locale }) {
           <div className="quiz__stats" aria-label={isJa ? "ゲームの進行状況" : "Game progress"}>
             <span>{session.configuration.sessionRule === "time-attack"
               ? (isJa ? "第" + question?.number + "問" : "Question " + question?.number)
-              : (isJa ? "第" + question?.number + "問 / 10問" :
-                "Question " + question?.number + " / 10")}</span>
+              : (isJa ? "第" + question?.number + "問 / " + session.questionLimit + "問" :
+                "Question " + question?.number + " / " + session.questionLimit)}</span>
             <span>{isJa ? "スコア" : "Score"}: {session.score}</span>
             {remainingMs !== null && (
               <span role="timer" aria-label={isJa ? "残り時間" : "Remaining time"}>
@@ -257,7 +251,8 @@ export function NameToFlagQuiz({ locale }: { locale: Locale }) {
           <p className="quiz__note">
             {result.finishReason === "timeout"
               ? (isJa ? "時間切れです。" : "Time is up.")
-              : (isJa ? "10問終了しました。" : "All 10 questions completed.")}
+              : (isJa ? result.answered + "問終了しました。" :
+                "All " + result.answered + " questions completed.")}
           </p>
           <ol className="quiz__history">
             {result.history.map((record) => {

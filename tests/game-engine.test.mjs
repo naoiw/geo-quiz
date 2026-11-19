@@ -66,7 +66,8 @@ test("formats, scoring, skipped questions and results are validated independentl
   assert.deepEqual(engine.getAnswerFormats("map-to-name"), ["text", "multiple-choice"]);
   assert.deepEqual(engine.getAnswerFormats("name-to-flag"), ["flag"]);
   assert.throws(() => engine.startSession(config("name-to-flag", "text"), countries, { nowMs: 0 }), /Unsupported/);
-  assert.throws(() => engine.startSession(config(), countries.slice(0, 9), { nowMs: 0 }), /Not enough/);
+  assert.throws(() => engine.startSession(config(), [], { nowMs: 0 }), /no countries/);
+  assert.throws(() => engine.startSession(config("flag-to-name", "multiple-choice"), countries.slice(0, 3), { nowMs: 0 }), /at least four/);
   assert.throws(() => engine.startSession(config(), [countries[0], countries[0], ...countries.slice(1)], { nowMs: 0 }), /Duplicate/);
   assert.throws(() => engine.startSession(config(), countries, { nowMs: 0, random: () => 1 }), /Random/);
   assert.throws(() => engine.startSession(config(), countries, { nowMs: 0, scoring: { correct: 0.5, incorrect: 0, skipped: 0 } }), /Invalid scoring/);
@@ -99,10 +100,10 @@ test("formats, scoring, skipped questions and results are validated independentl
 
 test("regional filtering and localized text answers use the same country pool", () => {
   const asia = engine.getEligibleCountries(countries, "asia");
-  assert.equal(asia.length, 48);
+  assert.equal(asia.length, 49);
   assert.ok(asia.every((c) => c.regionIds.includes("asia")));
   const session = engine.startSession(config("flag-to-name", "text", "ten-untimed", "asia"), countries, { nowMs: 0, random: () => 0.5 });
-  assert.equal(session.eligibleCountryIds.length, 48);
+  assert.equal(session.eligibleCountryIds.length, 49);
   assert.ok(asia.some((c) => c.id === session.currentQuestion.countryId));
 
   const japan = countries.find((c) => c.id === "JP");

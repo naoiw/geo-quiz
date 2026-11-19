@@ -345,3 +345,18 @@
     padding: 14px;
   }
 }
+
+/* Shared region selector also shows the available question count. */
+.quiz__region-summary {
+  font-size: 12px;
+  font-weight: 500;
+  color: #5b6f89;
+  line-height: 1.5;
+}
+
+.quiz__region-warning {
+  font-size: 12px;
+  font-weight: 700;
+  color: #9b3f34;
+  line-height: 1.5;
+}

@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { countries, findCountry, getCountryName, regions } from "../../country-data";
-import type { RegionId } from "../../country-data";
 import {
   advanceSession, getQuestionCountry, getRemainingMs, getResult,
   skipQuestion, startSession, submitAnswer, tickSession,
@@ -11,10 +10,10 @@ import { WorldMap } from "../../map/WorldMap";
 import { CountryFlag } from "../../flags/CountryFlag";
 import { createCountryNameChoices } from "./name-choices";
 import { CountryChoiceGrid } from "./CountryChoiceGrid";
+import { RegionSelector, countRegionCountries, type RegionSelection } from "./RegionSelector";
 import "./NameQuiz.css";
 
 type NameAnswerFormat = Extract<AnswerFormat, "text" | "multiple-choice">;
-type RegionSelection = RegionId | "world";
 
 interface Props {
   locale: Locale;
@@ -36,6 +35,8 @@ export function NameQuiz({ locale, kind }: Props) {
   const [sessionRule, setSessionRule] = useState<SessionRule>("ten-untimed");
   const [regionId, setRegionId] = useState<RegionSelection>("world");
   const [durationSeconds, setDurationSeconds] = useState<number>(120);
+  const insufficientCountries = countRegionCountries(regionId) <
+    (answerFormat === "multiple-choice" ? 4 : 1);
   const [session, setSession] = useState<GameSession | null>(null);
   const [answerText, setAnswerText] = useState("");
   const [clockMs, setClockMs] = useState(0);
@@ -85,6 +86,7 @@ export function NameQuiz({ locale, kind }: Props) {
     : null;
 
   const start = () => {
+    if (insufficientCountries) return;
     const now = Date.now();
     setSession(startSession({
       quizKind: kind,
@@ -170,21 +172,13 @@ export function NameQuiz({ locale, kind }: Props) {
                 <option value="multiple-choice">{isJa ? "国名を四択" : "Four choices"}</option>
               </select>
             </label>
-            <label className="quiz__label">
-              {isJa ? "出題地域" : "Region"}
-              <select value={regionId} onChange={(event) =>
-                setRegionId(event.target.value as RegionSelection)}>
-                <option value="world">{isJa ? "全世界（197）" : "World (197)"}</option>
-                {regions.map((region) => {
-                  const count = countries.filter((item) => item.regionIds.includes(region.id)).length;
-                  return (
-                    <option key={region.id} value={region.id}>
-                      {region.names[locale] + " (" + count + ")"}
-                    </option>
-                  );
-                })}
-              </select>
-            </label>
+            <RegionSelector
+              locale={locale}
+              value={regionId}
+              onChange={setRegionId}
+              sessionRule={sessionRule}
+              minimumCountries={answerFormat === "multiple-choice" ? 4 : 1}
+            />
             <label className="quiz__label">
               {isJa ? "ゲームルール" : "Game rule"}
               <select value={sessionRule} onChange={(event) =>
@@ -211,7 +205,8 @@ export function NameQuiz({ locale, kind }: Props) {
           <p className="quiz__note">{isJa
             ? "配点は暫定で正解100点、誤答・パス0点です。制限時間も今後調整します。"
             : "Scoring is provisional: +100 for correct, 0 otherwise. Time limits may change."}</p>
-          <button type="button" className="quiz__primary" onClick={start}>
+          <button type="button" className="quiz__primary" onClick={start}
+            disabled={insufficientCountries}>
             {isJa ? "クイズを開始" : "Start quiz"}
           </button>
         </div>
@@ -222,7 +217,8 @@ export function NameQuiz({ locale, kind }: Props) {
           <div className="quiz__stats" aria-label={isJa ? "ゲームの進行状況" : "Game progress"}>
             <span>{session.configuration.sessionRule === "time-attack"
               ? (isJa ? "第" + question?.number + "問" : "Question " + question?.number)
-              : (isJa ? "第" + question?.number + "問 / 10問" : "Question " + question?.number + " / 10")}</span>
+              : (isJa ? "第" + question?.number + "問 / " + session.questionLimit + "問" :
+                "Question " + question?.number + " / " + session.questionLimit)}</span>
             <span>{isJa ? "スコア" : "Score"}: {session.score}</span>
             {timeLeft !== null && (
               <span role="timer" aria-label={isJa ? "残り時間" : "Remaining time"}>
@@ -373,7 +369,8 @@ export function NameQuiz({ locale, kind }: Props) {
           <p className="quiz__note">
             {result.finishReason === "timeout"
               ? (isJa ? "時間切れです。" : "Time is up.")
-              : (isJa ? "10問終了しました。" : "All 10 questions completed.")}
+              : (isJa ? session.questionLimit + "問終了しました。" :
+                "All " + session.questionLimit + " questions completed.")}
           </p>
           <ol className="quiz__history">
             {result.history.map((record) => {

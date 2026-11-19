@@ -115,9 +115,9 @@ test("map quiz only reveals the answer after confirmation, never on question sta
   assert.ok(quiz.includes('answerFormat: "map"'));
   assert.ok(quiz.includes("selectedId") && quiz.includes("onCountrySelect="));
   assert.ok(quiz.includes("disabled={!selectedId}"));
-  assert.ok(quiz.includes("submitAnswer("));
-  assert.ok(quiz.includes("skipQuestion("));
-  assert.ok(quiz.includes("advanceSession(") && quiz.includes("getResult("));
+  assert.ok(quiz.includes('submitRound({ format: "map", countryId: selectedId })'));
+  assert.ok(quiz.includes("skipRound()"));
+  assert.ok(quiz.includes("advanceRound()") && quiz.includes("useQuizSession(locale)"));
   assert.ok(quiz.includes('focusCountryId={review?.correctCountryId ?? null}'));
   assert.ok(quiz.includes('highlightedCountryId={review?.correctCountryId ?? null}'));
   assert.ok(quiz.includes('readOnly={session.status !== "asking"}'));

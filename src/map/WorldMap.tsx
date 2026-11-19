@@ -6,9 +6,13 @@ import { quizText, type QuizTextKey } from "../i18n/quizMessages";
 import mapData from "./world-50m.json";
 import { needsLocationPin } from "./location-pin";
 import { SmallCountryMarker } from "./SmallCountryMarker";
+import {
+  constrainMapView, nearestWorldOffset, visibleWorldOffsets, wrappedPointX,
+  type MapView,
+} from "./world-wrap";
 import "./WorldMap.css";
 
-type View = { x: number; y: number; width: number; height: number };
+type View = MapView;
 type Point = { x: number; y: number };
 type MapFeature = (typeof mapData.features)[number];
 
@@ -28,17 +32,6 @@ const REGION_VIEWS: Readonly<Record<RegionId, View>> = {
 const featureById = new Map(
   mapData.features.filter((feature) => feature.id).map((feature) => [feature.id, feature]),
 );
-
-function constrain(view: View, minimumWidth = MIN_WIDTH): View {
-  const width = Math.max(minimumWidth, Math.min(WORLD.width, view.width));
-  const height = width / 2;
-  return {
-    x: Math.max(0, Math.min(WORLD.width - width, view.x)),
-    y: Math.max(0, Math.min(WORLD.height - height, view.y)),
-    width,
-    height,
-  };
-}
 
 function pointerDistance(a: Point, b: Point): number {
   return Math.hypot(a.x - b.x, a.y - b.y);
@@ -87,6 +80,7 @@ export function WorldMap({
   const [view, setView] = useState<View>(() => initialRegionId ? REGION_VIEWS[initialRegionId] : WORLD);
   const [mapArea, setMapArea] = useState<RegionId | "world">(initialRegionId ?? "world");
   const zoomFactor = WORLD.width / view.width;
+  const visibleTiles = visibleWorldOffsets(view);
   const minimumWidth = readOnly || showRegionNavigation ? MIN_QUIZ_WIDTH : MIN_WIDTH;
 
   const zoomAt = useCallback((factor: number, clientX?: number, clientY?: number) => {
@@ -96,7 +90,7 @@ export function WorldMap({
       const fy = rect && clientY !== undefined ? (clientY - rect.top) / rect.height : 0.5;
       const width = Math.max(minimumWidth, Math.min(WORLD.width, current.width / factor));
       const height = width / 2;
-      return constrain({
+      return constrainMapView({
         x: current.x + current.width * fx - width * fx,
         y: current.y + current.height * fy - height * fy,
         width,
@@ -122,7 +116,7 @@ export function WorldMap({
     const spread = Math.max(x1 - x0, (y1 - y0) * 2);
     // Countries spanning the antimeridian (or scattered islands) use their label location.
     const width = spread > 170 ? 60 : Math.max(feature.tiny && readOnly ? 12 : MIN_WIDTH, Math.min(360, spread * 1.6 + 12));
-    setView(constrain({
+    setView(constrainMapView({
       x: feature.center[0] - width / 2,
       y: feature.center[1] - width / 4,
       width,
@@ -170,7 +164,7 @@ export function WorldMap({
       const dx = next.x - previous.x;
       const dy = next.y - previous.y;
       if (!dx && !dy) return;
-      setView((current) => constrain({
+      setView((current) => constrainMapView({
         ...current,
         x: current.x - dx * current.width / rect.width,
         y: current.y - dy * current.height / rect.height,
@@ -189,7 +183,7 @@ export function WorldMap({
         const py = (beforeMid.y - rect.top) / rect.height;
         const qx = (afterMid.x - rect.left) / rect.width;
         const qy = (afterMid.y - rect.top) / rect.height;
-        return constrain({
+        return constrainMapView({
           x: current.x + current.width * px - width * qx,
           y: current.y + current.height * py - height * qy,
           width,
@@ -235,7 +229,7 @@ export function WorldMap({
     const movement = direction[key];
     if (movement) {
       event.preventDefault();
-      setView((current) => constrain({
+      setView((current) => constrainMapView({
         ...current,
         x: current.x + current.width * movement[0] * 0.12,
         y: current.y + current.height * movement[1] * 0.12,
@@ -298,57 +292,79 @@ export function WorldMap({
           onPointerUp={(event) => finishPointer(event)}
           onPointerCancel={(event) => finishPointer(event, true)}
         >
-          <rect x="0" y="0" width="360" height="180" fill="#e7f2fa" />
-          <g stroke="#c9dfe9" strokeWidth="0.22" fill="none" pointerEvents="none">
-            {[30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((x) =>
-              <path key={"meridian-" + x} d={"M" + x + " 0V180"} />,
-            )}
-            {[30, 60, 90, 120, 150].map((y) =>
-              <path key={"parallel-" + y} d={"M0 " + y + "H360"} />,
-            )}
-          </g>
-          <g className="world-map__land">
-            {mapData.features.map((feature, index) => {
-              const country = feature.id ? countriesById.get(feature.id) : null;
-              const highlighted = !!country && country.id === highlightedCountryId;
-              const selected = !!country && country.id === selectedCountryId;
-              const state = !country ? "inactive" : highlighted ? "highlighted" : selected ? "selected" : "selectable";
-              return (
-                <path
-                  key={index}
-                  d={feature.d}
-                  fillRule="evenodd"
-                  className={"world-map__country world-map__country--" + state}
-                  vectorEffect="non-scaling-stroke"
-                  data-country-id={country?.id}
-                  data-tiny={feature.tiny ? "true" : undefined}
-                  pointerEvents={country ? "auto" : "none"}
-                  role={!readOnly && country ? "button" : undefined}
-                  tabIndex={!readOnly && country ? 0 : undefined}
-                  aria-label={!readOnly ? country?.names[locale] : undefined}
-                  onKeyDown={!readOnly && country ? (event) => onCountryKey(event, country.id) : undefined}
-                />
-              );
-            })}
-          </g>
-          {/* Keep microstates tappable without drawing circles over the map. */}
-          {!readOnly && <g className="world-map__microstate-hit-areas" aria-hidden="true">
-            {mapData.features.filter((feature) => feature.tiny && feature.id && countriesById.has(feature.id)).map((feature) => {
-              const id = feature.id as string;
-              return (
-                <circle
-                  key={id}
-                  cx={feature.center[0]}
-                  cy={feature.center[1]}
-                  r={2.8 / zoomFactor}
-                  className="world-map__microstate-hit-area"
-                  vectorEffect="non-scaling-stroke"
-                  data-country-id={id}
-                  pointerEvents="all"
-                />
-              );
-            })}
-          </g>}
+          <rect
+            x={view.x}
+            y={view.y}
+            width={view.width}
+            height={view.height}
+            fill="#e7f2fa"
+            pointerEvents="none"
+          />
+          {/* Repeat only the longitude tiles visible in the viewport.
+              Every copy preserves the original shared country ID, so selection
+              works equally on either side of the antimeridian. */}
+          {visibleTiles.map((offset) => (
+            <g key={offset} className="world-map__tile" transform={`translate(${offset} 0)`}>
+              <g stroke="#c9dfe9" strokeWidth="0.22" fill="none" pointerEvents="none">
+                {[30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((x) =>
+                  <path key={"meridian-" + x} d={"M" + x + " 0V180"} />,
+                )}
+                {[30, 60, 90, 120, 150].map((y) =>
+                  <path key={"parallel-" + y} d={"M0 " + y + "H360"} />,
+                )}
+              </g>
+              <g className="world-map__land">
+                {mapData.features.map((feature, index) => {
+                  const country = feature.id ? countriesById.get(feature.id) : null;
+                  const highlighted = !!country && country.id === highlightedCountryId;
+                  const selected = !!country && country.id === selectedCountryId;
+                  const state = !country ? "inactive" : highlighted ? "highlighted" :
+                    selected ? "selected" : "selectable";
+                  // Each country has only one keyboard-accessible copy, even
+                  // when its polygons are visible in two adjacent tiles.
+                  const keyboardCopy = !!country && !readOnly &&
+                    offset === nearestWorldOffset(feature.center[0], view);
+                  return (
+                    <path
+                      key={index}
+                      d={feature.d}
+                      fillRule="evenodd"
+                      className={"world-map__country world-map__country--" + state}
+                      vectorEffect="non-scaling-stroke"
+                      data-country-id={country?.id}
+                      data-tiny={feature.tiny ? "true" : undefined}
+                      pointerEvents={country ? "auto" : "none"}
+                      role={keyboardCopy ? "button" : undefined}
+                      tabIndex={keyboardCopy ? 0 : undefined}
+                      aria-label={keyboardCopy ? country?.names[locale] : undefined}
+                      onKeyDown={keyboardCopy && country ?
+                        (event) => onCountryKey(event, country.id) : undefined}
+                    />
+                  );
+                })}
+              </g>
+              {/* Invisible microstate touch targets are repeated with the land. */}
+              {!readOnly && <g className="world-map__microstate-hit-areas" aria-hidden="true">
+                {mapData.features.filter((feature) =>
+                  feature.tiny && feature.id && countriesById.has(feature.id)
+                ).map((feature) => {
+                  const id = feature.id as string;
+                  return (
+                    <circle
+                      key={id}
+                      cx={feature.center[0]}
+                      cy={feature.center[1]}
+                      r={2.8 / zoomFactor}
+                      className="world-map__microstate-hit-area"
+                      vectorEffect="non-scaling-stroke"
+                      data-country-id={id}
+                      pointerEvents="all"
+                    />
+                  );
+                })}
+              </g>}
+            </g>
+          ))}
           {/* A high-contrast pin locates very small highlighted/selected countries.
               It never changes the hit target or reveals the answer by country name. */}
           <g className="world-map__location-pins" pointerEvents="none" aria-hidden="true">
@@ -357,7 +373,7 @@ export function WorldMap({
               return feature ? (
                 <SmallCountryMarker
                   key={kind + "-" + countryId}
-                  center={feature.center}
+                  center={[wrappedPointX(feature.center[0], view), feature.center[1]]}
                   viewport={view}
                   kind={kind}
                 />

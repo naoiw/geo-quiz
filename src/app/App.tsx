@@ -125,6 +125,7 @@ export function App() {
       </header>
 
       <main className="page-container">
+        {!activeMode && (
         <section className="hero" aria-labelledby="hero-title">
           <p className="eyebrow">{t("tagline")}</p>
           <h1 id="hero-title">{t("heading")}</h1>
@@ -137,6 +138,7 @@ export function App() {
             </div>
           </div>
         </section>
+        )}
 
         {!activeMode ? (
           <section id="modes" className="mode-selection" aria-labelledby="modes-title">
@@ -172,6 +174,8 @@ export function App() {
           </section>
         )}
 
+        {!activeMode && (
+        <>
         <details
           className="reference-demos"
           onToggle={(event) => setShowPreviews(event.currentTarget.open)}
@@ -268,6 +272,8 @@ export function App() {
           <h2>{t("nextStep")}</h2>
           <p>{t("nextStepBody")}</p>
         </aside>
+        </>
+        )}
       </main>
 
       <footer className="site-footer page-container">

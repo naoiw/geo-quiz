@@ -402,6 +402,11 @@
   .quiz__flag-prompt { min-height: 0; }
   .quiz__flag-prompt .country-flag { width: min(100%, 320px); }
   .quiz__answer-input-row input { min-height: 48px; }
+  /* 16px prevents automatic focus zoom in mobile Safari on form controls. */
+  .quiz__label select, .quiz__answer-input-row input { font-size: 16px; }
+  .quiz__stats { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
+  .quiz__timer { grid-column: 1 / -1; }
+  .quiz__choice { overflow-wrap: anywhere; }
 }
 @media (max-width: 390px) {
   .quiz__result-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }

@@ -1,0 +1,62 @@
+# 2D世界地図（Issue #3）
+
+## 概要
+
+React + SVGのインタラクティブ世界地図。Natural Earthの1:50m admin-0 countriesの国境をオフラインで同梱し、国名・地理コードを国マスタ（#2）の共通国IDに統一しています。
+
+- 国をクリック・タップしてIDを返す
+- 出題向け強調（黄色）と回答選択（青色）を分離
+- ドラッグによる移動、マウスホイール・ピンチ・ボタンによるズーム、リセット、国への移動
+- 日本語・英語の国名ラベル（キーボード操作/アクセシビリティ用）
+- 小国の代替タップターゲット（ピン）と国への拡大
+- 197対象の全レコードに地図ポリゴンの対応を用意。対象外の境界は非選択の背景として表示
+
+## 技術構成
+
+- src/map/world-50m.json: ビルド時に簡略化した地図形状。{id,d,bounds,center,tiny}を持ちます。
+- src/map/WorldMap.tsx: Reactの描画コンポーネント。SVGのviewBoxを変えて拡大縮小します。DOMにCanvasや地図タイルは使いません。
+- src/map/WorldMap.css: 地図スタイルとスマホ調整
+- tests/world-map.test.mjs: 出題197件の形状対応・重複・境界チェック
+
+ビルド時に約10万点のポリゴン頂点を約3.3万点へ簡略化し、国境データは約440KBのテキストとして同梱しています。座標は(x,y)=(経度+180,90-緯度)の正距円筒図法に相当する平面投影です。軽量化許容差は緯度経度で約0.045度です。詳細な国境測量や政治的見解を目的とした地図ではありません。
+
+## データの識別コード
+
+Natural EarthのADM0_A3コードを原則採用し、内部キーへ明示的に変換しています。
+
+| Natural Earth | 国マスタ | 対応 |
+| --- | --- | --- |
+| PSX | PS | パレスチナ |
+| KOS | XK | コソボ |
+| SDS | SS | 南スーダン |
+
+他の対象国はISO alpha-3に概ね対応しますが、Natural EarthのADM0_A3が別値の場合もあります。変換表を修正する場合は197件全数のテストを通してください。対象外の地域も非選択の背景ポリゴンとして描画します。
+
+## ゲームロジックとの接続
+
+WorldMapは以下のpropsで制御します。
+
+- locale: ja / en
+- mode: explore / highlight / answer（answerはターゲットの強調を表示しない）
+- highlightedCountryId: 出題時の強調対象
+- selectedCountryId: 回答・選択状態
+- focusCountryId: 指定国へ視点を移す対象
+- onCountrySelect: 国IDを親へ返す関数
+
+正誤判定・問題生成・得点・時間制限はWorldMapには含めません。Issue #5・#6・#8のゲームエンジンから同じ国IDを受け取って操作します。3D版も同じ入力・出力契約を使う想定です（Issue #19）。
+
+トップ画面は地図操作の検証用に「自由に選ぶ」「国を強調」「地図から回答」の3種類を用意しています。これは本番のクイズ機能の完成を意味しません。
+
+## 出典と利用条件
+
+- Natural Earth Vector [1:50m admin 0 countries](https://github.com/nvkelso/natural-earth-vector/blob/ca96624a56bd078437bca8184e78163e5039ad19/geojson/ne_50m_admin_0_countries.geojson)
+- 使用リビジョン: ca96624a56bd078437bca8184e78163e5039ad19
+- Natural Earthのデータはパブリックドメイン。[利用条件](https://github.com/nvkelso/natural-earth-vector/blob/master/LICENSE.md)
+- 画面上にNatural Earthの名称を記載しています。
+
+## 限界と後続対応
+
+- 小国は形状が数ピクセル以下になるため、選択用のピンとズームで補助しています。密集する小国ではさらにズームする必要があります。
+- 大きな国の離島や日付変更線付近の領域は、中心ラベルを基準としたフォーカスを使います。
+- 2D描画の精度・操作感と、国境の扱いは実機で継続検証します。
+- 3D地球儀はIssue #19、ゲーム統合はIssue #5・#6・#8です。

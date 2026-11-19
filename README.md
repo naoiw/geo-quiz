@@ -13,7 +13,7 @@
 | 国名 | 地図で国を選択 |
 | 国名 | 国旗を四択で選択 |
 
-4題型は、地域選択（全世界／6地域）、10問無制限・時間制限あり・タイムアタック、日英切替、答え合わせと結果表示に対応します。国名→地図はタップで候補を選んだあと確定する方式です。国名→国旗は、同じ出題地域／全世界から誤答国旗を抽出する方式を切り替えられます。制限時間・配点は暫定値です。3D地図は今後追加します。詳細は [Issues](https://github.com/naoiw/geo-quiz/issues) を参照してください。
+4題型は、地域選択（全世界／6地域、越境国の複数地域所属に対応）、10問無制限・時間制限あり・タイムアタック、日英切替、答え合わせと結果表示に対応します。国名→地図はタップで候補を選んだあと確定する方式です。国名→国旗は、同じ出題地域／全世界から誤答国旗を抽出する方式を切り替えられます。制限時間・配点は暫定値です。3D地図は今後追加します。詳細は [Issues](https://github.com/naoiw/geo-quiz/issues) を参照してください。
 
 ## Web版の公開先
 
@@ -72,6 +72,7 @@ Web版が主要4題型・スマホUI・日英対応・データ整合性・テ�
 - src/features/quiz/MapToNameQuiz.tsx / FlagToNameQuiz.tsx: 国名回答題型の軽量エントリ
 - src/features/quiz/NameToMapQuiz.tsx: 2D地図から国を選択して回答するクイズ
 - src/features/quiz/NameToFlagQuiz.tsx: 4枚の国旗から正解を選ぶクイズ
+- src/features/quiz/RegionSelector.tsx: 4題型共通の地域選択、国数・出題数表示と不足時の案内
 - src/features/quiz/CountryChoiceGrid.tsx: 国名／国旗の四択ボタン共通部品
 - src/features/quiz/flag-choices.ts: 国旗四択の候補生成と誤答抽出範囲・アルゴリズム切替
 - src/features/quiz/name-choices.ts: 地図・国旗クイズに再利用できる国名四択候補生成
@@ -94,6 +95,7 @@ Web版が主要4題型・スマホUI・日英対応・データ整合性・テ�
 - [国名 → 地図クイズ](docs/NAME_TO_MAP_QUIZ.md)
 - [国名 → 国旗クイズ](docs/NAME_TO_FLAG_QUIZ.md)
 - [国名テキスト入力・表記ゆれの判定規則](docs/TEXT_ANSWER.md)
+- [地域別プレイ・越境国・出題不足時の扱い](docs/REGION_PLAY.md)
 
 ## ライセンス
 

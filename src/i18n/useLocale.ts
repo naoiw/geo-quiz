@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
-import type { Locale } from "./messages";
-
-const KEY = "geo-quiz:locale";
+import { translate, type Locale } from "./messages";
+import { LOCALE_STORAGE_KEY, resolveLocale } from "./locale";
 
 function getInitialLocale(): Locale {
+  let stored: string | null = null;
   try {
-    const stored = window.localStorage.getItem(KEY);
-    if (stored === "ja" || stored === "en") {
-      return stored;
-    }
+    stored = window.localStorage.getItem(LOCALE_STORAGE_KEY);
   } catch {
-    // Some browsers restrict localStorage.
+    // Storage may be blocked; browsing and language switching must still work.
   }
-  return navigator.language.toLowerCase().startsWith("ja") ? "ja" : "en";
+
+  const preferred = navigator.languages?.length
+    ? navigator.languages
+    : [navigator.language];
+  return resolveLocale(stored, preferred);
 }
 
 export function useLocale() {
@@ -20,10 +21,13 @@ export function useLocale() {
 
   useEffect(() => {
     document.documentElement.lang = locale;
+    document.title = translate(locale, "metaTitle");
+    const description = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+    if (description) description.content = translate(locale, "metaDescription");
     try {
-      window.localStorage.setItem(KEY, locale);
+      window.localStorage.setItem(LOCALE_STORAGE_KEY, locale);
     } catch {
-      // Language switching works without persistence.
+      // Selection remains active even without persistence.
     }
   }, [locale]);
 

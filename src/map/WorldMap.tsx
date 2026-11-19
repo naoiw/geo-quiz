@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { KeyboardEvent, PointerEvent } from "react";
 import { countriesById, regions, type RegionId } from "../country-data";
 import type { Locale } from "../i18n/messages";
+import { quizText, type QuizTextKey } from "../i18n/quizMessages";
 import mapData from "./world-50m.json";
 import "./WorldMap.css";
 
@@ -74,6 +75,7 @@ export function WorldMap({
   showRegionNavigation = false,
   initialRegionId = null,
 }: WorldMapProps) {
+  const qt = (key: QuizTextKey) => quizText(locale, key);
   const svgRef = useRef<SVGSVGElement>(null);
   const pointers = useRef(new Map<number, Point>());
   const gesture = useRef<{ moved: boolean; candidate: string | null; start: Point }>({
@@ -217,28 +219,24 @@ export function WorldMap({
   const focusId = mode === "answer" ? null : focusCountryId ?? selectedCountryId;
   const focusFeature = focusId ? featureById.get(focusId) : null;
   const instructions = readOnly
-    ? locale === "ja"
-      ? "黄色い国を見て回答してください。ドラッグ・拡大縮小で位置を確認できます。"
-      : "Identify the highlighted country. Drag and zoom to inspect its location."
-    : locale === "ja"
-      ? "国をタップ・クリックして選択できます。ドラッグで移動、ホイール・ピンチ・ボタンで拡大縮小できます。"
-      : "Tap or click to select a country. Drag to pan; use the wheel, pinch or buttons to zoom.";
+    ? qt("identify_the_highlighted_country_drag_and_zoom_to_inspect")
+    : qt("tap_or_click_to_select_a_country_drag_to");
 
   return (
     <div className={"world-map" + (readOnly ? " world-map--quiz" : "")}>
       <div className="world-map__toolbar">
         <span className="world-map__hint">{instructions}</span>
-        <div className="world-map__controls" role="group" aria-label={locale === "ja" ? "地図操作" : "Map controls"}>
-          <button type="button" onClick={() => zoomAt(1.8)} aria-label={locale === "ja" ? "拡大" : "Zoom in"} title={locale === "ja" ? "拡大" : "Zoom in"}>+</button>
-          <button type="button" onClick={() => zoomAt(1 / 1.8)} aria-label={locale === "ja" ? "縮小" : "Zoom out"} title={locale === "ja" ? "縮小" : "Zoom out"}>−</button>
-          {focusFeature && <button type="button" onClick={() => focusOn(focusFeature)}>{locale === "ja" ? "国に移動" : "Focus"}</button>}
-          <button type="button" onClick={() => navigateRegion("world")}>{locale === "ja" ? "全体" : "Reset"}</button>
+        <div className="world-map__controls" role="group" aria-label={qt("mapControls")}>
+          <button type="button" onClick={() => zoomAt(1.8)} aria-label={qt("zoomIn")} title={qt("zoomIn")}>+</button>
+          <button type="button" onClick={() => zoomAt(1 / 1.8)} aria-label={qt("zoomOut")} title={qt("zoomOut")}>−</button>
+          {focusFeature && <button type="button" onClick={() => focusOn(focusFeature)}>{qt("focusCountry")}</button>}
+          <button type="button" onClick={() => navigateRegion("world")}>{qt("resetMap")}</button>
         </div>
         {showRegionNavigation && (
           <label className="world-map__region-navigation">
-            {locale === "ja" ? "表示エリア" : "Map area"}
+            {qt("mapArea")}
             <select value={mapArea} onChange={(event) => navigateRegion(event.target.value as RegionId | "world")}>
-              <option value="world">{locale === "ja" ? "全世界" : "World"}</option>
+              <option value="world">{qt("world")}</option>
               {regions.map((region) => (
                 <option value={region.id} key={region.id}>{region.names[locale]}</option>
               ))}
@@ -253,8 +251,8 @@ export function WorldMap({
           viewBox={view.x + " " + view.y + " " + view.width + " " + view.height}
           role="group"
           aria-label={readOnly
-            ? (locale === "ja" ? "出題国が黄色で示された世界地図" : "World map with a highlighted mystery country")
-            : (locale === "ja" ? "選択可能な2D世界地図" : "Interactive 2D world map")}
+            ? (qt("mysteryMap"))
+            : (qt("interactiveMap"))}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={(event) => finishPointer(event)}
@@ -314,7 +312,7 @@ export function WorldMap({
         </svg>
       </div>
       <div className="world-map__bottom">
-        <span>{locale === "ja" ? "地図: Natural Earth 1:50m" : "Map: Natural Earth 1:50m"}</span>
+        <span>{qt("mapCredit")}</span>
         <span>{zoomFactor.toFixed(1)}×</span>
       </div>
     </div>

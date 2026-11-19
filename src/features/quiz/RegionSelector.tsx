@@ -3,6 +3,7 @@ import type { RegionId } from "../../country-data";
 import { getEligibleCountries, getQuestionLimit } from "../../game-engine/engine";
 import type { SessionRule } from "../../game-engine/types";
 import type { Locale } from "../../i18n/messages";
+import { quizText, type QuizTextKey } from "../../i18n/quizMessages";
 
 export type RegionSelection = RegionId | "world";
 
@@ -27,16 +28,17 @@ export function RegionSelector({
   minimumCountries = 1,
 }: Props) {
   const isJa = locale === "ja";
+  const qt = (key: QuizTextKey) => quizText(locale, key);
   const count = countRegionCountries(value);
   const questionLimit = getQuestionLimit(count, sessionRule);
   const insufficient = count < minimumCountries;
 
   return (
     <label className="quiz__label">
-      {isJa ? "出題地域" : "Question region"}
+      {qt("questionRegion")}
       <select value={value} onChange={(event) =>
         onChange(event.target.value as RegionSelection)}>
-        <option value="world">{isJa ? "全世界" : "World"} ({countries.length})</option>
+        <option value="world">{qt("world")} ({countries.length})</option>
         {regions.map((region) => (
           <option key={region.id} value={region.id}>
             {region.names[locale]} ({countRegionCountries(region.id)})

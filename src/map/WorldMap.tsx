@@ -11,12 +11,13 @@ type MapFeature = (typeof mapData.features)[number];
 
 const WORLD: View = { x: 0, y: 0, width: 360, height: 180 };
 const MIN_WIDTH = 24;
+const MIN_QUIZ_WIDTH = 8;
 const featureById = new Map(
   mapData.features.filter((feature) => feature.id).map((feature) => [feature.id, feature]),
 );
 
-function constrain(view: View): View {
-  const width = Math.max(MIN_WIDTH, Math.min(WORLD.width, view.width));
+function constrain(view: View, minimumWidth = MIN_WIDTH): View {
+  const width = Math.max(minimumWidth, Math.min(WORLD.width, view.width));
   const height = width / 2;
   return {
     x: Math.max(0, Math.min(WORLD.width - width, view.x)),
@@ -41,6 +42,8 @@ export interface WorldMapProps {
   selectedCountryId?: string | null;
   focusCountryId?: string | null;
   onCountrySelect?: (countryId: string) => void;
+  /** Disable country selection and name labels while a country-name quiz is active. */
+  readOnly?: boolean;
 }
 
 /**
@@ -54,6 +57,7 @@ export function WorldMap({
   selectedCountryId = null,
   focusCountryId = null,
   onCountrySelect,
+  readOnly = false,
 }: WorldMapProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const pointers = useRef(new Map<number, Point>());
@@ -62,22 +66,23 @@ export function WorldMap({
   });
   const [view, setView] = useState<View>(WORLD);
   const zoomFactor = WORLD.width / view.width;
+  const minimumWidth = readOnly ? MIN_QUIZ_WIDTH : MIN_WIDTH;
 
   const zoomAt = useCallback((factor: number, clientX?: number, clientY?: number) => {
     const rect = svgRef.current?.getBoundingClientRect();
     setView((current) => {
       const fx = rect && clientX !== undefined ? (clientX - rect.left) / rect.width : 0.5;
       const fy = rect && clientY !== undefined ? (clientY - rect.top) / rect.height : 0.5;
-      const width = Math.max(MIN_WIDTH, Math.min(WORLD.width, current.width / factor));
+      const width = Math.max(minimumWidth, Math.min(WORLD.width, current.width / factor));
       const height = width / 2;
       return constrain({
         x: current.x + current.width * fx - width * fx,
         y: current.y + current.height * fy - height * fy,
         width,
         height,
-      });
+      }, minimumWidth);
     });
-  }, []);
+  }, [minimumWidth]);
 
   // Native, non-passive handler prevents the browser from scrolling while zooming the map.
   useEffect(() => {
@@ -95,14 +100,14 @@ export function WorldMap({
     const [x0, y0, x1, y1] = feature.bounds;
     const spread = Math.max(x1 - x0, (y1 - y0) * 2);
     // Countries spanning the antimeridian (or scattered islands) use their label location.
-    const width = spread > 170 ? 60 : Math.max(MIN_WIDTH, Math.min(360, spread * 1.6 + 12));
+    const width = spread > 170 ? 60 : Math.max(feature.tiny && readOnly ? 12 : MIN_WIDTH, Math.min(360, spread * 1.6 + 12));
     setView(constrain({
       x: feature.center[0] - width / 2,
       y: feature.center[1] - width / 4,
       width,
       height: width / 2,
-    }));
-  }, []);
+    }, minimumWidth));
+  }, [minimumWidth, readOnly]);
 
   useEffect(() => {
     const feature = focusCountryId ? featureById.get(focusCountryId) : null;
@@ -143,7 +148,7 @@ export function WorldMap({
         ...current,
         x: current.x - dx * current.width / rect.width,
         y: current.y - dy * current.height / rect.height,
-      }));
+      }, minimumWidth));
     } else if (after.length === 2) {
       gesture.current.moved = true;
       const beforeMid = midpoint(before[0], before[1]);
@@ -152,7 +157,7 @@ export function WorldMap({
       const newDistance = pointerDistance(after[0], after[1]);
       if (!oldDistance || !newDistance) return;
       setView((current) => {
-        const width = Math.max(MIN_WIDTH, Math.min(360, current.width * oldDistance / newDistance));
+        const width = Math.max(minimumWidth, Math.min(360, current.width * oldDistance / newDistance));
         const height = width / 2;
         const px = (beforeMid.x - rect.left) / rect.width;
         const py = (beforeMid.y - rect.top) / rect.height;
@@ -163,7 +168,7 @@ export function WorldMap({
           y: current.y + current.height * py - height * qy,
           width,
           height,
-        });
+        }, minimumWidth);
       });
     }
   };
@@ -190,12 +195,16 @@ export function WorldMap({
 
   const focusId = mode === "answer" ? null : selectedCountryId ?? focusCountryId;
   const focusFeature = focusId ? featureById.get(focusId) : null;
-  const instructions = locale === "ja"
-    ? "国をタップ・クリックして選択できます。ドラッグで移動、ホイール・ピンチ・ボタンで拡大縮小できます。"
-    : "Tap or click to select a country. Drag to pan; use the wheel, pinch or buttons to zoom.";
+  const instructions = readOnly
+    ? locale === "ja"
+      ? "黄色い国を見て回答してください。ドラッグ・拡大縮小で位置を確認できます。"
+      : "Identify the highlighted country. Drag and zoom to inspect its location."
+    : locale === "ja"
+      ? "国をタップ・クリックして選択できます。ドラッグで移動、ホイール・ピンチ・ボタンで拡大縮小できます。"
+      : "Tap or click to select a country. Drag to pan; use the wheel, pinch or buttons to zoom.";
 
   return (
-    <div className="world-map">
+    <div className={"world-map" + (readOnly ? " world-map--quiz" : "")}>
       <div className="world-map__toolbar">
         <span className="world-map__hint">{instructions}</span>
         <div className="world-map__controls" role="group" aria-label={locale === "ja" ? "地図操作" : "Map controls"}>
@@ -211,7 +220,9 @@ export function WorldMap({
           className="world-map__svg"
           viewBox={view.x + " " + view.y + " " + view.width + " " + view.height}
           role="group"
-          aria-label={locale === "ja" ? "選択可能な2D世界地図" : "Interactive 2D world map"}
+          aria-label={readOnly
+            ? (locale === "ja" ? "出題国が黄色で示された世界地図" : "World map with a highlighted mystery country")
+            : (locale === "ja" ? "選択可能な2D世界地図" : "Interactive 2D world map")}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={(event) => finishPointer(event)}
@@ -240,17 +251,18 @@ export function WorldMap({
                   className={"world-map__country world-map__country--" + state}
                   vectorEffect="non-scaling-stroke"
                   data-country-id={country?.id}
+                  data-tiny={feature.tiny ? "true" : undefined}
                   pointerEvents={country ? "auto" : "none"}
-                  role={country ? "button" : undefined}
-                  tabIndex={country ? 0 : undefined}
-                  aria-label={country?.names[locale]}
-                  onKeyDown={country ? (event) => onCountryKey(event, country.id) : undefined}
+                  role={!readOnly && country ? "button" : undefined}
+                  tabIndex={!readOnly && country ? 0 : undefined}
+                  aria-label={!readOnly ? country?.names[locale] : undefined}
+                  onKeyDown={!readOnly && country ? (event) => onCountryKey(event, country.id) : undefined}
                 />
               );
             })}
           </g>
           {/* Keep microstates tappable without drawing circles over the map. */}
-          <g className="world-map__microstate-hit-areas" aria-hidden="true">
+          {!readOnly && <g className="world-map__microstate-hit-areas" aria-hidden="true">
             {mapData.features.filter((feature) => feature.tiny && feature.id && countriesById.has(feature.id)).map((feature) => {
               const id = feature.id as string;
               return (
@@ -265,7 +277,7 @@ export function WorldMap({
                 />
               );
             })}
-          </g>
+          </g>}
         </svg>
       </div>
       <div className="world-map__bottom">

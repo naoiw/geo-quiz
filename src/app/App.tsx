@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ModeCard } from "../components/ModeCard";
+import { MapToNameQuiz } from "../features/quiz/MapToNameQuiz";
 import { countries, findCountry, getCountryName } from "../country-data";
 import { quizModes } from "../features/quiz/modes";
 import { CountryFlag } from "../flags/CountryFlag";
@@ -64,6 +65,8 @@ export function App() {
             </div>
           </div>
         </section>
+
+        <MapToNameQuiz locale={locale} />
 
         <section className="map-demo" aria-labelledby="map-title">
           <div className="section-heading">

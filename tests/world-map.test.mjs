@@ -45,7 +45,9 @@ test("tiny-country hit targets do not draw markers over the map", () => {
   const mapComponent = readFileSync("src/map/WorldMap.tsx", "utf8");
   const mapStyles = readFileSync("src/map/WorldMap.css", "utf8");
   assert.match(mapComponent, /className="world-map__microstate-hit-area"/);
-  assert.match(mapStyles, /\.world-map__microstate-hit-area\s*\{\s*fill: transparent;\s*stroke: none;/);
+  assert.match(mapStyles, /\.world-map__microstate-hit-area\s*\{\s*fill: transparent;\s*stroke: transparent;/);
+  assert.match(mapStyles, /stroke-width: 18px;/);
+  assert.match(mapComponent, /vectorEffect="non-scaling-stroke"/);
   assert.doesNotMatch(mapComponent, /world-map__pin/);
 });
 

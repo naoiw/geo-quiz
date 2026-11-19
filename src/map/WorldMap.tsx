@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { KeyboardEvent, PointerEvent } from "react";
-import { countriesById } from "../country-data";
+import { countriesById, regions, type RegionId } from "../country-data";
 import type { Locale } from "../i18n/messages";
 import mapData from "./world-50m.json";
 import "./WorldMap.css";
@@ -12,6 +12,16 @@ type MapFeature = (typeof mapData.features)[number];
 const WORLD: View = { x: 0, y: 0, width: 360, height: 180 };
 const MIN_WIDTH = 24;
 const MIN_QUIZ_WIDTH = 8;
+
+/** Broad geographic presets: never center the quiz on the correct answer. */
+const REGION_VIEWS: Readonly<Record<RegionId, View>> = {
+  africa: { x: 150, y: 53, width: 144, height: 72 },
+  asia: { x: 190, y: 5, width: 170, height: 85 },
+  europe: { x: 155, y: 7, width: 120, height: 60 },
+  "north-america": { x: 4, y: 8, width: 164, height: 82 },
+  "south-america": { x: 55, y: 67, width: 166, height: 83 },
+  oceania: { x: 234, y: 74, width: 126, height: 63 },
+};
 const featureById = new Map(
   mapData.features.filter((feature) => feature.id).map((feature) => [feature.id, feature]),
 );
@@ -44,6 +54,9 @@ export interface WorldMapProps {
   onCountrySelect?: (countryId: string) => void;
   /** Disable country selection and name labels while a country-name quiz is active. */
   readOnly?: boolean;
+  /** Enables navigation between broad geographic areas in name-to-map questions. */
+  showRegionNavigation?: boolean;
+  initialRegionId?: RegionId | null;
 }
 
 /**
@@ -58,15 +71,18 @@ export function WorldMap({
   focusCountryId = null,
   onCountrySelect,
   readOnly = false,
+  showRegionNavigation = false,
+  initialRegionId = null,
 }: WorldMapProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const pointers = useRef(new Map<number, Point>());
   const gesture = useRef<{ moved: boolean; candidate: string | null; start: Point }>({
     moved: false, candidate: null, start: { x: 0, y: 0 },
   });
-  const [view, setView] = useState<View>(WORLD);
+  const [view, setView] = useState<View>(() => initialRegionId ? REGION_VIEWS[initialRegionId] : WORLD);
+  const [mapArea, setMapArea] = useState<RegionId | "world">(initialRegionId ?? "world");
   const zoomFactor = WORLD.width / view.width;
-  const minimumWidth = readOnly ? MIN_QUIZ_WIDTH : MIN_WIDTH;
+  const minimumWidth = readOnly || showRegionNavigation ? MIN_QUIZ_WIDTH : MIN_WIDTH;
 
   const zoomAt = useCallback((factor: number, clientX?: number, clientY?: number) => {
     const rect = svgRef.current?.getBoundingClientRect();
@@ -113,6 +129,11 @@ export function WorldMap({
     const feature = focusCountryId ? featureById.get(focusCountryId) : null;
     if (feature) focusOn(feature);
   }, [focusCountryId, focusOn]);
+
+  const navigateRegion = (id: RegionId | "world") => {
+    setMapArea(id);
+    setView(id === "world" ? WORLD : REGION_VIEWS[id]);
+  };
 
   const handlePointerDown = (event: PointerEvent<SVGSVGElement>) => {
     if (!pointers.current.size) {
@@ -193,7 +214,7 @@ export function WorldMap({
     }
   };
 
-  const focusId = mode === "answer" ? null : selectedCountryId ?? focusCountryId;
+  const focusId = mode === "answer" ? null : focusCountryId ?? selectedCountryId;
   const focusFeature = focusId ? featureById.get(focusId) : null;
   const instructions = readOnly
     ? locale === "ja"
@@ -211,8 +232,19 @@ export function WorldMap({
           <button type="button" onClick={() => zoomAt(1.8)} aria-label={locale === "ja" ? "拡大" : "Zoom in"} title={locale === "ja" ? "拡大" : "Zoom in"}>+</button>
           <button type="button" onClick={() => zoomAt(1 / 1.8)} aria-label={locale === "ja" ? "縮小" : "Zoom out"} title={locale === "ja" ? "縮小" : "Zoom out"}>−</button>
           {focusFeature && <button type="button" onClick={() => focusOn(focusFeature)}>{locale === "ja" ? "国に移動" : "Focus"}</button>}
-          <button type="button" onClick={() => setView(WORLD)}>{locale === "ja" ? "全体" : "Reset"}</button>
+          <button type="button" onClick={() => navigateRegion("world")}>{locale === "ja" ? "全体" : "Reset"}</button>
         </div>
+        {showRegionNavigation && (
+          <label className="world-map__region-navigation">
+            {locale === "ja" ? "表示エリア" : "Map area"}
+            <select value={mapArea} onChange={(event) => navigateRegion(event.target.value as RegionId | "world")}>
+              <option value="world">{locale === "ja" ? "全世界" : "World"}</option>
+              {regions.map((region) => (
+                <option value={region.id} key={region.id}>{region.names[locale]}</option>
+              ))}
+            </select>
+          </label>
+        )}
       </div>
       <div className="world-map__viewport">
         <svg
@@ -272,6 +304,7 @@ export function WorldMap({
                   cy={feature.center[1]}
                   r={2.8 / zoomFactor}
                   className="world-map__microstate-hit-area"
+                  vectorEffect="non-scaling-stroke"
                   data-country-id={id}
                   pointerEvents="all"
                 />

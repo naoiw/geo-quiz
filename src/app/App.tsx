@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ModeCard } from "../components/ModeCard";
 import { MapToNameQuiz } from "../features/quiz/MapToNameQuiz";
 import { FlagToNameQuiz } from "../features/quiz/FlagToNameQuiz";
+import { NameToMapQuiz } from "../features/quiz/NameToMapQuiz";
 import { countries, findCountry, getCountryName } from "../country-data";
 import { quizModes } from "../features/quiz/modes";
 import { CountryFlag } from "../flags/CountryFlag";
@@ -69,6 +70,7 @@ export function App() {
 
         <MapToNameQuiz locale={locale} />
         <FlagToNameQuiz locale={locale} />
+        <NameToMapQuiz locale={locale} />
 
         <section className="map-demo" aria-labelledby="map-title">
           <div className="section-heading">

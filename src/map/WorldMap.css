@@ -103,8 +103,29 @@
 
 .world-map__microstate-hit-area {
   fill: transparent;
-  stroke: none;
+  stroke: transparent;
+  /* Add an invisible, fixed-pixel touch target around tiny country geometry. */
+  stroke-width: 18px;
   cursor: pointer;
+}
+
+.world-map__region-navigation {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #526782;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.world-map__region-navigation select {
+  max-width: 155px;
+  padding: 8px;
+  border: 1px solid #cbd9e8;
+  border-radius: 8px;
+  background: #fff;
+  color: #172b47;
+  font: inherit;
 }
 
 /* SVG paths must not display the browser's rectangular focus ring. */

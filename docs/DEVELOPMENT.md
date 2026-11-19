@@ -22,7 +22,7 @@ npm run build:pages:main
 npm run preview
 ```
 
-開発・テスト・ビルド時には `scripts/sync-flags.mjs` が `flag-icons` のSVGを197件抽出します。`public/flags` は生成物です。CDNを使わずGitHub Pagesで配信します。依存関係は `package-lock.json` に固定し、ローカルもCIも `npm ci` で同じ解決結果を使用します。依存の追加・更新時は `npm install` でlockfileを再生成し、`package.json` とセットでコミットします。
+開発・テスト・ビルド時には `scripts/sync-flags.mjs` が `flag-icons` のSVGを197件抽出します。ビルド後には `scripts/build-service-worker.mjs` が `dist` の全配信資産からバージョン付き `sw.js` を生成します（PWAは本番/プレビュー時だけ登録）。`public/flags` は生成物です。CDNを使わずGitHub Pagesで配信します。依存関係は `package-lock.json` に固定し、ローカルもCIも `npm ci` で同じ解決結果を使用します。依存の追加・更新時は `npm install` でlockfileを再生成し、`package.json` とセットでコミットします。
 
 ## ブランチ・PR
 
@@ -50,6 +50,7 @@ npm run preview
 | --- | --- |
 | `tests/game-engine.test.mjs` | 6回答形式、進行ルール、スコア、時間境界、重複防止 |
 | `tests/quality-matrix.test.mjs` | 全7地域×6回答形式×日英×3ルールの完走・採点・候補整合性、197件の国旗・地図データ照合 |
+| `tests/pwa.test.mjs` | Manifest、PWA登録条件、プリキャッシュ生成と更新用ハッシュの整合性 |
 | `tests/quiz-refactor.test.mjs` | 共通セッション、ルール設定、題型固有の操作を維持する構成契約 |
 | `tests/quiz-ui.test.mjs` | モード導線、共通結果UI、フォーカス、地図のキーボード操作 |
 | `tests/regions.test.mjs` | 全7選択地域×6回答形式、越境国、候補不足 |

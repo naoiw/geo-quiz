@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Geo Quiz globe">
+  <rect width="512" height="512" fill="#1d4ed8"/>
+  <defs><clipPath id="globe"><circle cx="256" cy="256" r="197"/></clipPath></defs>
+  <circle cx="256" cy="256" r="197" fill="#f3f8ff" stroke="#133977" stroke-width="12"/>
+  <g clip-path="url(#globe)" stroke="#85c5f5" stroke-width="8" fill="none">
+    <path d="M 59 157 H 453 M 59 256 H 453 M 59 355 H 453"/>
+    <path d="M256 59 V453"/>
+    <ellipse cx="256" cy="256" rx="96" ry="197"/>
+  </g>
+  <circle cx="339" cy="179" r="22" fill="#f5b547"/>
+</svg>

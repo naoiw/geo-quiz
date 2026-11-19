@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "prebuild": "npm run sync:flags",
     "build": "tsc --noEmit && vite build",
+    "postbuild": "node scripts/build-service-worker.mjs",
     "preview": "vite preview",
     "build:pages:main": "npm run build -- --base=/geo-quiz/",
     "pretest": "npm run sync:flags",

@@ -24,6 +24,8 @@ npm run build:pages:main
 
 Viteの`--base=/geo-quiz/`を使用。HTMLの`%BASE_URL%`とアプリ内の`import.meta.env.BASE_URL`を利用しています。独自ドメイン移行時は公開パスに合わせて更新してください。
 
+PWAのManifestは`%BASE_URL%manifest.webmanifest`、登録するService Workerは`import.meta.env.BASE_URL + "sw.js"`を使うため、どちらもGitHub Pagesのサブパスと一致します。`postbuild`で生成した`dist/sw.js`は全配信ファイルの内容ハッシュに連動するキャッシュ名を使用し、デプロイ後のバージョン切替に対応します。詳細は [PWA.md](PWA.md)。
+
 ## Androidとの違い
 
 Webは`main`マージごとに更新します。Android版は移植後、ストア配信用のタグ、バージョン、署名、審査を別途管理し、Webの全更新に同期させません。

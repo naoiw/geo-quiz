@@ -1944,7 +1944,8 @@
       "en": []
     },
     "regionIds": [
-      "asia"
+      "asia",
+      "europe"
     ],
     "flagId": "KZ",
     "geometryId": "KZ"
@@ -2993,7 +2994,8 @@
       ]
     },
     "regionIds": [
-      "europe"
+      "europe",
+      "asia"
     ],
     "flagId": "RU",
     "geometryId": "RU"
@@ -3549,7 +3551,8 @@
       ]
     },
     "regionIds": [
-      "asia"
+      "asia",
+      "europe"
     ],
     "flagId": "TR",
     "geometryId": "TR"

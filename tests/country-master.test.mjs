@@ -25,6 +25,7 @@ test("all IDs, bilingual names, regions, and logical asset keys are valid", () =
     ids.add(c.id);
     assert.ok(Object.hasOwn(counts, c.classification));
     assert.ok(c.regionIds.length > 0);
+    assert.equal(new Set(c.regionIds).size, c.regionIds.length, c.id + ": duplicate region");
     for (const region of c.regionIds) assert.ok(regionIds.has(region), c.id + ": unknown region");
     for (const locale of ["ja", "en"]) {
       assert.ok(typeof c.names[locale] === "string" && c.names[locale].trim(), c.id + " missing " + locale);
@@ -56,8 +57,9 @@ test("edge cases and geographical grouping are explicit", () => {
   assert.equal(byId.get("TW").names.en, "Taiwan");
   assert.equal(byId.get("VA").classification, "observer");
   assert.equal(byId.get("PS").classification, "observer");
-  assert.deepEqual(byId.get("RU").regionIds, ["europe"]);
-  assert.deepEqual(byId.get("TR").regionIds, ["asia"]);
+  assert.deepEqual(byId.get("RU").regionIds, ["europe", "asia"]);
+  assert.deepEqual(byId.get("TR").regionIds, ["asia", "europe"]);
+  assert.deepEqual(byId.get("KZ").regionIds, ["asia", "europe"]);
   assert.ok(byId.get("US").aliases.ja.includes("アメリカ"));
-  assert.equal(countries.reduce((total, c) => total + c.regionIds.length, 0), 197);
+  assert.equal(countries.reduce((total, c) => total + c.regionIds.length, 0), 200);
 });

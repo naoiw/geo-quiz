@@ -48,6 +48,8 @@ export interface AnswerRecord {
 export interface GameSession {
   readonly configuration: GameConfiguration;
   readonly countryPool: readonly Country[];
+  /** Actual 10-question round size (may be reduced for a small future region). */
+  readonly questionLimit: number;
   readonly eligibleCountryIds: readonly string[];
   readonly remainingCountryIds: readonly string[];
   readonly currentQuestion: Question | null;

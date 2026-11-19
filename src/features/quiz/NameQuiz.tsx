@@ -6,6 +6,7 @@ import {
 } from "../../game-engine/engine";
 import type { AnswerFormat, GameSession, SessionRule } from "../../game-engine/types";
 import type { Locale } from "../../i18n/messages";
+import { quizText, type QuizTextKey } from "../../i18n/quizMessages";
 import { WorldMap } from "../../map/WorldMap";
 import { CountryFlag } from "../../flags/CountryFlag";
 import { createCountryNameChoices } from "./name-choices";
@@ -30,6 +31,7 @@ function formatTime(milliseconds: number): string {
 
 export function NameQuiz({ locale, kind }: Props) {
   const isJa = locale === "ja";
+  const qt = (key: QuizTextKey) => quizText(locale, key);
   const isFlag = kind === "flag-to-name";
   const [answerFormat, setAnswerFormat] = useState<NameAnswerFormat>("text");
   const [sessionRule, setSessionRule] = useState<SessionRule>("ten-untimed");
@@ -151,25 +153,24 @@ export function NameQuiz({ locale, kind }: Props) {
       <div className="section-heading">
         <div>
           <h2 id={kind + "-quiz-title"}>{isFlag
-            ? (isJa ? "国旗 → 国名クイズ" : "Flag → Country quiz")
-            : (isJa ? "地図 → 国名クイズ" : "Map → Country quiz")}</h2>
+            ? (qt("flagNameTitle"))
+            : (qt("mapNameTitle"))}</h2>
           <p>{isFlag
-            ? (isJa ? "国旗を見て、国名を回答しよう。" : "Identify the country from its flag.")
-            : (isJa ? "黄色く強調された国を見て、国名を回答しよう。" :
-                "Identify the country highlighted in yellow.")}</p>
+            ? (qt("flagNameIntro"))
+            : (qt("mapNameIntro"))}</p>
         </div>
-        <span className="section-count">{isJa ? "プレイ可能" : "PLAYABLE"}</span>
+        <span className="section-count">{qt("playable")}</span>
       </div>
 
       {!session && (
         <div className="quiz__setup">
           <div className="quiz__settings">
             <label className="quiz__label">
-              {isJa ? "回答方式" : "Answer format"}
+              {qt("answerFormat")}
               <select value={answerFormat} onChange={(event) =>
                 setAnswerFormat(event.target.value as NameAnswerFormat)}>
-                <option value="text">{isJa ? "国名を入力" : "Type a country"}</option>
-                <option value="multiple-choice">{isJa ? "国名を四択" : "Four choices"}</option>
+                <option value="text">{qt("typeName")}</option>
+                <option value="multiple-choice">{qt("fourChoices")}</option>
               </select>
             </label>
             <RegionSelector
@@ -180,17 +181,17 @@ export function NameQuiz({ locale, kind }: Props) {
               minimumCountries={answerFormat === "multiple-choice" ? 4 : 1}
             />
             <label className="quiz__label">
-              {isJa ? "ゲームルール" : "Game rule"}
+              {qt("gameRule")}
               <select value={sessionRule} onChange={(event) =>
                 setSessionRule(event.target.value as SessionRule)}>
-                <option value="ten-untimed">{isJa ? "10問・時間無制限" : "10 questions · untimed"}</option>
-                <option value="ten-timed">{isJa ? "10問・時間制限" : "10 questions · timed"}</option>
-                <option value="time-attack">{isJa ? "タイムアタック" : "Time attack"}</option>
+                <option value="ten-untimed">{qt("tenUntimed")}</option>
+                <option value="ten-timed">{qt("tenTimed")}</option>
+                <option value="time-attack">{qt("timeAttack")}</option>
               </select>
             </label>
             {sessionRule !== "ten-untimed" && (
               <label className="quiz__label">
-                {isJa ? "制限時間" : "Time limit"}
+                {qt("timeLimit")}
                 <select value={durationSeconds} onChange={(event) =>
                   setDurationSeconds(Number(event.target.value))}>
                   {durations.map((seconds) => (
@@ -202,34 +203,32 @@ export function NameQuiz({ locale, kind }: Props) {
               </label>
             )}
           </div>
-          <p className="quiz__note">{isJa
-            ? "配点は暫定で正解100点、誤答・パス0点です。制限時間も今後調整します。"
-            : "Scoring is provisional: +100 for correct, 0 otherwise. Time limits may change."}</p>
+          <p className="quiz__note">{qt("scoring_is_provisional_100_for_correct_0_otherwise_time")}</p>
           <button type="button" className="quiz__primary" onClick={start}
             disabled={insufficientCountries}>
-            {isJa ? "クイズを開始" : "Start quiz"}
+            {qt("startQuiz")}
           </button>
         </div>
       )}
 
       {session && session.status !== "finished" && (
         <div className="quiz__game">
-          <div className="quiz__stats" aria-label={isJa ? "ゲームの進行状況" : "Game progress"}>
+          <div className="quiz__stats" aria-label={qt("gameProgress")}>
             <span>{session.configuration.sessionRule === "time-attack"
               ? (isJa ? "第" + question?.number + "問" : "Question " + question?.number)
               : (isJa ? "第" + question?.number + "問 / " + session.questionLimit + "問" :
                 "Question " + question?.number + " / " + session.questionLimit)}</span>
-            <span>{isJa ? "スコア" : "Score"}: {session.score}</span>
+            <span>{qt("score")}: {session.score}</span>
             {timeLeft !== null && (
-              <span role="timer" aria-label={isJa ? "残り時間" : "Remaining time"}>
+              <span role="timer" aria-label={qt("remainingTime")}>
                 {formatTime(timeLeft)}
               </span>
             )}
           </div>
           <p className="quiz__prompt">
             {isFlag
-              ? (isJa ? "この国旗はどこの国？" : "Which country does this flag represent?")
-              : (isJa ? "黄色い国の名前は？" : "Which country is highlighted?")}
+              ? (qt("which_country_does_this_flag_represent"))
+              : (qt("which_country_is_highlighted"))}
           </p>
           {isFlag ? (
             <div className="quiz__flag-prompt">
@@ -237,12 +236,12 @@ export function NameQuiz({ locale, kind }: Props) {
                 <CountryFlag
                   country={country}
                   locale={locale}
-                  alt={isJa ? "問題の国旗" : "Question flag"}
+                  alt={qt("questionFlag")}
                 />
               )}
               {flagRegion && (
                 <span className="quiz__region-hint">
-                  {isJa ? "地域： " : "Region: "}{flagRegion.names[locale]}
+                  {qt("regionPrefix")}{flagRegion.names[locale]}
                 </span>
               )}
             </div>
@@ -261,12 +260,10 @@ export function NameQuiz({ locale, kind }: Props) {
               answerWithText();
             }}>
               <label htmlFor={kind + "-answer-name"}>
-                {isJa ? "国名を入力" : "Enter country name"}
+                {qt("enterCountry")}
               </label>
               <p className="quiz__input-help" id={kind + "-answer-help"}>
-                {isJa
-                  ? "ひらがな・カタカナ・正式名・通称に対応。変換を確定してから回答してください。"
-                  : "Official and accepted alternative names are supported. Confirm your text before submitting."}
+                {qt("official_and_accepted_alternative_names_are_supported_confirm_your")}
               </p>
               <div className="quiz__answer-input-row">
                 <input
@@ -300,7 +297,7 @@ export function NameQuiz({ locale, kind }: Props) {
                     }
                   }}
                   disabled={session.status !== "asking"}
-                  placeholder={isJa ? "例：にほん / 日本" : "e.g. Japan"}
+                  placeholder={qt("namePlaceholder")}
                   autoComplete="off"
                   autoCapitalize="off"
                   enterKeyHint="done"
@@ -310,14 +307,14 @@ export function NameQuiz({ locale, kind }: Props) {
                   type="submit"
                   className="quiz__primary"
                   disabled={session.status !== "asking" || !answerText.trim()}>
-                  {isJa ? "回答する" : "Submit"}
+                  {qt("submit")}
                 </button>
               </div>
             </form>
           ) : (
             <CountryChoiceGrid
               choices={choices}
-              label={isJa ? "国名の選択肢" : "Country choices"}
+              label={qt("countryChoices")}
               disabled={session.status !== "asking"}
               correctCountryId={review?.correctCountryId}
               selectedCountryId={review?.answer?.format === "multiple-choice"
@@ -329,7 +326,7 @@ export function NameQuiz({ locale, kind }: Props) {
           {session.status === "asking" && (
             <div className="quiz__actions">
               <button type="button" className="quiz__secondary" onClick={skip}>
-                {isJa ? "パス" : "Skip"}
+                {qt("skip")}
               </button>
             </div>
           )}
@@ -338,16 +335,16 @@ export function NameQuiz({ locale, kind }: Props) {
               role="status" aria-live="polite">
               <p>
                 <strong>{review.judgement === "correct"
-                  ? (isJa ? "正解！" : "Correct!")
+                  ? (qt("correctNotice"))
                   : review.judgement === "skipped"
-                    ? (isJa ? "パスしました" : "Skipped")
-                    : (isJa ? "不正解" : "Incorrect")}</strong>
+                    ? (qt("skippedNotice"))
+                    : (qt("incorrectNotice"))}</strong>
                 {"　"}
-                {isJa ? "正解：" : "Answer: "}
+                {qt("answerPrefix")}
                 {correctCountry ? getCountryName(correctCountry, locale) : review.correctCountryId}
               </p>
               <button type="button" className="quiz__primary" onClick={next}>
-                {isJa ? "次へ" : "Continue"}
+                {qt("continue")}
               </button>
             </div>
           )}
@@ -355,20 +352,20 @@ export function NameQuiz({ locale, kind }: Props) {
       )}
 
       {result && (
-        <div className="quiz__results" role="region" aria-label={isJa ? "クイズ結果" : "Quiz results"}>
-          <h3>{isJa ? "結果発表" : "Results"}</h3>
-          <p className="quiz__result-summary">{isJa ? "合計スコア" : "Total score"}: <strong>{result.score}</strong></p>
+        <div className="quiz__results" role="region" aria-label={qt("quizResults")}>
+          <h3>{qt("results")}</h3>
+          <p className="quiz__result-summary">{qt("totalScore")}: <strong>{result.score}</strong></p>
           <div className="quiz__result-stats">
-            <span>{isJa ? "回答数" : "Answered"}: {result.answered}</span>
-            <span>{isJa ? "正解" : "Correct"}: {result.correct}</span>
-            <span>{isJa ? "不正解" : "Incorrect"}: {result.incorrect}</span>
-            <span>{isJa ? "パス" : "Skipped"}: {result.skipped}</span>
-            <span>{isJa ? "正答率" : "Accuracy"}: {result.accuracyPercent.toFixed(1)}%</span>
-            <span>{isJa ? "経過時間" : "Elapsed"}: {formatTime(result.elapsedMs)}</span>
+            <span>{qt("answered")}: {result.answered}</span>
+            <span>{qt("correctCount")}: {result.correct}</span>
+            <span>{qt("incorrectNotice")}: {result.incorrect}</span>
+            <span>{qt("skippedNotice_2")}: {result.skipped}</span>
+            <span>{qt("accuracy")}: {result.accuracyPercent.toFixed(1)}%</span>
+            <span>{qt("elapsed")}: {formatTime(result.elapsedMs)}</span>
           </div>
           <p className="quiz__note">
             {result.finishReason === "timeout"
-              ? (isJa ? "時間切れです。" : "Time is up.")
+              ? (qt("timeUp"))
               : (isJa ? result.answered + "問終了しました。" :
                 "All " + result.answered + " questions completed.")}
           </p>
@@ -388,7 +385,7 @@ export function NameQuiz({ locale, kind }: Props) {
                   <span>{correct ? getCountryName(correct, locale) : record.correctCountryId}</span>
                   {answer !== null && record.judgement !== "correct" && (
                     <span className="quiz__history-answer">
-                      {isJa ? "回答：" : "Your answer: "}{answer}
+                      {qt("yourAnswer")}{answer}
                     </span>
                   )}
                 </li>
@@ -396,7 +393,7 @@ export function NameQuiz({ locale, kind }: Props) {
             })}
           </ol>
           <button type="button" className="quiz__primary" onClick={changeToSetup}>
-            {isJa ? "もう一度遊ぶ" : "Play again"}
+            {qt("playAgain")}
           </button>
         </div>
       )}

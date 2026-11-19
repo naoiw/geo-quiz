@@ -6,6 +6,7 @@ import {
 } from "../../game-engine/engine";
 import type { GameSession, SessionRule } from "../../game-engine/types";
 import type { Locale } from "../../i18n/messages";
+import { quizText, type QuizTextKey } from "../../i18n/quizMessages";
 import { WorldMap } from "../../map/WorldMap";
 import { RegionSelector, countRegionCountries, type RegionSelection } from "./RegionSelector";
 import "./NameQuiz.css";
@@ -22,6 +23,7 @@ function formatTime(milliseconds: number): string {
 /** 2D renderer only: question IDs and judgement remain in the shared game engine. */
 export function NameToMapQuiz({ locale }: { locale: Locale }) {
   const isJa = locale === "ja";
+  const qt = (key: QuizTextKey) => quizText(locale, key);
   const [regionId, setRegionId] = useState<RegionSelection>("world");
   const [sessionRule, setSessionRule] = useState<SessionRule>("ten-untimed");
   const [durationSeconds, setDurationSeconds] = useState(120);
@@ -103,12 +105,10 @@ export function NameToMapQuiz({ locale }: { locale: Locale }) {
     <section className="quiz" id="name-to-map-quiz" aria-labelledby="name-to-map-quiz-title">
       <div className="section-heading">
         <div>
-          <h2 id="name-to-map-quiz-title">{isJa ? "国名 → 地図クイズ" : "Country → Map quiz"}</h2>
-          <p>{isJa
-            ? "表示された国がある場所を世界地図から選ぼう。"
-            : "Find the named country on the world map."}</p>
+          <h2 id="name-to-map-quiz-title">{qt("nameMapTitle")}</h2>
+          <p>{qt("nameMapIntro")}</p>
         </div>
-        <span className="section-count">{isJa ? "プレイ可能" : "PLAYABLE"}</span>
+        <span className="section-count">{qt("playable")}</span>
       </div>
 
       {!session && (
@@ -121,17 +121,17 @@ export function NameToMapQuiz({ locale }: { locale: Locale }) {
               sessionRule={sessionRule}
             />
             <label className="quiz__label">
-              {isJa ? "ゲームルール" : "Game rule"}
+              {qt("gameRule")}
               <select value={sessionRule} onChange={(event) =>
                 setSessionRule(event.target.value as SessionRule)}>
-                <option value="ten-untimed">{isJa ? "10問・時間無制限" : "10 questions · untimed"}</option>
-                <option value="ten-timed">{isJa ? "10問・時間制限" : "10 questions · timed"}</option>
-                <option value="time-attack">{isJa ? "タイムアタック" : "Time attack"}</option>
+                <option value="ten-untimed">{qt("tenUntimed")}</option>
+                <option value="ten-timed">{qt("tenTimed")}</option>
+                <option value="time-attack">{qt("timeAttack")}</option>
               </select>
             </label>
             {sessionRule !== "ten-untimed" && (
               <label className="quiz__label">
-                {isJa ? "制限時間" : "Time limit"}
+                {qt("timeLimit")}
                 <select value={durationSeconds} onChange={(event) =>
                   setDurationSeconds(Number(event.target.value))}>
                   {durations.map((seconds) => (
@@ -143,44 +143,40 @@ export function NameToMapQuiz({ locale }: { locale: Locale }) {
               </label>
             )}
           </div>
-          <p className="quiz__note">{isJa
-            ? "スマホの誤タップを防ぐため、国を選んでから「回答を確定」を押します。配点は暫定で正解100点、誤答・パス0点です。"
-            : "Select a country, then confirm to prevent accidental taps. Provisional scoring: +100 correct, 0 otherwise."}</p>
+          <p className="quiz__note">{qt("select_a_country_then_confirm_to_prevent_accidental_taps")}</p>
           <button type="button" className="quiz__primary" onClick={start}
             disabled={insufficientCountries}>
-            {isJa ? "クイズを開始" : "Start quiz"}
+            {qt("startQuiz")}
           </button>
         </div>
       )}
 
       {session && session.status !== "finished" && (
         <div className="quiz__game">
-          <div className="quiz__stats" aria-label={isJa ? "ゲームの進行状況" : "Game progress"}>
+          <div className="quiz__stats" aria-label={qt("gameProgress")}>
             <span>{session.configuration.sessionRule === "time-attack"
               ? (isJa ? "第" + session.currentQuestion?.number + "問" :
                 "Question " + session.currentQuestion?.number)
               : (isJa ? "第" + session.currentQuestion?.number + "問 / " + session.questionLimit + "問" :
                 "Question " + session.currentQuestion?.number + " / " + session.questionLimit)}</span>
-            <span>{isJa ? "スコア" : "Score"}: {session.score}</span>
+            <span>{qt("score")}: {session.score}</span>
             {remainingMs !== null && (
-              <span role="timer" aria-label={isJa ? "残り時間" : "Remaining time"}>
+              <span role="timer" aria-label={qt("remainingTime")}>
                 {formatTime(remainingMs)}
               </span>
             )}
           </div>
 
           <p className="quiz__prompt">
-            {isJa ? "「" : "Where is "}<strong>
+            {qt("mapPromptStart")}<strong>
               {questionCountry ? getCountryName(questionCountry, locale) :
                 session.currentQuestion?.countryId}
-            </strong>{isJa ? "」はどこ？" : "?"}
+            </strong>{qt("mapPromptEnd")}
           </p>
           <p className="quiz__map-help">
             {review
-              ? (isJa ? "黄色が正解の国、青が選択した国です。" :
-                "Yellow marks the correct country; blue marks your choice.")
-              : (isJa ? "地図の国をタップして選択。ズーム・ドラッグ・表示エリアの変更もできます。" :
-                "Tap a country to select it. Zoom, drag or switch the displayed area.")}
+              ? (qt("yellow_marks_the_correct_country_blue_marks_your_choice"))
+              : (qt("tap_a_country_to_select_it_zoom_drag_or"))}
           </p>
 
           <WorldMap
@@ -199,15 +195,15 @@ export function NameToMapQuiz({ locale }: { locale: Locale }) {
             <div className="quiz__map-actions">
               <div className="quiz__map-selection" role="status" aria-live="polite">
                 {selectedCountry
-                  ? (isJa ? "選択中：" : "Selected: ") + getCountryName(selectedCountry, locale)
-                  : (isJa ? "まだ国を選択していません。" : "No country selected yet.")}
+                  ? (qt("selectedPrefix")) + getCountryName(selectedCountry, locale)
+                  : (qt("noSelection"))}
               </div>
               <div className="quiz__map-buttons">
                 <button type="button" className="quiz__secondary" onClick={skip}>
-                  {isJa ? "パス" : "Skip"}
+                  {qt("skip")}
                 </button>
                 <button type="button" className="quiz__primary" onClick={submit} disabled={!selectedId}>
-                  {isJa ? "回答を確定" : "Confirm answer"}
+                  {qt("confirmAnswer")}
                 </button>
               </div>
             </div>
@@ -218,22 +214,22 @@ export function NameToMapQuiz({ locale }: { locale: Locale }) {
               role="status" aria-live="polite">
               <p>
                 <strong>{review.judgement === "correct"
-                  ? (isJa ? "正解！" : "Correct!")
-                  : review.judgement === "skipped" ? (isJa ? "パスしました" : "Skipped")
-                    : (isJa ? "不正解" : "Incorrect")}</strong>
+                  ? (qt("correctNotice"))
+                  : review.judgement === "skipped" ? (qt("skippedNotice"))
+                    : (qt("incorrectNotice"))}</strong>
                 {"　"}
-                {isJa ? "正解：" : "Answer: "}
+                {qt("answerPrefix")}
                 {questionCountry ? getCountryName(questionCountry, locale) : review.correctCountryId}
                 {reviewedChoiceId && review.judgement === "incorrect" && (
                   <span className="quiz__map-your-answer">
-                    {isJa ? "あなたの回答：" : "Your choice: "}
+                    {qt("yourChoice")}
                     {findCountry(reviewedChoiceId)
                       ? getCountryName(findCountry(reviewedChoiceId)!, locale) : reviewedChoiceId}
                   </span>
                 )}
               </p>
               <button type="button" className="quiz__primary" onClick={next}>
-                {isJa ? "次へ" : "Continue"}
+                {qt("continue")}
               </button>
             </div>
           )}
@@ -241,20 +237,20 @@ export function NameToMapQuiz({ locale }: { locale: Locale }) {
       )}
 
       {result && (
-        <div className="quiz__results" role="region" aria-label={isJa ? "クイズ結果" : "Quiz results"}>
-          <h3>{isJa ? "結果発表" : "Results"}</h3>
-          <p className="quiz__result-summary">{isJa ? "合計スコア" : "Total score"}: <strong>{result.score}</strong></p>
+        <div className="quiz__results" role="region" aria-label={qt("quizResults")}>
+          <h3>{qt("results")}</h3>
+          <p className="quiz__result-summary">{qt("totalScore")}: <strong>{result.score}</strong></p>
           <div className="quiz__result-stats">
-            <span>{isJa ? "回答数" : "Answered"}: {result.answered}</span>
-            <span>{isJa ? "正解" : "Correct"}: {result.correct}</span>
-            <span>{isJa ? "不正解" : "Incorrect"}: {result.incorrect}</span>
-            <span>{isJa ? "パス" : "Skipped"}: {result.skipped}</span>
-            <span>{isJa ? "正答率" : "Accuracy"}: {result.accuracyPercent.toFixed(1)}%</span>
-            <span>{isJa ? "経過時間" : "Elapsed"}: {formatTime(result.elapsedMs)}</span>
+            <span>{qt("answered")}: {result.answered}</span>
+            <span>{qt("correctCount")}: {result.correct}</span>
+            <span>{qt("incorrectNotice")}: {result.incorrect}</span>
+            <span>{qt("skippedNotice_2")}: {result.skipped}</span>
+            <span>{qt("accuracy")}: {result.accuracyPercent.toFixed(1)}%</span>
+            <span>{qt("elapsed")}: {formatTime(result.elapsedMs)}</span>
           </div>
           <p className="quiz__note">
             {result.finishReason === "timeout"
-              ? (isJa ? "時間切れです。" : "Time is up.")
+              ? (qt("timeUp"))
               : (isJa ? result.answered + "問終了しました。" :
                 "All " + result.answered + " questions completed.")}
           </p>
@@ -272,7 +268,7 @@ export function NameToMapQuiz({ locale }: { locale: Locale }) {
                   <span>{correct ? getCountryName(correct, locale) : record.correctCountryId}</span>
                   {record.judgement === "incorrect" && record.answer?.format === "map" && (
                     <span className="quiz__history-answer">
-                      {isJa ? "回答：" : "Your answer: "}
+                      {qt("yourAnswer")}
                       {choice ? getCountryName(choice, locale) : record.answer.countryId}
                     </span>
                   )}
@@ -281,7 +277,7 @@ export function NameToMapQuiz({ locale }: { locale: Locale }) {
             })}
           </ol>
           <button type="button" className="quiz__primary" onClick={restart}>
-            {isJa ? "もう一度遊ぶ" : "Play again"}
+            {qt("playAgain")}
           </button>
         </div>
       )}

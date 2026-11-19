@@ -38,6 +38,23 @@ main.page-container { flex: 1; }
 .mode-card__top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
 .mode-card__icon { font-size: 27px; line-height: 1.2; }
 .mode-card__status { padding: 6px 9px; border-radius: 7px; background: #f1f5f9; color: #657a98; font-size: 11px; font-weight: 700; }
+.mode-card__play {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #1d4ed8;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.mode-card__play:hover {
+  background: #1e40af;
+  color: #fff;
+}
+
 .mode-card h3 { margin: 15px 0 7px; font-size: 18px; }
 .mode-card p { margin: 0; color: #60738e; font-size: 13px; line-height: 1.8; }
 .next-step { margin: 30px 0 60px; padding: 24px 26px; border-radius: 14px; background: #e9f0fb; }

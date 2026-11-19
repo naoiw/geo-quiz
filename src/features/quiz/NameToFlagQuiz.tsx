@@ -1,10 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { countries, findCountry, getCountryName } from "../../country-data";
-import {
-  advanceSession, getQuestionCountry, getRemainingMs, getResult,
-  skipQuestion, startSession, submitAnswer, tickSession,
-} from "../../game-engine/engine";
-import type { GameSession, SessionRule } from "../../game-engine/types";
+import { QuizRuleFields } from "./QuizRuleFields";
+import { useQuizSession } from "./useQuizSession";
+import type { SessionRule } from "../../game-engine/types";
 import { CountryFlag } from "../../flags/CountryFlag";
 import type { Locale } from "../../i18n/messages";
 import { quizText, type QuizTextKey } from "../../i18n/quizMessages";
@@ -15,24 +13,19 @@ import { createFlagChoices, type FlagChoiceScope } from "./flag-choices";
 import "./NameQuiz.css";
 import "./NameToFlagQuiz.css";
 
-const durations = [60, 120, 180, 300] as const;
-
 /** The fourth game mode: country name -> one of four locally bundled flags. */
 export function NameToFlagQuiz({ locale }: { locale: Locale }) {
-  const isJa = locale === "ja";
   const qt = (key: QuizTextKey) => quizText(locale, key);
   const [regionId, setRegionId] = useState<RegionSelection>("world");
   const [scope, setScope] = useState<FlagChoiceScope>("region");
   const [sessionRule, setSessionRule] = useState<SessionRule>("ten-untimed");
   const [durationSeconds, setDurationSeconds] = useState(120);
   const insufficientCountries = countRegionCountries(regionId) < (scope === "region" ? 4 : 1);
-  const [session, setSession] = useState<GameSession | null>(null);
-  const [clockMs, setClockMs] = useState(0);
-
+  const {
+    session, questionCountry, review, result, remainingMs,
+    startRound, submit: submitRound, skip: skipRound, advance: advanceRound, reset,
+  } = useQuizSession(locale);
   const question = session?.currentQuestion;
-  const questionCountry = session ? getQuestionCountry(session) : null;
-  const review = session?.status === "review" ? session.lastReview : null;
-  const result = session?.status === "finished" ? getResult(session) : null;
   const selectedId = review?.answer?.format === "flag" ? review.answer.countryId : null;
 
   // The candidate set is stable throughout a question and its review, including
@@ -43,58 +36,19 @@ export function NameToFlagQuiz({ locale }: { locale: Locale }) {
       .map((country) => ({ countryId: country.id, country }));
   }, [question?.number, question?.countryId, session?.countryPool, scope]);
 
-  useEffect(() => {
-    if (!session || session.deadlineMs === null || session.status === "finished") return;
-    const interval = window.setInterval(() => {
-      const now = Date.now();
-      setClockMs(now);
-      setSession((previous) => previous && previous.status !== "finished"
-        ? tickSession(previous, now)
-        : previous);
-    }, 250);
-    return () => window.clearInterval(interval);
-  }, [session?.deadlineMs, session?.status]);
-
-  const remainingMs = session && session.deadlineMs !== null
-    ? getRemainingMs(session, Math.max(clockMs, session.startedAtMs))
-    : null;
-
   const start = () => {
     if (insufficientCountries) return;
-    const now = Date.now();
-    setSession(startSession({
+    startRound({
       quizKind: "name-to-flag",
       answerFormat: "flag",
       sessionRule,
       regionId: regionId === "world" ? null : regionId,
-    }, countries, {
-      nowMs: now,
-      ...(sessionRule === "ten-untimed" ? {} : { durationMs: durationSeconds * 1000 }),
-    }));
-    setClockMs(now);
+    }, durationSeconds);
   };
 
-  const answer = (countryId: string) => {
-    const now = Date.now();
-    setClockMs(now);
-    setSession((previous) => previous?.status === "asking"
-      ? submitAnswer(previous, { format: "flag", countryId }, locale, now)
-      : previous);
-  };
-
-  const skip = () => {
-    const now = Date.now();
-    setClockMs(now);
-    setSession((previous) => previous?.status === "asking"
-      ? skipQuestion(previous, now) : previous);
-  };
-
-  const next = () => {
-    const now = Date.now();
-    setClockMs(now);
-    setSession((previous) => previous?.status === "review"
-      ? advanceSession(previous, now) : previous);
-  };
+  const answer = (countryId: string) => submitRound({ format: "flag", countryId });
+  const skip = () => skipRound();
+  const next = () => advanceRound();
 
   return (
     <section className="quiz" id="name-to-flag-quiz" aria-labelledby="name-to-flag-quiz-title">
@@ -123,28 +77,13 @@ export function NameToFlagQuiz({ locale }: { locale: Locale }) {
                 <option value="world">{qt("worldwide")}</option>
               </select>
             </label>
-            <label className="quiz__label">
-              {qt("gameRule")}
-              <select value={sessionRule} onChange={(event) =>
-                setSessionRule(event.target.value as SessionRule)}>
-                <option value="ten-untimed">{qt("tenUntimed")}</option>
-                <option value="ten-timed">{qt("tenTimed")}</option>
-                <option value="time-attack">{qt("timeAttack")}</option>
-              </select>
-            </label>
-            {sessionRule !== "ten-untimed" && (
-              <label className="quiz__label">
-                {qt("timeLimit")}
-                <select value={durationSeconds} onChange={(event) =>
-                  setDurationSeconds(Number(event.target.value))}>
-                  {durations.map((seconds) => (
-                    <option key={seconds} value={seconds}>
-                      {seconds / 60} {isJa ? "分" : seconds === 60 ? "minute" : "minutes"}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            )}
+            <QuizRuleFields
+              locale={locale}
+              sessionRule={sessionRule}
+              onSessionRuleChange={setSessionRule}
+              durationSeconds={durationSeconds}
+              onDurationChange={setDurationSeconds}
+            />
           </div>
           <p className="quiz__note">{qt("tap_a_flag_to_submit_provisional_scoring_100_correct")}</p>
           <button type="button" className="quiz__primary" onClick={start}
@@ -238,7 +177,7 @@ export function NameToFlagQuiz({ locale }: { locale: Locale }) {
               );
             })}
           </ol>
-          <button type="button" className="quiz__primary" onClick={() => setSession(null)}>
+          <button type="button" className="quiz__primary" onClick={reset}>
             {qt("playAgain")}
           </button>
         </div>

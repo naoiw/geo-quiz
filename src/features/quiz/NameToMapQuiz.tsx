@@ -1,10 +1,8 @@
-import { useEffect, useState } from "react";
-import { countries, findCountry, getCountryName } from "../../country-data";
-import {
-  advanceSession, getQuestionCountry, getRemainingMs, getResult,
-  skipQuestion, startSession, submitAnswer, tickSession,
-} from "../../game-engine/engine";
-import type { GameSession, SessionRule } from "../../game-engine/types";
+import { useState } from "react";
+import { findCountry, getCountryName } from "../../country-data";
+import { QuizRuleFields } from "./QuizRuleFields";
+import { useQuizSession } from "./useQuizSession";
+import type { SessionRule } from "../../game-engine/types";
 import type { Locale } from "../../i18n/messages";
 import { quizText, type QuizTextKey } from "../../i18n/quizMessages";
 import { QuizFeedback, QuizProgress, QuizResultSummary } from "./QuizStatus";
@@ -13,86 +11,51 @@ import { RegionSelector, countRegionCountries, type RegionSelection } from "./Re
 import "./NameQuiz.css";
 import "./NameToMapQuiz.css";
 
-const durations = [60, 120, 180, 300] as const;
-
 /** 2D renderer only: question IDs and judgement remain in the shared game engine. */
 export function NameToMapQuiz({ locale }: { locale: Locale }) {
-  const isJa = locale === "ja";
   const qt = (key: QuizTextKey) => quizText(locale, key);
   const [regionId, setRegionId] = useState<RegionSelection>("world");
   const [sessionRule, setSessionRule] = useState<SessionRule>("ten-untimed");
   const [durationSeconds, setDurationSeconds] = useState(120);
   const insufficientCountries = countRegionCountries(regionId) < 1;
-  const [session, setSession] = useState<GameSession | null>(null);
+  const {
+    session, questionCountry, review, result, remainingMs,
+    startRound, submit: submitRound, skip: skipRound, advance: advanceRound, reset,
+  } = useQuizSession(locale);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [clockMs, setClockMs] = useState(0);
-
-  const questionCountry = session ? getQuestionCountry(session) : null;
-  const review = session?.status === "review" ? session.lastReview : null;
-  const result = session?.status === "finished" ? getResult(session) : null;
   const reviewedChoiceId = review?.answer?.format === "map" ? review.answer.countryId : null;
   const mapSelectedId = review ? reviewedChoiceId : selectedId;
   const selectedCountry = selectedId ? findCountry(selectedId) : null;
 
-  useEffect(() => {
-    if (!session || session.deadlineMs === null || session.status === "finished") return;
-    const interval = window.setInterval(() => {
-      const now = Date.now();
-      setClockMs(now);
-      setSession((previous) => previous && previous.status !== "finished"
-        ? tickSession(previous, now) : previous);
-    }, 250);
-    return () => window.clearInterval(interval);
-  }, [session?.deadlineMs, session?.status]);
-
-  const remainingMs = session && session.deadlineMs !== null
-    ? getRemainingMs(session, Math.max(clockMs, session.startedAtMs)) : null;
-
   const start = () => {
     if (insufficientCountries) return;
-    const now = Date.now();
-    const configuration = {
+    startRound({
       quizKind: "name-to-map",
       answerFormat: "map",
       sessionRule,
       regionId: regionId === "world" ? null : regionId,
-    } as const;
-    setSession(startSession(configuration, countries, {
-      nowMs: now,
-      ...(sessionRule === "ten-untimed" ? {} : { durationMs: durationSeconds * 1000 }),
-    }));
+    }, durationSeconds);
     setSelectedId(null);
-    setClockMs(now);
   };
 
   const submit = () => {
     if (!selectedId || session?.status !== "asking") return;
-    const now = Date.now();
-    setClockMs(now);
-    setSession((previous) => previous?.status === "asking"
-      ? submitAnswer(previous, { format: "map", countryId: selectedId }, locale, now)
-      : previous);
+    submitRound({ format: "map", countryId: selectedId });
   };
 
   const skip = () => {
     if (session?.status !== "asking") return;
-    const now = Date.now();
-    setClockMs(now);
-    setSession((previous) => previous?.status === "asking"
-      ? skipQuestion(previous, now) : previous);
+    skipRound();
     setSelectedId(null);
   };
 
   const next = () => {
-    const now = Date.now();
-    setClockMs(now);
-    setSession((previous) => previous?.status === "review"
-      ? advanceSession(previous, now) : previous);
+    advanceRound();
     setSelectedId(null);
   };
 
   const restart = () => {
-    setSession(null);
+    reset();
     setSelectedId(null);
   };
 
@@ -115,28 +78,13 @@ export function NameToMapQuiz({ locale }: { locale: Locale }) {
               onChange={setRegionId}
               sessionRule={sessionRule}
             />
-            <label className="quiz__label">
-              {qt("gameRule")}
-              <select value={sessionRule} onChange={(event) =>
-                setSessionRule(event.target.value as SessionRule)}>
-                <option value="ten-untimed">{qt("tenUntimed")}</option>
-                <option value="ten-timed">{qt("tenTimed")}</option>
-                <option value="time-attack">{qt("timeAttack")}</option>
-              </select>
-            </label>
-            {sessionRule !== "ten-untimed" && (
-              <label className="quiz__label">
-                {qt("timeLimit")}
-                <select value={durationSeconds} onChange={(event) =>
-                  setDurationSeconds(Number(event.target.value))}>
-                  {durations.map((seconds) => (
-                    <option key={seconds} value={seconds}>
-                      {seconds / 60} {isJa ? "分" : seconds === 60 ? "minute" : "minutes"}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            )}
+            <QuizRuleFields
+              locale={locale}
+              sessionRule={sessionRule}
+              onSessionRuleChange={setSessionRule}
+              durationSeconds={durationSeconds}
+              onDurationChange={setDurationSeconds}
+            />
           </div>
           <p className="quiz__note">{qt("select_a_country_then_confirm_to_prevent_accidental_taps")}</p>
           <button type="button" className="quiz__primary" onClick={start}

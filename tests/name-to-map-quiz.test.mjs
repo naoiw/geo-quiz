@@ -123,7 +123,7 @@ test("map quiz only reveals the answer after confirmation, never on question sta
   assert.ok(quiz.includes('readOnly={session.status !== "asking"}'));
   assert.ok(quiz.includes("showRegionNavigation"));
   assert.ok(app.includes("<NameToMapQuiz locale={locale} />"));
-  assert.ok(card.includes('mode.id !== "name-to-flag"'));
+  assert.ok(card.includes('href={"#" + mode.id + "-quiz"}'));
 });
 
 test("region navigation and microstate touch targets do not draw visible pin circles", () => {

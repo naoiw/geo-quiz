@@ -10,6 +10,7 @@ import type { Locale } from "../../i18n/messages";
 import { WorldMap } from "../../map/WorldMap";
 import { CountryFlag } from "../../flags/CountryFlag";
 import { createCountryNameChoices } from "./name-choices";
+import { CountryChoiceGrid } from "./CountryChoiceGrid";
 import "./NameQuiz.css";
 
 type NameAnswerFormat = Extract<AnswerFormat, "text" | "multiple-choice">;
@@ -288,25 +289,16 @@ export function NameQuiz({ locale, kind }: Props) {
               </div>
             </form>
           ) : (
-            <div className="quiz__choices" role="group" aria-label={isJa ? "国名の選択肢" : "Country choices"}>
-              {choices.map((choice, index) => {
-                const isCorrect = review !== null && choice.countryId === review.correctCountryId;
-                const isWrong = review?.answer?.format === "multiple-choice" &&
-                  review.answer.countryId === choice.countryId && !isCorrect;
-                return (
-                  <button
-                    type="button"
-                    key={choice.countryId}
-                    className={"quiz__choice" + (isCorrect ? " quiz__choice--correct" : "") +
-                      (isWrong ? " quiz__choice--wrong" : "")}
-                    disabled={session.status !== "asking"}
-                    onClick={() => answerWithChoice(choice.countryId)}>
-                    <span className="quiz__choice-index">{String.fromCharCode(65 + index)}</span>
-                    {choice.label}
-                  </button>
-                );
-              })}
-            </div>
+            <CountryChoiceGrid
+              choices={choices}
+              label={isJa ? "国名の選択肢" : "Country choices"}
+              disabled={session.status !== "asking"}
+              correctCountryId={review?.correctCountryId}
+              selectedCountryId={review?.answer?.format === "multiple-choice"
+                ? review.answer.countryId : null}
+              onSelect={answerWithChoice}
+              renderChoice={(choice) => choice.label}
+            />
           )}
           {session.status === "asking" && (
             <div className="quiz__actions">

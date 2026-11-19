@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const countries = JSON.parse(
-  readFileSync(new URL("../src/country-data/countries.json", import.meta.url), "utf8"),
+  readFileSync("src/country-data/countries.json", "utf8"),
 );
 const regionIds = new Set(["africa", "asia", "europe", "north-america", "south-america", "oceania"]);
 const counts = { "un-member": 193, observer: 2, additional: 2 };

@@ -59,7 +59,7 @@ export function getAcceptedTextAnswers(country: Country, locale: Locale): string
     ...country.aliases[locale],
     ...(country.readings?.[locale] ?? []),
   ].map(normalizeTextAnswer).filter(Boolean))];
-
+}
 
 export function judgeAnswer(
   question: Question,

@@ -10,6 +10,7 @@
 ## UI・ゲーム仕様
 
 - [UI_UX.md](UI_UX.md) — モード選択、共通進捗・正誤・結果、スマホ/PC・アクセシビリティ
+- [QA_CHECKLIST.md](QA_CHECKLIST.md) — 自動回帰テストの対象とPC・スマホでの手動検証表
 - [REGION_PLAY.md](REGION_PLAY.md) — 地域別出題、越境国、小地域での問題数
 - [LOCALIZATION.md](LOCALIZATION.md) — 日英の言語設定・翻訳
 - [TEXT_ANSWER.md](TEXT_ANSWER.md) — 国名入力の読み仮名・別名・表記ゆれ・IME

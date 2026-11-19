@@ -61,6 +61,8 @@ npm run preview
 | `src/i18n` | UIの日英翻訳、国名表示言語の設定・保存 |
 | `tests` | エンジン・データ・出題形式・画面接続・共通化の回帰テスト |
 
+主要な国データ・国旗・地図の照合に加え、全7地域×6回答形式×3ゲームルール×日英の回帰テストをCIで実施します。PC・スマホの実機確認項目は [品質検証チェックリスト](docs/QA_CHECKLIST.md) にまとめています。
+
 詳細は [設計](docs/ARCHITECTURE.md)、[共通エンジン](docs/GAME_ENGINE.md)、[UI/UX](docs/UI_UX.md) を参照してください。
 
 ## GitHub運用・公開
@@ -76,6 +78,7 @@ npm run preview
 - [国名入力と表記ゆれ](docs/TEXT_ANSWER.md)
 - [日英ローカライズ](docs/LOCALIZATION.md)
 - [スマホ・PC UIとアクセシビリティ](docs/UI_UX.md)
+- [品質検証チェックリスト](docs/QA_CHECKLIST.md)
 - [2D世界地図と小国の表示](docs/MAP.md)
 - [データ・アセットとライセンス](docs/DATA.md)
 

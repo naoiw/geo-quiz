@@ -5,3 +5,4 @@
 - [DEPLOYMENT.md](DEPLOYMENT.md): mainからのGitHub Pages
 - [DATA.md](DATA.md): 国データ、国旗・地図、外部ライセンス
 - [MAP.md](MAP.md): インタラクティブ2D地図の描画、操作、データ出典
+- [FLAGS.md](FLAGS.md): 国旗SVGの生成、表示、ライセンスと注意点

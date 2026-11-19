@@ -148,3 +148,64 @@ main.page-container { flex: 1; }
     max-width: 100%;
   }
 }
+
+.flag-demo {
+  margin-bottom: 56px;
+}
+
+.flag-demo__panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 28px;
+  padding: 24px;
+  border: 1px solid #d9e5f1;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.flag-demo__control {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 14px;
+  color: #526782;
+  font-weight: 700;
+}
+
+.flag-demo__control select {
+  min-width: min(270px, 100%);
+  padding: 10px 12px;
+  border: 1px solid #cbd9e8;
+  border-radius: 9px;
+  background: #fff;
+  color: #172b47;
+  font: inherit;
+}
+
+.flag-demo__sample {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: min(320px, 100%);
+}
+
+.flag-demo__sample .country-flag {
+  border: 1px solid #edf1f7;
+}
+
+.flag-demo__sample p {
+  margin: 0;
+  color: #172b47;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.flag-demo__notice {
+  margin: 12px 0 0;
+  color: #7a8ca2;
+  font-size: 12px;
+  line-height: 1.6;
+}

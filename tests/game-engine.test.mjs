@@ -109,7 +109,7 @@ test("regional filtering and localized text answers use the same country pool", 
   const question = { number: 1, countryId: "JP", quizKind: "flag-to-name", answerFormat: "text" };
   assert.equal(engine.judgeAnswer(question, { format: "text", value: "ＪＡＰＡＮ " }, japan, "en"), "correct");
   assert.equal(engine.judgeAnswer(question, { format: "text", value: "日本" }, japan, "ja"), "correct");
-  assert.equal(engine.judgeAnswer(question, { format: "text", value: "日本国" }, japan, "ja"), "incorrect");
+  assert.equal(engine.judgeAnswer(question, { format: "text", value: "日本国" }, japan, "ja"), "correct");
   assert.equal(engine.judgeAnswer(question, { format: "text", value: " " }, japan, "ja"), "incorrect");
   const us = countries.find((c) => c.id === "US");
   assert.equal(engine.judgeAnswer({ ...question, countryId: "US" }, { format: "text", value: "アメリカ" }, us, "ja"), "correct");

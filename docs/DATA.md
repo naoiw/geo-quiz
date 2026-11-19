@@ -21,7 +21,8 @@ src/country-data/countries.json に197件の国・地域データを収録して
 | classification | un-member / observer / additional |
 | isoAlpha2 / isoAlpha3 | ISOコード。未割当の場合はnull |
 | names.ja / names.en | 日本語・英語の表示名 |
-| aliases.ja / aliases.en | 通称・別表記。Issue #10で見直し |
+| aliases.ja / aliases.en | 国別・言語別の受理する通称・正式名・別表記（#10） |
+| readings.ja（任意） | 表示名や別名の明示的な読み仮名（#10） |
 | regionIds | 地域選択用のID配列 |
 | flagId / geometryId | 国旗と国境の論理ID |
 
@@ -58,3 +59,8 @@ flagId、geometryIdは国IDと同じ論理キーです。地図ポリゴンはIs
 npm test で197件の内訳、ID/論理アセットキーの重複、日英の名称欠落、地域コード、ISO例外、越境例、別名配列を検査します。CIとPages公開時のビルドにも組み込みます。
 
 検証対象はマスタの内部整合性のみです。地図の197件すべての対応はtests/world-map.test.mjsで検証します。国旗197件の実在チェック・SVG形式・ライセンス同梱確認はtests/flag-assets.test.mjsで実行します。
+
+## 国名の読みと正答判定（Issue #10）
+漢字を含む日本語表示名23件にはすべて明示的な読みを登録しています。片仮名のみの名前はひらがなへ自動対応します。元データの受理可能な別名も保持し、通称・正式名の一部を追加しました。
+
+正規化と厳密一致、日英の入力判定ルールは [TEXT_ANSWER.md](TEXT_ANSWER.md) を参照してください。

@@ -7,18 +7,13 @@ import {
 import type { GameSession, SessionRule } from "../../game-engine/types";
 import type { Locale } from "../../i18n/messages";
 import { quizText, type QuizTextKey } from "../../i18n/quizMessages";
+import { QuizFeedback, QuizProgress, QuizResultSummary } from "./QuizStatus";
 import { WorldMap } from "../../map/WorldMap";
 import { RegionSelector, countRegionCountries, type RegionSelection } from "./RegionSelector";
 import "./NameQuiz.css";
 import "./NameToMapQuiz.css";
 
 const durations = [60, 120, 180, 300] as const;
-
-function formatTime(milliseconds: number): string {
-  const seconds = Math.ceil(milliseconds / 1000);
-  return String(Math.floor(seconds / 60)).padStart(2, "0") + ":" +
-    String(seconds % 60).padStart(2, "0");
-}
 
 /** 2D renderer only: question IDs and judgement remain in the shared game engine. */
 export function NameToMapQuiz({ locale }: { locale: Locale }) {
@@ -153,20 +148,14 @@ export function NameToMapQuiz({ locale }: { locale: Locale }) {
 
       {session && session.status !== "finished" && (
         <div className="quiz__game">
-          <div className="quiz__stats" aria-label={qt("gameProgress")}>
-            <span>{session.configuration.sessionRule === "time-attack"
-              ? (isJa ? "第" + session.currentQuestion?.number + "問" :
-                "Question " + session.currentQuestion?.number)
-              : (isJa ? "第" + session.currentQuestion?.number + "問 / " + session.questionLimit + "問" :
-                "Question " + session.currentQuestion?.number + " / " + session.questionLimit)}</span>
-            <span>{qt("score")}: {session.score}</span>
-            {remainingMs !== null && (
-              <span role="timer" aria-label={qt("remainingTime")}>
-                {formatTime(remainingMs)}
-              </span>
-            )}
-          </div>
-
+          <QuizProgress
+            locale={locale}
+            number={session.currentQuestion?.number ?? 1}
+            limit={session.questionLimit}
+            rule={session.configuration.sessionRule}
+            score={session.score}
+            remainingMs={remainingMs}
+          />
           <p className="quiz__prompt">
             {qt("mapPromptStart")}<strong>
               {questionCountry ? getCountryName(questionCountry, locale) :
@@ -210,50 +199,26 @@ export function NameToMapQuiz({ locale }: { locale: Locale }) {
           )}
 
           {review && (
-            <div className={"quiz__review quiz__review--" + review.judgement}
-              role="status" aria-live="polite">
-              <p>
-                <strong>{review.judgement === "correct"
-                  ? (qt("correctNotice"))
-                  : review.judgement === "skipped" ? (qt("skippedNotice"))
-                    : (qt("incorrectNotice"))}</strong>
-                {"　"}
-                {qt("answerPrefix")}
-                {questionCountry ? getCountryName(questionCountry, locale) : review.correctCountryId}
-                {reviewedChoiceId && review.judgement === "incorrect" && (
-                  <span className="quiz__map-your-answer">
-                    {qt("yourChoice")}
-                    {findCountry(reviewedChoiceId)
-                      ? getCountryName(findCountry(reviewedChoiceId)!, locale) : reviewedChoiceId}
-                  </span>
-                )}
-              </p>
-              <button type="button" className="quiz__primary" onClick={next}>
-                {qt("continue")}
-              </button>
-            </div>
+            <QuizFeedback
+              locale={locale}
+              judgement={review.judgement}
+              correctName={questionCountry ? getCountryName(questionCountry, locale) : review.correctCountryId}
+              onContinue={next}
+              details={reviewedChoiceId && review.judgement === "incorrect" ? (
+                <span className="quiz__map-your-answer">
+                  {qt("yourChoice")}
+                  {findCountry(reviewedChoiceId)
+                    ? getCountryName(findCountry(reviewedChoiceId)!, locale) : reviewedChoiceId}
+                </span>
+              ) : null}
+            />
           )}
         </div>
       )}
 
       {result && (
         <div className="quiz__results" role="region" aria-label={qt("quizResults")}>
-          <h3>{qt("results")}</h3>
-          <p className="quiz__result-summary">{qt("totalScore")}: <strong>{result.score}</strong></p>
-          <div className="quiz__result-stats">
-            <span>{qt("answered")}: {result.answered}</span>
-            <span>{qt("correctCount")}: {result.correct}</span>
-            <span>{qt("incorrectNotice")}: {result.incorrect}</span>
-            <span>{qt("skippedNotice_2")}: {result.skipped}</span>
-            <span>{qt("accuracy")}: {result.accuracyPercent.toFixed(1)}%</span>
-            <span>{qt("elapsed")}: {formatTime(result.elapsedMs)}</span>
-          </div>
-          <p className="quiz__note">
-            {result.finishReason === "timeout"
-              ? (qt("timeUp"))
-              : (isJa ? result.answered + "問終了しました。" :
-                "All " + result.answered + " questions completed.")}
-          </p>
+          <QuizResultSummary locale={locale} result={result} />
           <ol className="quiz__history">
             {result.history.map((record) => {
               const correct = findCountry(record.correctCountryId);

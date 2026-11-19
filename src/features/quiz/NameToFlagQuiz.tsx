@@ -8,6 +8,7 @@ import type { GameSession, SessionRule } from "../../game-engine/types";
 import { CountryFlag } from "../../flags/CountryFlag";
 import type { Locale } from "../../i18n/messages";
 import { quizText, type QuizTextKey } from "../../i18n/quizMessages";
+import { QuizFeedback, QuizProgress, QuizResultSummary } from "./QuizStatus";
 import { CountryChoiceGrid } from "./CountryChoiceGrid";
 import { RegionSelector, countRegionCountries, type RegionSelection } from "./RegionSelector";
 import { createFlagChoices, type FlagChoiceScope } from "./flag-choices";
@@ -15,12 +16,6 @@ import "./NameQuiz.css";
 import "./NameToFlagQuiz.css";
 
 const durations = [60, 120, 180, 300] as const;
-
-function formatTime(milliseconds: number): string {
-  const seconds = Math.ceil(milliseconds / 1000);
-  return String(Math.floor(seconds / 60)).padStart(2, "0") + ":" +
-    String(seconds % 60).padStart(2, "0");
-}
 
 /** The fourth game mode: country name -> one of four locally bundled flags. */
 export function NameToFlagQuiz({ locale }: { locale: Locale }) {
@@ -161,19 +156,14 @@ export function NameToFlagQuiz({ locale }: { locale: Locale }) {
 
       {session && session.status !== "finished" && (
         <div className="quiz__game">
-          <div className="quiz__stats" aria-label={qt("gameProgress")}>
-            <span>{session.configuration.sessionRule === "time-attack"
-              ? (isJa ? "第" + question?.number + "問" : "Question " + question?.number)
-              : (isJa ? "第" + question?.number + "問 / " + session.questionLimit + "問" :
-                "Question " + question?.number + " / " + session.questionLimit)}</span>
-            <span>{qt("score")}: {session.score}</span>
-            {remainingMs !== null && (
-              <span role="timer" aria-label={qt("remainingTime")}>
-                {formatTime(remainingMs)}
-              </span>
-            )}
-          </div>
-
+          <QuizProgress
+            locale={locale}
+            number={question?.number ?? 1}
+            limit={session.questionLimit}
+            rule={session.configuration.sessionRule}
+            score={session.score}
+            remainingMs={remainingMs}
+          />
           <p className="quiz__prompt">
             {qt("flagPromptStart")}<strong>
               {questionCountry ? getCountryName(questionCountry, locale) : question?.countryId}
@@ -206,52 +196,25 @@ export function NameToFlagQuiz({ locale }: { locale: Locale }) {
           )}
 
           {review && (
-            <div className={"quiz__review quiz__review--" + review.judgement}
-              role="status" aria-live="polite">
-              <p>
-                <strong>{review.judgement === "correct"
-                  ? (qt("correctNotice"))
-                  : review.judgement === "skipped"
-                    ? (qt("skippedNotice"))
-                    : (qt("incorrectNotice"))}</strong>
-                {"　"}
-                {qt("answerPrefix")}
-                {questionCountry ? getCountryName(questionCountry, locale) : review.correctCountryId}
-                {review.judgement === "incorrect" && selectedId && (
-                  <span className="quiz__flag-your-answer">
-                    {qt("yourFlag")}
-                    {findCountry(selectedId) ? getCountryName(findCountry(selectedId)!, locale) : selectedId}
-                  </span>
-                )}
-              </p>
-              <button type="button" className="quiz__primary" onClick={next}>
-                {qt("continue")}
-              </button>
-            </div>
+            <QuizFeedback
+              locale={locale}
+              judgement={review.judgement}
+              correctName={questionCountry ? getCountryName(questionCountry, locale) : review.correctCountryId}
+              onContinue={next}
+              details={review.judgement === "incorrect" && selectedId ? (
+                <span className="quiz__flag-your-answer">
+                  {qt("yourFlag")}
+                  {findCountry(selectedId) ? getCountryName(findCountry(selectedId)!, locale) : selectedId}
+                </span>
+              ) : null}
+            />
           )}
         </div>
       )}
 
       {result && (
         <div className="quiz__results" role="region" aria-label={qt("quizResults")}>
-          <h3>{qt("results")}</h3>
-          <p className="quiz__result-summary">
-            {qt("totalScore")}: <strong>{result.score}</strong>
-          </p>
-          <div className="quiz__result-stats">
-            <span>{qt("answered")}: {result.answered}</span>
-            <span>{qt("correctCount")}: {result.correct}</span>
-            <span>{qt("incorrectNotice")}: {result.incorrect}</span>
-            <span>{qt("skippedNotice_2")}: {result.skipped}</span>
-            <span>{qt("accuracy")}: {result.accuracyPercent.toFixed(1)}%</span>
-            <span>{qt("elapsed")}: {formatTime(result.elapsedMs)}</span>
-          </div>
-          <p className="quiz__note">
-            {result.finishReason === "timeout"
-              ? (qt("timeUp"))
-              : (isJa ? result.answered + "問終了しました。" :
-                "All " + result.answered + " questions completed.")}
-          </p>
+          <QuizResultSummary locale={locale} result={result} />
           <ol className="quiz__history">
             {result.history.map((record) => {
               const correct = findCountry(record.correctCountryId);

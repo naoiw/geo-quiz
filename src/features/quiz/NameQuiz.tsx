@@ -62,10 +62,6 @@ export function NameQuiz({ locale, kind }: Props) {
 
   const start = () => {
     if (insufficientCountries) return;
-    const now = Date.now();
-    setSession(startSession({
-      quizKind: kind  const start = () => {
-    if (insufficientCountries) return;
     startRound({
       quizKind: kind,
       answerFormat,

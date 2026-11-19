@@ -23,5 +23,7 @@ jobs:
         run: npm run lint
       - name: Typecheck
         run: npm run typecheck
+      - name: Validate country master
+        run: npm test
       - name: Build
         run: npm run build

@@ -14,6 +14,7 @@ npm run dev
 npm run lint
 npm run typecheck
 npm run build
+npm test
 ~~~
 
 ## ブランチとIssue
@@ -36,7 +37,7 @@ npm run build
 
 `.github/workflows/ci.yml`は`main`向けPRと`main`へのpushでlint・typecheck・buildを実行します。Pages公開ワークフローもlintとビルドに成功した成果物だけを公開します。
 
-確認項目：Issueの完了条件、PC・スマホ表示、日本語/英語、既存機能への影響、未完成機能の公開防止。国データ・出題ロジックの自動テストはIssue #17で拡充します。
+確認項目：Issueの完了条件、PC・スマホ表示、日本語/英語、既存機能への影響、未完成機能の公開防止。国マスタの197件の整合性テストはnpm testで実行します。国旗・地図アセットとの照合や出題ロジックのテストはIssue #17で拡充します。
 
 初期構成はlockfile未生成です。依存固定後に`package-lock.json`を追加し、`npm ci`へ切り替えてください。
 

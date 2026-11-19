@@ -95,6 +95,12 @@
   cursor: pointer;
 }
 
+/* Highlight the existing tiny country geometry, without overlay markers or black frames. */
+.world-map--quiz .world-map__country--highlighted[data-tiny="true"] {
+  stroke: #fbbf24;
+  stroke-width: 3;
+}
+
 .world-map__microstate-hit-area {
   fill: transparent;
   stroke: none;

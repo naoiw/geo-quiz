@@ -28,8 +28,17 @@
       "en": "United Arab Emirates"
     },
     "aliases": {
-      "ja": [],
-      "en": []
+      "ja": [
+        "UAE"
+      ],
+      "en": [
+        "UAE"
+      ]
+    },
+    "readings": {
+      "ja": [
+        "あらぶしゅちょうこくれんぽう"
+      ]
     },
     "regionIds": [
       "asia"
@@ -560,8 +569,20 @@
       "en": "Congo - Kinshasa"
     },
     "aliases": {
-      "ja": [],
-      "en": []
+      "ja": [
+        "コンゴ民主共和国"
+      ],
+      "en": [
+        "Democratic Republic of the Congo",
+        "DR Congo",
+        "DRC"
+      ]
+    },
+    "readings": {
+      "ja": [
+        "こんごみんしゅきょうわこく(きんしゃさ)",
+        "こんごみんしゅきょうわこく"
+      ]
     },
     "regionIds": [
       "africa"
@@ -582,6 +603,11 @@
       "ja": [],
       "en": []
     },
+    "readings": {
+      "ja": [
+        "ちゅうおうあふりかきょうわこく"
+      ]
+    },
     "regionIds": [
       "africa"
     ],
@@ -598,8 +624,19 @@
       "en": "Congo - Brazzaville"
     },
     "aliases": {
-      "ja": [],
-      "en": []
+      "ja": [
+        "コンゴ共和国"
+      ],
+      "en": [
+        "Republic of the Congo",
+        "Congo"
+      ]
+    },
+    "readings": {
+      "ja": [
+        "こんごきょうわこく(ぶらざびる)",
+        "こんごきょうわこく"
+      ]
     },
     "regionIds": [
       "africa"
@@ -641,6 +678,11 @@
       ],
       "en": [
         "Ivory Coast"
+      ]
+    },
+    "readings": {
+      "ja": [
+        "ぞうげかいがん"
       ]
     },
     "regionIds": [
@@ -697,8 +739,18 @@
       "en": "China"
     },
     "aliases": {
-      "ja": [],
-      "en": []
+      "ja": [
+        "中華人民共和国"
+      ],
+      "en": [
+        "People's Republic of China"
+      ]
+    },
+    "readings": {
+      "ja": [
+        "ちゅうごく",
+        "ちゅうかじんみんきょうわこく"
+      ]
     },
     "regionIds": [
       "asia"
@@ -818,6 +870,11 @@
         "Czech Republic"
       ]
     },
+    "readings": {
+      "ja": [
+        "ちぇこきょうわこく"
+      ]
+    },
     "regionIds": [
       "europe"
     ],
@@ -894,6 +951,11 @@
       "ja": [],
       "en": []
     },
+    "readings": {
+      "ja": [
+        "どみにかこく"
+      ]
+    },
     "regionIds": [
       "north-america"
     ],
@@ -912,6 +974,11 @@
     "aliases": {
       "ja": [],
       "en": []
+    },
+    "readings": {
+      "ja": [
+        "どみにかきょうわこく"
+      ]
     },
     "regionIds": [
       "north-america"
@@ -1100,8 +1167,15 @@
       "en": "Micronesia"
     },
     "aliases": {
-      "ja": [],
+      "ja": [
+        "ミクロネシア"
+      ],
       "en": []
+    },
+    "readings": {
+      "ja": [
+        "みくろねしあれんぽう"
+      ]
     },
     "regionIds": [
       "oceania"
@@ -1163,6 +1237,11 @@
       "en": [
         "UK",
         "Britain"
+      ]
+    },
+    "readings": {
+      "ja": [
+        "えいこく"
       ]
     },
     "regionIds": [
@@ -1278,6 +1357,11 @@
     "aliases": {
       "ja": [],
       "en": []
+    },
+    "readings": {
+      "ja": [
+        "せきどうぎにあ"
+      ]
     },
     "regionIds": [
       "africa"
@@ -1637,8 +1721,17 @@
       "en": "Japan"
     },
     "aliases": {
-      "ja": [],
+      "ja": [
+        "日本国"
+      ],
       "en": []
+    },
+    "readings": {
+      "ja": [
+        "にほん",
+        "にっぽん",
+        "にほんこく"
+      ]
     },
     "regionIds": [
       "asia"
@@ -1777,6 +1870,12 @@
         "Democratic People's Republic of Korea"
       ]
     },
+    "readings": {
+      "ja": [
+        "きたちょうせん",
+        "ちょうせんみんしゅしゅぎじんみんきょうわこく"
+      ]
+    },
     "regionIds": [
       "asia"
     ],
@@ -1793,8 +1892,18 @@
       "en": "South Korea"
     },
     "aliases": {
-      "ja": [],
-      "en": []
+      "ja": [
+        "大韓民国"
+      ],
+      "en": [
+        "Republic of Korea"
+      ]
+    },
+    "readings": {
+      "ja": [
+        "かんこく",
+        "だいかんみんこく"
+      ]
     },
     "regionIds": [
       "asia"
@@ -2157,6 +2266,11 @@
       "ja": [],
       "en": []
     },
+    "readings": {
+      "ja": [
+        "まーしゃるしょとう"
+      ]
+    },
     "regionIds": [
       "oceania"
     ],
@@ -2175,6 +2289,11 @@
     "aliases": {
       "ja": [],
       "en": []
+    },
+    "readings": {
+      "ja": [
+        "きたまけどにあ"
+      ]
     },
     "regionIds": [
       "europe"
@@ -2212,10 +2331,17 @@
     },
     "aliases": {
       "ja": [
-        "ビルマ"
+        "ビルマ",
+        "ミャンマー"
       ],
       "en": [
-        "Burma"
+        "Burma",
+        "Myanmar"
+      ]
+    },
+    "readings": {
+      "ja": [
+        "みゃんまー(びるま)"
       ]
     },
     "regionIds": [
@@ -2719,6 +2845,11 @@
         "State of Palestine"
       ]
     },
+    "readings": {
+      "ja": [
+        "ぱれすちなじちく"
+      ]
+    },
     "regionIds": [
       "asia"
     ],
@@ -2856,6 +2987,11 @@
         "Russian Federation"
       ]
     },
+    "readings": {
+      "ja": [
+        "ろしあれんぽう"
+      ]
+    },
     "regionIds": [
       "europe"
     ],
@@ -2912,6 +3048,11 @@
     "aliases": {
       "ja": [],
       "en": []
+    },
+    "readings": {
+      "ja": [
+        "そろもんしょとう"
+      ]
     },
     "regionIds": [
       "oceania"
@@ -3141,6 +3282,11 @@
       "ja": [],
       "en": []
     },
+    "readings": {
+      "ja": [
+        "みなみすーだん"
+      ]
+    },
     "regionIds": [
       "africa"
     ],
@@ -3312,6 +3458,11 @@
       "ja": [],
       "en": []
     },
+    "readings": {
+      "ja": [
+        "ひがしてぃもーる"
+      ]
+    },
     "regionIds": [
       "asia"
     ],
@@ -3392,6 +3543,11 @@
         "Turkey"
       ]
     },
+    "readings": {
+      "ja": [
+        "とるこきょうわこく"
+      ]
+    },
     "regionIds": [
       "asia"
     ],
@@ -3448,6 +3604,11 @@
     "aliases": {
       "ja": [],
       "en": []
+    },
+    "readings": {
+      "ja": [
+        "たいわん"
+      ]
     },
     "regionIds": [
       "asia"
@@ -3531,6 +3692,12 @@
         "United States of America"
       ]
     },
+    "readings": {
+      "ja": [
+        "あめりかがっしゅうこく",
+        "べいこく"
+      ]
+    },
     "regionIds": [
       "north-america"
     ],
@@ -3594,6 +3761,12 @@
         "Vatican"
       ]
     },
+    "readings": {
+      "ja": [
+        "ばちかんしこく",
+        "ろーまきょうこうちょう"
+      ]
+    },
     "regionIds": [
       "europe"
     ],
@@ -3612,6 +3785,11 @@
     "aliases": {
       "ja": [],
       "en": []
+    },
+    "readings": {
+      "ja": [
+        "せんとびんせんとおよびぐれなでぃーんしょとう"
+      ]
     },
     "regionIds": [
       "north-america"
@@ -3745,6 +3923,11 @@
     "aliases": {
       "ja": [],
       "en": []
+    },
+    "readings": {
+      "ja": [
+        "みなみあふりか"
+      ]
     },
     "regionIds": [
       "africa"

@@ -26,4 +26,4 @@
 
 ## テスト
 
-`tests/flag-assets.test.mjs` は197枚のSVGと国ID・ライセンスの対応を検証します。`tests/flag-to-name-quiz.test.mjs` は出題・入力式・四択式・日英・共通UIの連携を検証します。より広範なブラウザE2Eと文字入力の表記ゆれは#17/#10の後続対応です。
+`tests/flag-assets.test.mjs` は197枚のSVGと国ID・ライセンスの対応を検証します。`tests/flag-to-name-quiz.test.mjs` は出題・入力式・四択式・日英・共通UIの連携を検証します。国名の読み・表記ゆれはIssue #10で実装済みです。より広範なブラウザE2Eは#17の後続対応です。

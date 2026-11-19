@@ -124,6 +124,13 @@
   margin-top: 22px;
 }
 
+.quiz__input-help {
+  margin: 8px 0 10px;
+  font-size: 12px;
+  line-height: 1.65;
+  color: #60738e;
+}
+
 .quiz__answer-input-row {
   display: flex;
   gap: 10px;

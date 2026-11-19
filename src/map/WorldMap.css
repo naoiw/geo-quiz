@@ -95,7 +95,7 @@
   cursor: pointer;
 }
 
-/* Highlight the existing tiny country geometry, without overlay markers or black frames. */
+/* Keep tiny country geometry highlighted underneath the optional location pin. */
 .world-map--quiz .world-map__country--highlighted[data-tiny="true"] {
   stroke: #fbbf24;
   stroke-width: 3;
@@ -174,4 +174,35 @@
   .world-map__region-navigation { width: 100%; }
   .world-map__region-navigation select { flex: 1; max-width: none; }
   .world-map__bottom { flex-wrap: wrap; }
+}
+
+/* Only small, selected/highlighted countries receive these non-interactive pins.
+   The teardrop tip points at the feature's representative map coordinate. */
+.world-map__location-pin {
+  --pin-fill: #f59e0b;
+  --pin-center: #35240a;
+}
+.world-map__location-pin--selected {
+  --pin-fill: #2563eb;
+  --pin-center: #fff;
+}
+.world-map__pin-shape {
+  fill: var(--pin-fill);
+  stroke: #fff;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  paint-order: stroke fill;
+  filter: drop-shadow(0 1px 2px #0f172a80);
+}
+.world-map__pin-center {
+  fill: var(--pin-center);
+  stroke: #fff;
+  stroke-width: 1;
+}
+.world-map__pin-leader {
+  stroke: var(--pin-fill);
+  stroke-width: 3;
+  stroke-linecap: round;
+  paint-order: stroke fill;
+  filter: drop-shadow(0 1px 1px #fff);
 }

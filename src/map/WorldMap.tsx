@@ -4,6 +4,8 @@ import { countriesById, regions, type RegionId } from "../country-data";
 import type { Locale } from "../i18n/messages";
 import { quizText, type QuizTextKey } from "../i18n/quizMessages";
 import mapData from "./world-50m.json";
+import { needsLocationPin } from "./location-pin";
+import { SmallCountryMarker } from "./SmallCountryMarker";
 import "./WorldMap.css";
 
 type View = { x: number; y: number; width: number; height: number };
@@ -242,6 +244,16 @@ export function WorldMap({
   };
 
   const focusId = mode === "answer" ? null : focusCountryId ?? selectedCountryId;
+  // Do not reveal the target country in answer mode before the player selects it.
+  // Only visibly highlighted or player-selected small countries receive pins.
+  const locationPins = [
+    { countryId: highlightedCountryId, kind: "highlighted" as const },
+    { countryId: selectedCountryId, kind: "selected" as const },
+  ].filter(({ countryId, kind }) => {
+    if (!countryId || (kind === "selected" && countryId === highlightedCountryId)) return false;
+    const feature = featureById.get(countryId);
+    return !!feature && needsLocationPin(feature, view.width);
+  });
   const focusFeature = focusId ? featureById.get(focusId) : null;
   const instructions = readOnly
     ? qt("mapHighlightHelp")
@@ -337,6 +349,21 @@ export function WorldMap({
               );
             })}
           </g>}
+          {/* A high-contrast pin locates very small highlighted/selected countries.
+              It never changes the hit target or reveals the answer by country name. */}
+          <g className="world-map__location-pins" pointerEvents="none" aria-hidden="true">
+            {locationPins.map(({ countryId, kind }) => {
+              const feature = featureById.get(countryId!);
+              return feature ? (
+                <SmallCountryMarker
+                  key={kind + "-" + countryId}
+                  center={feature.center}
+                  viewport={view}
+                  kind={kind}
+                />
+              ) : null;
+            })}
+          </g>
         </svg>
       </div>
       <div className="world-map__bottom">

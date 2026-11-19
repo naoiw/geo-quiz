@@ -22,9 +22,14 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
-      - uses: android-actions/setup-android@v3
       - name: Install Android 36 SDK
-        run: sdkmanager --install "platforms;android-36" "build-tools;36.0.0"
+        run: |
+          SDKMANAGER="$(command -v sdkmanager || true)"
+          if [ -z "$SDKMANAGER" ]; then
+            SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | sort -V | tail -n 1)"
+          fi
+          test -n "$SDKMANAGER"
+          "$SDKMANAGER" --install "platforms;android-36" "build-tools;36.0.0"
       - name: Install locked npm dependencies
         run: npm ci --no-audit --no-fund
       - name: Build Android bundle and generate native project

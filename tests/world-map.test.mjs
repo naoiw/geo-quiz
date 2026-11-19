@@ -48,3 +48,15 @@ test("tiny-country hit targets do not draw markers over the map", () => {
   assert.match(mapStyles, /\.world-map__microstate-hit-area\s*\{\s*fill: transparent;\s*stroke: none;/);
   assert.doesNotMatch(mapComponent, /world-map__pin/);
 });
+
+test("country selection and focus do not draw a black SVG focus frame", () => {
+  const mapStyles = readFileSync("src/map/WorldMap.css", "utf8");
+  assert.match(
+    mapStyles,
+    /\.world-map__country:focus,\s*\.world-map__country:focus-visible\s*\{\s*outline: none;\s*box-shadow: none;/,
+  );
+  assert.doesNotMatch(
+    mapStyles,
+    /\.world-map__country:focus-visible\s*\{[^}]*\bstroke\s*:/,
+  );
+});

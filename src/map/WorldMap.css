@@ -101,10 +101,16 @@
   cursor: pointer;
 }
 
+/* SVG paths must not display the browser's rectangular focus ring. */
+.world-map__country:focus,
 .world-map__country:focus-visible {
   outline: none;
-  stroke: #0f172a;
-  stroke-width: 2;
+  box-shadow: none;
+}
+
+/* Preserve a keyboard focus cue without drawing a dark border. */
+.world-map__country:focus-visible {
+  filter: brightness(0.82);
 }
 
 .world-map__bottom {

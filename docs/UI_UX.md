@@ -13,7 +13,7 @@
 
 ## 共通部品
 
-`src/features/quiz/QuizStatus.tsx` に、どの題型でも同じUIを使う部品を配置します。
+`src/features/quiz/QuizStatus.tsx` に全題型共通の進捗・正誤・結果の部品を配置します。出題・回答・スキップ・次問・タイマーは `useQuizSession.ts`、3つの進行ルールと時間設定は `QuizRuleFields.tsx` を各題型で共通利用します。画面固有の入力/選択はそれぞれの題型に残します。
 
 | 部品 | 内容 |
 | --- | --- |

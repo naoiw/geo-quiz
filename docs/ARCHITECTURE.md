@@ -1,41 +1,69 @@
 # アーキテクチャ
 
-## 方針
+## 全体像
 
-- React + TypeScript + ViteをWebと将来のAndroidで共用する。AndroidはCapacitorを第一候補とする（Issue #15）。
-- UI、クイズ題型、出題/採点、国データ、i18nを独立させる。
-- src/game-engineはReact、DOM、地図描画ライブラリに依存させず、純粋なゲームロジックを置く。
-- src/country-dataは国IDをキーとして日本語/英語、地域、国旗ID、地図形状IDを結びつける。
-- 2D地図（Issue #3）を先に開発し、3D地球儀（Issue #19）を追加するときも国IDと回答処理を共有する。
-- 画面文言はsrc/i18nで管理する。ブラウザ言語判定と手動切替を初期UIに用意する。
+React + TypeScript + Vite製の静的Webアプリ。4題型・6回答形式を、**国IDを共通キーとする純粋ゲームエンジン**で扱います。地図・国旗・国名・地域・画面翻訳の追加が採点ロジックを変更しない構成です。Web完成後のAndroid移植はCapacitorを候補としています。
 
-## ディレクトリ責務
+```text
+App (モード選択・言語設定・プレビュー)
+  ├─ NameQuiz ────────── 地図→国名 / 国旗→国名（入力/四択）
+  ├─ NameToMapQuiz ───── 国名→地図（候補選択→確定）
+  └─ NameToFlagQuiz ──── 国名→国旗（四択）
+         │
+         ├─ useQuizSession ─── React/時刻・セッションのアダプタ
+         │        └─ game-engine/engine.ts ─── 純粋な状態遷移
+         ├─ QuizRuleFields / RegionSelector ── 共通ルール・地域
+         ├─ QuizStatus ─────────────────────── 共通進捗・正誤・結果
+         ├─ CountryChoiceGrid ─────────────── 国名/国旗四択
+         ├─ WorldMap / CountryFlag ─────────── 表示アセット
+         └─ i18n + country-data ────────────── 日英UI・国別名称
+```
 
-| パス | 責務 |
+`App` は必要な題型だけをマウントします。選択した題型の設定・回答のドラフトは**各画面ローカル**、セッションの時間制限・採点・遷移は**共通フック**、出題・正誤の規則は**純粋エンジン**が責任を持ちます。
+
+## ディレクトリの責務
+
+| ディレクトリ／ファイル | 内容 |
 | --- | --- |
-| src/app | 画面と状態の結合 |
-| src/components | 共通表示コンポーネント |
-| src/features/quiz | 4題型の出題画面、国名／国旗の共通四択UI、候補生成、地域・時間設定 |
-| src/game-engine | 出題、回答判定、採点、時間管理、結果集計の共通エンジン |
-| src/country-data | 国マスタ、地域（複数所属可）、地図・国旗の共通キー |
-| src/flags | 国旗SVGの表示UI |
-| scripts/sync-flags.mjs | 国マスタを元にflag-iconsから必要なSVGだけをコピー |
-| src/i18n | 表示言語と翻訳 |
+| `src/app/App.tsx` / `App.css` | モード選択、ハッシュ連動、プレビュー、トップ画面 |
+| `src/features/quiz/NameQuiz.tsx` | 地図/国旗→国名の統合画面。IME入力と国名四択 |
+| `src/features/quiz/NameToMapQuiz.tsx` | 地図のタップ候補・確定操作 |
+| `src/features/quiz/NameToFlagQuiz.tsx` | 国旗候補の作成・選択操作 |
+| `src/features/quiz/useQuizSession.ts` | 時刻を注入した start/submit/skip/advance/reset、250msの更新、正誤・結果取得 |
+| `src/features/quiz/QuizRuleFields.tsx` | ルール・1/2/3/5分の共通設定 |
+| `src/features/quiz/QuizStatus.tsx` | 問題番号、スコア、残り時間、レビューと結果 |
+| `src/features/quiz/RegionSelector.tsx` | 国マスタに基づく地域件数と候補不足の案内 |
+| `src/features/quiz/CountryChoiceGrid.tsx` | 国名・国旗の四択の汎用UI |
+| `src/features/quiz/name-choices.ts`, `flag-choices.ts` | 題型別の正解・誤答候補生成 |
+| `src/game-engine/types.ts`, `engine.ts` | Reactに依存しないセッション型と純粋関数 |
+| `src/country-data` | 全197件の国ID、名称・別名・読み、所属地域、国旗/ジオメトリID |
+| `src/map`, `src/flags` | 2D SVG地図（Natural Earth）とローカル国旗SVG |
+| `src/i18n/messages.ts`, `quizMessages.ts`, `useLocale.ts` | 画面文言と表示言語設定・保存 |
+| `scripts/sync-flags.mjs` | 必要な国旗197件をローカルアセットとして生成 |
 
-題型は地図→国名、国旗→国名、国名→地図、国名→国旗。回答形式（テキスト/四択）とプレイルール（10問制/制限あり/タイムアタック）は独立した設定として管理し、ゲームエンジンでは合計6つの回答バリエーションに対応する。`src/game-engine/engine.ts` は国データ・言語・時刻・乱数を受け取る純粋な状態遷移で、React、地図表示、国旗表示に依存しない（詳細：[GAME_ENGINE.md](GAME_ENGINE.md)）。
+## セッション境界
 
-## Android移植の着手基準
+`game-engine/engine.ts` は `GameConfiguration`、国マスタ、`nowMs`、任意の乱数・配点を受け取り、変更されていない入力から新しい `GameSession` を返します。内部にReact、DOM、ブラウザ時刻取得、タイマー、描画コードはありません。
 
-Web版の主要4題型と国名の入力／四択、スマホ操作、日英対応が完成し、出題・採点テスト、国旗・国境アセットのライセンス、読み込み性能・安定性を評価してからIssue #15に着手します。WebのUI・ゲームエンジン・国マスタ・i18nは共通化し、Android固有のバージョン・署名・審査・リリースは独立して管理します。3D地球儀はAndroid初回公開の必須条件にしません。
+`useQuizSession(locale)` は、React状態・時刻取得・`setInterval`を所有し、以下を画面に提供します。
 
-## 現時点で未実装のもの
+- 状態: `session`、`questionCountry`、`review`、`result`、`remainingMs`
+- 操作: `startRound(config, durationSeconds)`、`submit(answer)`、`skip()`、`advance()`、`reset()`
+- 回答は `asking` 状態のみ、次問は `review` 状態のみ許可。終了したセッションへの重複操作はしない
+- 時間制限はエンジンの期限情報に従い250msごとに更新。国ごとのドラフト入力は画面が管理
 
-4題型の初期プレイ画面はすべて実装済み。国名の読み・表記ゆれ・入力UX（#10）は実装済み。地域指定の拡張（#11）は実装済み。4題型の画面全般の統一（#13）、共通四択の仕上げ（#18）、3D地球儀（#19）、Android（#15）、広告などは未実装です。
+これにより、新題型では**画面固有の出題表示・回答データと設定だけ**を実装すればよく、タイマーや正誤処理を重複させません。エンジンのAPIは変更していません。[詳細](GAME_ENGINE.md)。
 
-## 言語リソース（Issue #12）
+## 地域、言語、表示の分離
 
-画面の日本語・英語表示は `src/i18n/messages.ts`（トップ画面・設定）と `src/i18n/quizMessages.ts`（クイズ・地図・地域選択）で管理します。言語状態は `useLocale()` から4題型・プレビューへ同じ値で渡し、国マスタの各言語名とゲームエンジンの判定に接続します。ブラウザの優先言語・保存は純粋関数 `locale.ts` に分離しました。詳細は [LOCALIZATION.md](LOCALIZATION.md)。
+- `Country.id` は共通識別子。地域の複数所属・国旗SVG・地図ポリゴンを同一IDで解決する
+- 出題地域は全世界か6地域。10問未満の候補では問題数を縮め、四択で不足する場合は開始を無効化する
+- 表示言語はja/en。UI文字列と国名/別名/読みを分離し、テキスト回答は現在言語の明示的な名前だけを正解とする
+- 2D地図・国旗の描画や将来の3D地球儀は採点に影響しない。国ID判定を共用する
+- テキスト入力・スクリーンリーダー、スマホ操作は [UI_UX.md](UI_UX.md) 参照
 
-## 4題型の画面共有（Issue #13）
+## テストと今後
 
-トップ画面のModeCardから必要な題型だけをマウントする方式に変更し、従来の縦並びの4画面を廃止しました。src/features/quiz/QuizStatus.tsxに進捗・正誤・結果表示を集約し、CountryChoiceGridで国名四択/国旗四択を共有します。2D地図は回答操作とズーム・ドラッグ/キーボード移動を区別します。詳しくは [UI_UX.md](UI_UX.md)。
+`npm test` は純粋エンジン・各題型・197件国マスタ・国旗・地域・言語に加え、セッションコントローラーの重複防止契約（`tests/quiz-refactor.test.mjs`）を検証します。CIはLint／Typecheck／テスト／Buildを必須にします。
+
+実装済み: #3～#13の地図、旗、題型、地域、文字回答、言語、UI統一。今後: 3D地球儀（#19）、Android（#15）、品質・実機検証。現状は2D地図のみで3D切替は未実装です。

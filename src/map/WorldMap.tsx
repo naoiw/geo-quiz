@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import type { KeyboardEvent, PointerEvent } from "react";
 import { countriesById, regions, type RegionId } from "../country-data";
 import type { Locale } from "../i18n/messages";
@@ -77,6 +77,7 @@ export function WorldMap({
 }: WorldMapProps) {
   const qt = (key: QuizTextKey) => quizText(locale, key);
   const svgRef = useRef<SVGSVGElement>(null);
+  const hintId = useId();
   const pointers = useRef(new Map<number, Point>());
   const gesture = useRef<{ moved: boolean; candidate: string | null; start: Point }>({
     moved: false, candidate: null, start: { x: 0, y: 0 },
@@ -216,6 +217,30 @@ export function WorldMap({
     }
   };
 
+  /** Keyboard navigation of the map viewport is separate from country selection. */
+  const onMapKeyDown = (event: KeyboardEvent<SVGSVGElement>) => {
+    if (event.target !== event.currentTarget) return;
+    const key = event.key;
+    if (key === "+" || key === "=" || key === "-") {
+      event.preventDefault();
+      zoomAt(key === "-" ? 1 / 1.8 : 1.8);
+      return;
+    }
+    const direction: Readonly<Record<string, readonly [number, number]>> = {
+      ArrowLeft: [-1, 0], ArrowRight: [1, 0],
+      ArrowUp: [0, -1], ArrowDown: [0, 1],
+    };
+    const movement = direction[key];
+    if (movement) {
+      event.preventDefault();
+      setView((current) => constrain({
+        ...current,
+        x: current.x + current.width * movement[0] * 0.12,
+        y: current.y + current.height * movement[1] * 0.12,
+      }, minimumWidth));
+    }
+  };
+
   const focusId = mode === "answer" ? null : focusCountryId ?? selectedCountryId;
   const focusFeature = focusId ? featureById.get(focusId) : null;
   const instructions = readOnly
@@ -225,7 +250,7 @@ export function WorldMap({
   return (
     <div className={"world-map" + (readOnly ? " world-map--quiz" : "")}>
       <div className="world-map__toolbar">
-        <span className="world-map__hint">{instructions}</span>
+        <span id={hintId} className="world-map__hint">{instructions}</span>
         <div className="world-map__controls" role="group" aria-label={qt("mapControls")}>
           <button type="button" onClick={() => zoomAt(1.8)} aria-label={qt("zoomIn")} title={qt("zoomIn")}>+</button>
           <button type="button" onClick={() => zoomAt(1 / 1.8)} aria-label={qt("zoomOut")} title={qt("zoomOut")}>−</button>
@@ -250,6 +275,9 @@ export function WorldMap({
           className="world-map__svg"
           viewBox={view.x + " " + view.y + " " + view.width + " " + view.height}
           role="group"
+          tabIndex={0}
+          aria-describedby={hintId}
+          onKeyDown={onMapKeyDown}
           aria-label={readOnly
             ? (qt("mysteryMap"))
             : (qt("interactiveMap"))}

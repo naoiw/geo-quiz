@@ -66,3 +66,16 @@
     flex-basis: 24px;
   }
 }
+
+/* Keep four distinct flag targets in a fixed 2×2 grid even on narrow phones. */
+.quiz__flag-choices .quiz__choice { position: relative; }
+.quiz__flag-choices .quiz__choice-mark {
+  position: absolute; top: 8px; right: 8px; margin-left: 0;
+  display: grid; place-items: center; width: 26px; height: 26px;
+  background: #fff; border: 1px solid currentColor; border-radius: 50%;
+}
+.quiz__flag-choices .quiz__choice--wrong { border-style: dashed; }
+@media (max-width: 420px) {
+  .quiz__flag-choices .quiz__choice { min-height: 132px; padding: 8px; }
+  .quiz__flag-choices .country-flag { width: min(100%, 180px); }
+}

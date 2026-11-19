@@ -160,3 +160,18 @@
     align-self: flex-end;
   }
 }
+
+/* Touch and keyboard: map controls must remain usable in landscape and on narrow phones. */
+.world-map__svg:focus-visible { outline: 3px solid #2563eb; outline-offset: -4px; }
+.world-map__controls { flex-wrap: wrap; }
+.world-map__controls button { min-width: 44px; min-height: 44px; }
+.world-map__region-navigation select { min-height: 44px; max-width: min(180px, 65vw); }
+.world-map__toolbar { flex-wrap: wrap; }
+.world-map__hint { flex: 1 1 230px; }
+@media (max-width: 620px) {
+  .world-map__toolbar { gap: 10px; align-items: stretch; }
+  .world-map__controls { justify-content: flex-start; align-self: auto; }
+  .world-map__region-navigation { width: 100%; }
+  .world-map__region-navigation select { flex: 1; max-width: none; }
+  .world-map__bottom { flex-wrap: wrap; }
+}

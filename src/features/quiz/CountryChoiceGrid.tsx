@@ -43,6 +43,8 @@ export function CountryChoiceGrid<T extends CountryChoice>({
           >
             <span className="quiz__choice-index" aria-hidden="true">{String.fromCharCode(65 + index)}</span>
             {renderChoice(choice, index)}
+            {correct && <span className="quiz__choice-mark" aria-hidden="true">✓</span>}
+            {incorrect && <span className="quiz__choice-mark" aria-hidden="true">×</span>}
           </button>
         );
       })}

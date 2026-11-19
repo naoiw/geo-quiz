@@ -1,0 +1,79 @@
+name: Deploy GitHub Pages
+
+# One Pages artifact contains main (/geo-quiz/) and develop (/geo-quiz/develop/).
+on:
+  push:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: geo-quiz-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          path: production
+      - uses: actions/checkout@v4
+        with:
+          ref: develop
+          path: preview
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "26"
+
+      - name: Assemble production
+        shell: bash
+        run: |
+          mkdir -p publish/develop
+          if [ -f production/package.json ]; then
+            (
+              cd production
+              npm install --no-audit --no-fund
+              npm run lint
+              npm run build -- --base=/geo-quiz/
+            )
+            cp -a production/dist/. publish/
+          else
+            cat > publish/index.html <<'HTML'
+          <!doctype html>
+          <html lang="en"><head><meta charset="utf-8"><title>Geo Quiz</title></head>
+          <body><h1>Geo Quiz</h1><p>Production release is not available yet.</p>
+          <p><a href="./develop/">Open develop preview</a></p></body></html>
+          HTML
+          fi
+
+      - name: Assemble develop preview
+        shell: bash
+        run: |
+          cd preview
+          npm install --no-audit --no-fund
+          npm run lint
+          npm run build -- --base=/geo-quiz/develop/
+          cp -a dist/. ../publish/develop/
+
+      - name: Disable Jekyll
+        run: touch publish/.nojekyll
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: publish
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

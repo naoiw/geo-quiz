@@ -2,12 +2,13 @@
 
 ## 方針
 
-- React + TypeScript + ViteをWebと将来のAndroidで共用する。AndroidはCapacitorを第一候補とする（Issue #15）。
+- React + TypeScript + ViteでWeb版を先行開発する。Web版が十分に完成・安定したらAndroidへの展開を検討し、Capacitorを第一候補にコードを共通化する（Issue #15）。
 - UI、クイズ題型、出題/採点、国データ、i18nを独立させる。
 - src/game-engineはReact、DOM、地図描画ライブラリに依存させず、純粋なゲームロジックを置く。
 - src/country-dataは国IDをキーとして日本語/英語、地域、国旗ID、地図形状IDを結びつける。
 - 2D地図（Issue #3）を先に開発し、3D地球儀（Issue #19）を追加するときも国IDと回答処理を共有する。
 - 画面文言はsrc/i18nで管理する。ブラウザ言語判定と手動切替を初期UIに用意する。
+- GitHub Flowでmainを常時公開可能に保つ。未完成の機能は非表示または無効化する。
 
 ## ディレクトリ責務
 

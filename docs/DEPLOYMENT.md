@@ -1,32 +1,31 @@
 # GitHub Pages
 
-| ブランチ | URL |
-| --- | --- |
-| main | https://naoiw.github.io/geo-quiz/ |
-| develop | https://naoiw.github.io/geo-quiz/develop/ |
+## Web本番
 
-GitHub Pagesはリポジトリごとに一つのサイトです。Deploy GitHub Pagesワークフローがmain/developを別々のbase pathでビルドし、同じアーティファクトに統合します。
+https://naoiw.github.io/geo-quiz/
 
-## 初期設定
+mainへのマージでGitHub Pagesへ自動公開するGitHub Flowを採用します。旧developプレビューは今後の更新対象ではありません。
 
-1. リポジトリのSettings → Pagesを開く。
-2. Build and deployment → SourceをGitHub Actionsへ変更する。
-3. developへのpush後、ActionsのDeploy GitHub Pagesの成功を確認する。
-4. /geo-quiz/develop/を開く。
+## 公開手順
 
-GitHub側の権限・Pages設定が未完了なら、このファイルの追加だけではデプロイされません。
+1. featureブランチからmainへのPRを作成する。
+2. CIでlint、typecheck、buildを実行し、変更を確認する。
+3. mainへマージする。
+4. Deploy GitHub Pagesがmainを/geo-quiz/向けにビルド・公開する。
+5. Actionsの成功とWeb本番の表示を確認する。
 
-## Gitflowとの対応
+リポジトリのSettings → Pages → Build and deployment → SourceはGitHub Actionsを使用。github-pages Environmentでmainのデプロイを許可します。
 
-feature/*の更新は公開せず、developへのマージでプレビューを更新します。mainへの公開はrelease/*からのマージ時です。mainにまだアプリがない期間は本番ルートに案内ページを出します。
+## ビルド
 
-## base path
+    npm run build:pages
 
-Viteビルドでは以下のパスを使います。
+Viteのbase pathは/geo-quiz/です。faviconは%BASE_URL%、アプリのホームリンクはimport.meta.env.BASE_URLを使っています。dist/をPagesにアップロードします。
 
-~~~bash
-npm run build:pages:main
-npm run build:pages:develop
-~~~
+## PRプレビュー
 
-faviconはBASE_URL、アプリのホームリンクはimport.meta.env.BASE_URLを使用し、サブディレクトリでも動作するようにします。独自ドメイン移行時はこのbase pathと公開設定を見直してください。
+PR専用のオンラインプレビューは現時点では未実装です。CIとローカルの npm run dev で検証してください。必要になれば別Issueで仕組みを整備します。恒久的なdevelopブランチは使用しません。
+
+## Androidと独自ドメイン
+
+独自ドメイン移行時はbase pathとPages設定を修正します（Issue #16）。Android版はWeb品質が安定してから検討し、ストアのバージョン・署名・審査はWeb公開とは別に管理します（Issue #15）。

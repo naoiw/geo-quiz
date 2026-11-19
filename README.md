@@ -1,63 +1,52 @@
 # Geo Quiz
 
-地図と国旗で世界の国々を学ぶWebクイズアプリです。React + TypeScriptでWebを先行開発し、将来のAndroid版はCapacitorによるコード共通化を目指します。
+地図と国旗で世界の国々を学ぶWebクイズアプリです。Web版はGitHub Flowで継続的に公開し、Web版が安定した段階でAndroidアプリへの展開を検討します。
 
-**現在の状態:** Issue #1のアプリ基盤と画面プレビュー。国データ・地図・国旗・実際の出題と採点は未実装です。
+**現在の状態:** React/TypeScriptの初期画面を実装済み。実際の国データ、地図、国旗、出題・採点機能は未実装です。
 
 ## クイズの構想
 
 | 出題 | 回答 |
 | --- | --- |
-| 地図で強調された国 | 国名を入力、または四択 |
+| 強調表示された国の地図 | 国名を入力、または四択 |
 | 国旗 | 国名を入力、または四択 |
 | 国名 | 地図で国を選択 |
 | 国名 | 国旗を四択で選択 |
 
-地域選択、10問制・タイムアタック、2D/3D地図（2Dから実装）、日本語・英語に対応する計画です。詳細は [Issues](https://github.com/naoiw/geo-quiz/issues) を参照してください。
+地域選択、10問制・タイムアタック、2D/3D地図（まず2D）、日本語・英語に対応する予定です。詳細は[Issues](https://github.com/naoiw/geo-quiz/issues)を参照してください。
 
-## 公開先（GitHub Pages設定後）
+## Web版の公開先
 
-| 環境 | ブランチ | URL |
-| --- | --- | --- |
-| 本番 | main | https://naoiw.github.io/geo-quiz/ |
-| 開発プレビュー | develop | https://naoiw.github.io/geo-quiz/develop/ |
+https://naoiw.github.io/geo-quiz/
 
-初回はGitHubのSettings → PagesでSourceをGitHub Actionsに設定する必要があります。mainが未リリースの間、本番URLには案内ページのみを表示します。
+mainにマージされた変更をGitHub Pagesへ自動公開します。未完成の機能は開発予定として表示するか、無効化しておきます。以前のdevelopプレビューは更新を終了します。
 
 ## 技術スタック
 
-React 19 / TypeScript 5 / Vite 7 / CSS / ESLint / Node.js 26推奨 / GitHub Actions・Pages。将来の2D地図はGeoJSON/TopoJSON等、3DはThree.jsを候補とします。
+React 19 / TypeScript 5 / Vite 7 / CSS / ESLint / GitHub Actions / GitHub Pages。Node.js 26推奨。地図はGeoJSON/TopoJSONによる2D表示を先に実装し、将来的にThree.js等で3D表示を追加します。
 
-## 開発方法
+## ローカル開発
 
-~~~bash
-git clone https://github.com/naoiw/geo-quiz.git
-cd geo-quiz
-git switch develop
-npm install
-npm run dev
-~~~
+    git clone https://github.com/naoiw/geo-quiz.git
+    cd geo-quiz
+    npm install
+    npm run dev
 
-検証:
+検証は npm run lint、npm run typecheck、npm run build を実行してください。Node.jsは22.12以降を想定します。現在はpackage-lock.jsonがないため、依存を確定後に追加してCIをnpm ciへ移行する予定です。
 
-~~~bash
-npm run lint
-npm run typecheck
-npm run build
-npm run preview
-~~~
+## GitHub Flow
 
-Node.js 22.12以上が必要です。初期段階はlockfile未作成のためnpm installを使用します。依存バージョン確定後はlockfileを追加し、npm ciに切り替える方針です。
+1. Issueを作成し、mainからfeature/issue-N-topicを分岐。
+2. 変更を実装・確認し、main向けPull Requestを作成。
+3. CIと差分を確認し、公開可能ならmainにマージ。
+4. mainへのpushでGitHub Pagesへ自動公開。
+5. デプロイ・必要な動作確認が完了したらIssueをクローズ。
 
-## Gitflow運用
+developやreleaseブランチは通常使いません。大きな節目でタグを作成します。**PR専用オンラインプレビューは現状未実装です**。必要なら後から導入します。
 
-- main: 本番リリース済みコード。
-- develop: 次期リリースの統合・開発プレビュー。
-- feature/*: developから分岐し、PRでdevelopへ統合。
-- release/*: developから分岐し、検証後mainへ統合してdevelopへ変更を戻す。
-- hotfix/*: mainから分岐し、mainとdevelopの両方へ反映。
+## Android版の位置づけ
 
-featureからmainへの直接マージはしません。
+Web版の基本機能、モバイルUI、出題品質が安定してから着手します（[Issue #15](https://github.com/naoiw/geo-quiz/issues/15)）。CapacitorによるWebコード再利用を第一候補とします。ストア向けビルド、署名、審査、バージョン管理はWebの継続公開とは分けて扱います。
 
 ## ディレクトリ
 
@@ -67,16 +56,16 @@ featureからmainへの直接マージはしません。
 - src/game-engine: 出題・採点の型と純粋ロジック
 - src/country-data: 共通国ID・国名・国旗・地理データ
 - src/i18n: 日本語と英語
-- docs: 設計・開発・データ・配信の説明
+- docs: 設計・開発・データ・配信
 
 ## ドキュメント
 
 - [一覧](docs/README.md)
 - [設計](docs/ARCHITECTURE.md)
-- [開発・Gitflow](docs/DEVELOPMENT.md)
+- [開発・GitHub Flow](docs/DEVELOPMENT.md)
 - [デプロイ](docs/DEPLOYMENT.md)
 - [データとライセンス](docs/DATA.md)
 
 ## ライセンス
 
-このリポジトリのコードは既存の [Apache License 2.0](LICENSE) で公開されています。地図・国旗等の外部素材のライセンスは採用時に別途確認します。
+このリポジトリのソースコードは既存の[Apache License 2.0](LICENSE)です。地図・国旗等の外部データの利用条件は別途確認します。

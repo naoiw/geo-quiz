@@ -35,3 +35,7 @@ Web版の主要4題型と国名の入力／四択、スマホ操作、日英対�
 ## 言語リソース（Issue #12）
 
 画面の日本語・英語表示は `src/i18n/messages.ts`（トップ画面・設定）と `src/i18n/quizMessages.ts`（クイズ・地図・地域選択）で管理します。言語状態は `useLocale()` から4題型・プレビューへ同じ値で渡し、国マスタの各言語名とゲームエンジンの判定に接続します。ブラウザの優先言語・保存は純粋関数 `locale.ts` に分離しました。詳細は [LOCALIZATION.md](LOCALIZATION.md)。
+
+## 4題型の画面共有（Issue #13）
+
+トップ画面のModeCardから必要な題型だけをマウントする方式に変更し、従来の縦並びの4画面を廃止しました。src/features/quiz/QuizStatus.tsxに進捗・正誤・結果表示を集約し、CountryChoiceGridで国名四択/国旗四択を共有します。2D地図は回答操作とズーム・ドラッグ/キーボード移動を区別します。詳しくは [UI_UX.md](UI_UX.md)。

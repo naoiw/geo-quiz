@@ -172,7 +172,7 @@ test("UI wires flag choices, limits accidental name leaks and shares the choice 
   assert.ok(page.includes('answerFormat: "flag"'));
   assert.ok(page.includes('format: "flag", countryId'));
   assert.ok(page.includes("createFlagChoices("));
-  assert.ok(page.includes("getResult("));
+  assert.ok(page.includes("useQuizSession(locale)") && page.includes("startRound("));
   assert.ok(page.includes("<CountryChoiceGrid"));
   assert.ok(names.includes("<CountryChoiceGrid"));
   assert.ok(grid.includes("onSelect(choice.countryId)"));

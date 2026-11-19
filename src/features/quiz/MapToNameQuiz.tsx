@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { countries, findCountry, getCountryName, regions } from "../../country-data";
 import type { RegionId } from "../../country-data";
 import {
-  advanceSession, getQuestionCountry, getRemainingMs, getResult,
+  advanceSession, getRemainingMs, getResult,
   skipQuestion, startSession, submitAnswer, tickSession,
 } from "../../game-engine/engine";
 import type { AnswerFormat, GameSession, SessionRule } from "../../game-engine/types";
@@ -39,7 +39,6 @@ export function MapToNameQuiz({ locale }: Props) {
   const composing = useRef(false);
 
   const question = session?.currentQuestion;
-  const country = session ? getQuestionCountry(session) : null;
   const review = session?.status === "review" ? session.lastReview : null;
   const correctCountry = review ? findCountry(review.correctCountryId) : null;
   const result = session?.status === "finished" ? getResult(session) : null;
@@ -328,9 +327,11 @@ export function MapToNameQuiz({ locale }: Props) {
           <ol className="quiz__history">
             {result.history.map((record) => {
               const correct = findCountry(record.correctCountryId);
+              const answerCountry = record.answer?.format !== "text" && record.answer
+                ? findCountry(record.answer.countryId) : null;
               const answer = record.answer?.format === "text"
                 ? record.answer.value
-                : record.answer ? getCountryName(findCountry(record.answer.countryId) ?? correct!, locale) : null;
+                : record.answer ? (answerCountry ? getCountryName(answerCountry, locale) : record.answer.countryId) : null;
               return (
                 <li key={record.question.number}>
                   <span className={"quiz__history-marker quiz__history-marker--" + record.judgement}>

@@ -5,6 +5,7 @@
 - [ARCHITECTURE.md](ARCHITECTURE.md) — 4題型共通のレイヤ構成、Reactフックと純粋エンジンの責務分離
 - [DEVELOPMENT.md](DEVELOPMENT.md) — 開発環境、GitHub Flow、品質確認、テスト構成
 - [DEPLOYMENT.md](DEPLOYMENT.md) — mainからGitHub Pagesへのデプロイ
+- [PWA.md](PWA.md) — ホーム画面への追加、オフラインキャッシュ、更新と動作確認
 - [GAME_ENGINE.md](GAME_ENGINE.md) — 4題型/6回答形式、セッション状態、時間・採点・結果
 
 ## UI・ゲーム仕様

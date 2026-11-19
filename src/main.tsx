@@ -14,3 +14,14 @@ createRoot(root).render(
     <App />
   </StrictMode>,
 );
+
+// Only register the service worker on production/preview builds, never during Vite dev.
+if (import.meta.env.PROD && "serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    void navigator.serviceWorker.register(import.meta.env.BASE_URL + "sw.js", {
+      scope: import.meta.env.BASE_URL,
+    }).catch((error: unknown) => {
+      console.warn("Geo Quiz offline cache could not be registered.", error);
+    });
+  });
+}

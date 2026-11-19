@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ModeCard } from "../components/ModeCard";
 import { MapToNameQuiz } from "../features/quiz/MapToNameQuiz";
 import { FlagToNameQuiz } from "../features/quiz/FlagToNameQuiz";
@@ -6,6 +6,7 @@ import { NameToMapQuiz } from "../features/quiz/NameToMapQuiz";
 import { NameToFlagQuiz } from "../features/quiz/NameToFlagQuiz";
 import { countries, findCountry, getCountryName } from "../country-data";
 import { quizModes } from "../features/quiz/modes";
+import type { QuizKind } from "../game-engine/types";
 import { CountryFlag } from "../flags/CountryFlag";
 import { translate, type MessageKey } from "../i18n/messages";
 import { useLocale } from "../i18n/useLocale";
@@ -13,9 +14,46 @@ import { WorldMap } from "../map/WorldMap";
 
 type MapDemoMode = "explore" | "highlight" | "answer";
 
+function readModeFromHash(): QuizKind | null {
+  const hash = window.location.hash;
+  return quizModes.find((mode) => hash === "#" + mode.id + "-quiz")?.id ?? null;
+}
+
 export function App() {
   const { locale, setLocale } = useLocale();
   const t = (key: MessageKey) => translate(locale, key);
+  const [activeMode, setActiveMode] = useState<QuizKind | null>(readModeFromHash);
+  const quizPanelRef = useRef<HTMLDivElement>(null);
+  const modeHeadingRef = useRef<HTMLHeadingElement>(null);
+  const navigationStarted = useRef(false);
+
+  useEffect(() => {
+    const syncRoute = () => {
+      navigationStarted.current = true;
+      setActiveMode(readModeFromHash());
+    };
+    window.addEventListener("hashchange", syncRoute);
+    return () => window.removeEventListener("hashchange", syncRoute);
+  }, []);
+
+  useEffect(() => {
+    if (!navigationStarted.current) return;
+    const target = activeMode ? quizPanelRef.current : modeHeadingRef.current;
+    target?.focus();
+  }, [activeMode]);
+
+  const openMode = (mode: QuizKind) => {
+    navigationStarted.current = true;
+    setActiveMode(mode);
+    window.location.hash = mode + "-quiz";
+  };
+
+  const backToModes = () => {
+    navigationStarted.current = true;
+    setActiveMode(null);
+    window.location.hash = "modes";
+  };
+
   const [mapMode, setMapMode] = useState<MapDemoMode>("explore");
   const [targetId, setTargetId] = useState("JP");
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -99,107 +137,128 @@ export function App() {
           </div>
         </section>
 
-        <MapToNameQuiz locale={locale} />
-        <FlagToNameQuiz locale={locale} />
-        <NameToMapQuiz locale={locale} />
-        <NameToFlagQuiz locale={locale} />
-
-        <section className="map-demo" aria-labelledby="map-title">
-          <div className="section-heading">
-            <div>
-              <h2 id="map-title">{t("mapSection")}</h2>
-              <p>{t("mapSectionBody")}</p>
+        {!activeMode ? (
+          <section id="modes" className="mode-selection" aria-labelledby="modes-title">
+            <div className="section-heading">
+              <div>
+                <h2 id="modes-title" ref={modeHeadingRef} tabIndex={-1}>{t("modes")}</h2>
+                <p>{t("modesBody")}</p>
+              </div>
+              <span className="section-count">01 — 04</span>
             </div>
-            <span className="section-count">2D / 197</span>
-          </div>
-          <div className="map-demo__settings">
-            <div className="map-demo__modes" role="group" aria-label={t("mapModeLabel")}>
-              {(["explore", "highlight", "answer"] as const).map((mode) => (
-                <button
-                  type="button"
-                  key={mode}
-                  aria-pressed={mapMode === mode}
-                  className={mapMode === mode ? "is-active" : ""}
-                  onClick={() => selectMode(mode)}
-                >
-                  {t(mode === "explore" ? "mapExplore" : mode === "highlight" ? "mapHighlight" : "mapAnswer")}
-                </button>
+            <div className="mode-grid">
+              {quizModes.map((mode) => (
+                <ModeCard key={mode.id} mode={mode} t={t} onPlay={openMode} />
               ))}
             </div>
-            {mapMode !== "explore" && (
-              <label className="map-demo__target">
-                {t("mapTarget")}
-                <select value={targetId} onChange={(event) => changeTarget(event.target.value)}>
-                  {countries.map((country) => (
-                    <option key={country.id} value={country.id}>{getCountryName(country, locale)}</option>
-                  ))}
-                </select>
-              </label>
-            )}
-          </div>
-          {mapMode === "answer" && target && (
-            <p className="map-demo__question">
-              {locale === "ja"
-                ? "地図から「" + getCountryName(target, locale) + "」を選択してください。"
-                : "Select " + getCountryName(target, locale) + " on the map."}
-            </p>
-          )}
-          {mapMode === "highlight" && (
-            <p className="map-demo__question">{t("mapHighlightHelp")}</p>
-          )}
-          <WorldMap
-            locale={locale}
-            mode={mapMode}
-            highlightedCountryId={mapMode === "highlight" ? targetId : null}
-            selectedCountryId={selectedId}
-            focusCountryId={mapMode === "highlight" ? targetId : null}
-            onCountrySelect={setSelectedId}
-          />
-          <div className="map-demo__feedback" role="status" aria-live="polite">
-            {selectionText}
-          </div>
-          <p className="map-demo__notice">{t("mapNotice")}</p>
-        </section>
-
-        <section className="flag-demo" aria-labelledby="flag-title">
-          <div className="section-heading">
-            <div>
-              <h2 id="flag-title">{t("flagSection")}</h2>
-              <p>{t("flagSectionBody")}</p>
+          </section>
+        ) : (
+          <section className="active-quiz" aria-label={t("activeQuiz")}>
+            <nav className="active-quiz__navigation" aria-label={t("quizNavigation")}>
+              <button type="button" className="active-quiz__back" onClick={backToModes}>
+                <span aria-hidden="true">←</span> {t("backToModes")}
+              </button>
+              <span className="active-quiz__mode-name">
+                {t(quizModes.find((mode) => mode.id === activeMode)?.titleKey ?? "modes")}
+              </span>
+            </nav>
+            <div ref={quizPanelRef} tabIndex={-1} aria-label={t("activeQuiz")} role="region">
+              {activeMode === "map-to-name" && <MapToNameQuiz locale={locale} />}
+              {activeMode === "flag-to-name" && <FlagToNameQuiz locale={locale} />}
+              {activeMode === "name-to-map" && <NameToMapQuiz locale={locale} />}
+              {activeMode === "name-to-flag" && <NameToFlagQuiz locale={locale} />}
             </div>
-            <span className="section-count">197 FLAGS</span>
-          </div>
-          <div className="flag-demo__panel">
-            <label className="flag-demo__control">
-              {t("flagTarget")}
-              <select value={previewFlagId} onChange={(event) => setPreviewFlagId(event.target.value)}>
-                {countries.map((country) => (
-                  <option key={country.id} value={country.id}>{getCountryName(country, locale)}</option>
-                ))}
-              </select>
-            </label>
-            {previewFlagCountry && (
-              <div className="flag-demo__sample">
-                <CountryFlag country={previewFlagCountry} locale={locale} />
-                <p>{getCountryName(previewFlagCountry, locale)}</p>
+          </section>
+        )}
+
+        <details className="reference-demos">
+          <summary>{t("referenceDemos")}</summary>
+          <div className="reference-demos__content">
+            <section className="map-demo" aria-labelledby="map-title">
+              <div className="section-heading">
+                <div>
+                  <h2 id="map-title">{t("mapSection")}</h2>
+                  <p>{t("mapSectionBody")}</p>
+                </div>
+                <span className="section-count">2D / 197</span>
               </div>
-            )}
+              <div className="map-demo__settings">
+                <div className="map-demo__modes" role="group" aria-label={t("mapModeLabel")}>
+                  {(["explore", "highlight", "answer"] as const).map((mode) => (
+                    <button
+                      type="button"
+                      key={mode}
+                      aria-pressed={mapMode === mode}
+                      className={mapMode === mode ? "is-active" : ""}
+                      onClick={() => selectMode(mode)}
+                    >
+                      {t(mode === "explore" ? "mapExplore" : mode === "highlight" ? "mapHighlight" : "mapAnswer")}
+                    </button>
+                  ))}
+                </div>
+                {mapMode !== "explore" && (
+                  <label className="map-demo__target">
+                    {t("mapTarget")}
+                    <select value={targetId} onChange={(event) => changeTarget(event.target.value)}>
+                      {countries.map((country) => (
+                        <option key={country.id} value={country.id}>{getCountryName(country, locale)}</option>
+                      ))}
+                    </select>
+                  </label>
+                )}
+              </div>
+              {mapMode === "answer" && target && (
+                <p className="map-demo__question">
+                  {locale === "ja"
+                    ? "地図から「" + getCountryName(target, locale) + "」を選択してください。"
+                    : "Select " + getCountryName(target, locale) + " on the map."}
+                </p>
+              )}
+              {mapMode === "highlight" && (
+                <p className="map-demo__question">{t("mapHighlightHelp")}</p>
+              )}
+              <WorldMap
+                locale={locale}
+                mode={mapMode}
+                highlightedCountryId={mapMode === "highlight" ? targetId : null}
+                selectedCountryId={selectedId}
+                focusCountryId={mapMode === "highlight" ? targetId : null}
+                onCountrySelect={setSelectedId}
+              />
+              <div className="map-demo__feedback" role="status" aria-live="polite">
+                {selectionText}
+              </div>
+              <p className="map-demo__notice">{t("mapNotice")}</p>
+            </section>
+    
+            <section className="flag-demo" aria-labelledby="flag-title">
+              <div className="section-heading">
+                <div>
+                  <h2 id="flag-title">{t("flagSection")}</h2>
+                  <p>{t("flagSectionBody")}</p>
+                </div>
+                <span className="section-count">197 FLAGS</span>
+              </div>
+              <div className="flag-demo__panel">
+                <label className="flag-demo__control">
+                  {t("flagTarget")}
+                  <select value={previewFlagId} onChange={(event) => setPreviewFlagId(event.target.value)}>
+                    {countries.map((country) => (
+                      <option key={country.id} value={country.id}>{getCountryName(country, locale)}</option>
+                    ))}
+                  </select>
+                </label>
+                {previewFlagCountry && (
+                  <div className="flag-demo__sample">
+                    <CountryFlag country={previewFlagCountry} locale={locale} />
+                    <p>{getCountryName(previewFlagCountry, locale)}</p>
+                  </div>
+                )}
+              </div>
+              <p className="flag-demo__notice">{t("flagNotice")}</p>
+            </section>
           </div>
-          <p className="flag-demo__notice">{t("flagNotice")}</p>
-        </section>
-
-        <section aria-labelledby="modes-title">
-          <div className="section-heading">
-            <div>
-              <h2 id="modes-title">{t("modes")}</h2>
-              <p>{t("modesBody")}</p>
-            </div>
-            <span className="section-count">01 — 04</span>
-          </div>
-          <div className="mode-grid">
-            {quizModes.map((mode) => <ModeCard key={mode.id} mode={mode} t={t} />)}
-          </div>
-        </section>
+        </details>
 
         <aside className="next-step">
           <h2>{t("nextStep")}</h2>

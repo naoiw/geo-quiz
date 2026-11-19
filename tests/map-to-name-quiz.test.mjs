@@ -79,7 +79,8 @@ test("every tiny island and microstate remains in the playable world map", () =>
 test("quiz map hides country labels and adds no marker overlay", () => {
   const map = readFileSync("src/map/WorldMap.tsx", "utf8");
   const styles = readFileSync("src/map/WorldMap.css", "utf8");
-  const quiz = readFileSync("src/features/quiz/MapToNameQuiz.tsx", "utf8");
+  const quiz = readFileSync("src/features/quiz/NameQuiz.tsx", "utf8");
+  const wrapper = readFileSync("src/features/quiz/MapToNameQuiz.tsx", "utf8");
   assert.ok(map.includes("readOnly = false"));
   assert.ok(map.includes("aria-label={!readOnly ? country?.names[locale] : undefined}"));
   assert.ok(map.includes('!readOnly && <g className="world-map__microstate-hit-areas"'));
@@ -88,4 +89,5 @@ test("quiz map hides country labels and adds no marker overlay", () => {
   assert.ok(quiz.includes("readOnly"));
   assert.ok(quiz.includes("submitAnswer("));
   assert.ok(quiz.includes("getResult("));
+  assert.ok(wrapper.includes('kind="map-to-name"'));
 });

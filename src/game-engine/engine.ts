@@ -34,10 +34,29 @@ export function getEligibleCountries(
   return catalogue.filter((country) => regionId === null || country.regionIds.includes(regionId));
 }
 
-/** Intentionally strict: do not accept fuzzy matches beyond explicit aliases. */
+/**
+ * Normalize without fuzzy matching: NFKC, whitespace, punctuation typography,
+ * case, and hiragana/katakana. Kanji readings must be registered explicitly.
+ */
 export function normalizeTextAnswer(value: string): string {
-  return value.normalize("NFKC").trim().replace(/\s+/gu, " ").toLocaleLowerCase("en");
+  return value.normalize("NFKC")
+    .replace(/[‘’]/gu, "'")
+    .replace(/[‐‑‒–—−]/gu, "-")
+    .trim()
+    .replace(/\s+/gu, " ")
+    .replace(/\s*([()・])\s*/gu, "$1")
+    .replace(/[ぁ-ゖ]/gu, (kana) => String.fromCharCode(kana.charCodeAt(0) + 0x60))
+    .toLocaleLowerCase("en");
 }
+
+/** Normalize the localized canonical name, explicit aliases and registered readings. */
+export function getAcceptedTextAnswers(country: Country, locale: Locale): string[] {
+  return [...new Set([
+    country.names[locale],
+    ...country.aliases[locale],
+    ...(country.readings?.[locale] ?? []),
+  ].map(normalizeTextAnswer).filter(Boolean))];
+
 
 export function judgeAnswer(
   question: Question,
@@ -53,8 +72,7 @@ export function judgeAnswer(
   }
   if (answer.format === "text") {
     const value = normalizeTextAnswer(answer.value);
-    const accepted = [correctCountry.names[locale], ...correctCountry.aliases[locale]];
-    return value.length > 0 && accepted.some((name) => normalizeTextAnswer(name) === value)
+    return value.length > 0 && getAcceptedTextAnswers(correctCountry, locale).includes(value)
       ? "correct" : "incorrect";
   }
   return answer.countryId.trim().toUpperCase() === question.countryId ? "correct" : "incorrect";

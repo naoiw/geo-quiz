@@ -11,6 +11,8 @@ export interface Country {
   readonly isoAlpha3: string | null;
   readonly names: Readonly<Record<Locale, string>>;
   readonly aliases: Readonly<Record<Locale, readonly string[]>>;
+  /** Explicit phonetic readings where the displayed spelling cannot be read mechanically. */
+  readonly readings?: Readonly<Partial<Record<Locale, readonly string[]>>>;
   readonly regionIds: readonly RegionId[];
   /** Logical flag ID, resolved to a bundled 4:3 SVG by CountryFlag (Issue #4). */
   readonly flagId: string;

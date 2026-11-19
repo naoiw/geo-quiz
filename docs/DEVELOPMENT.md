@@ -42,6 +42,12 @@ npm run preview
 - Androidでは2D/3D描画、タップ・ピンチ、IME、端末戻る、状態復帰、オフライン動作を検証する。PWAのService Workerはブラウザ配信用であり、Androidにはアセットをアプリに内包する方式を優先する。
 - Play Store公開の前提（アプリID、target SDK、Android App Bundle、署名、ストア情報・プライバシー申告・テスト）は [ANDROID.md](ANDROID.md) を参照。
 
+## Androidの初期ビルド
+
+`npm ci`でCapacitor 8依存も取得します。Androidへの初回追加は `npm run build:android && npm run android:add`。その後は `npm run android:sync` でAndroid用アセットを同期します。
+
+CIの別ワークフロー「Android Debug APK」ではAndroid SDK 36/JDK 21を準備してAndroidネイティブプロジェクトを生成し、デバッグAPKをアーティファクトとして保存します。Androidの実機操作やPlay Store公開を保証するものではありません。詳細は [ANDROID.md](ANDROID.md)。
+
 ## コードの追加・変更
 
 `src/game-engine/engine.ts` はReact、DOM、`Date.now()`、タイマーへ依存させない。問題数、正誤、履歴、スコアは純粋関数として検証します。

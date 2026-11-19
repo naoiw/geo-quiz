@@ -126,7 +126,7 @@ test("map quiz only reveals the answer after confirmation, never on question sta
   assert.ok(card.includes('href={"#" + mode.id + "-quiz"}'));
 });
 
-test("region navigation and microstate touch targets do not draw visible pin circles", () => {
+test("region navigation and microstate touch targets remain separate from location pins", () => {
   const map = readFileSync("src/map/WorldMap.tsx", "utf8");
   const css = readFileSync("src/map/WorldMap.css", "utf8");
   for (const id of regionIds) {

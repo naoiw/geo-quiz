@@ -82,7 +82,8 @@ test("quiz map hides country labels while helping locate small highlighted count
   const quiz = readFileSync("src/features/quiz/NameQuiz.tsx", "utf8");
   const wrapper = readFileSync("src/features/quiz/MapToNameQuiz.tsx", "utf8");
   assert.ok(map.includes("readOnly = false"));
-  assert.ok(map.includes("aria-label={!readOnly ? country?.names[locale] : undefined}"));
+  assert.ok(map.includes("aria-label={keyboardCopy ? country?.names[locale] : undefined}"));
+  assert.ok(map.includes("offset === nearestWorldOffset(feature.center[0], view)"));
   assert.ok(map.includes('!readOnly && <g className="world-map__microstate-hit-areas"'));
   assert.ok(styles.includes('world-map--quiz .world-map__country--highlighted[data-tiny="true"]'));
   assert.ok(map.includes("needsLocationPin(feature, view.width)"));

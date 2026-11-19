@@ -66,7 +66,7 @@ test("pins are drawn only for highlighted or selected countries, never reveal an
   assert.ok(map.includes('<SmallCountryMarker'));
   assert.ok(map.includes('className="world-map__location-pins" pointerEvents="none"'));
   assert.ok(map.includes("onCountrySelect?.(candidate)"));
-  assert.ok(map.includes('aria-label={!readOnly ? country?.names[locale] : undefined}'));
+  assert.ok(map.includes('aria-label={keyboardCopy ? country?.names[locale] : undefined}'));
   assert.ok(marker.includes('pointerEvents="none"'));
   assert.ok(marker.includes('aria-hidden="true"'));
   assert.ok(!marker.includes("country.names"));

@@ -256,7 +256,9 @@ main.page-container { flex: 1; }
 
 /* Mobile-first single-mode flow: choose one mode before opening its game. */
 .mode-selection { margin-bottom: 38px; scroll-margin-top: 24px; }
-.mode-selection h2:focus, .active-quiz [role="region"]:focus { outline: none; }
+.mode-selection h2:focus-visible, .active-quiz [role="region"]:focus-visible {
+  outline: 3px solid #2563eb; outline-offset: 5px; border-radius: 5px;
+}
 .active-quiz { margin-bottom: 32px; }
 .active-quiz__navigation {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;

@@ -1,6 +1,6 @@
 # Geo Quiz
 
-地図・国旗を使って世界の国や地域を学ぶクイズWebアプリ。**197か国・地域、4題型・6回答形式、日本語／英語、全世界＋6地域**に対応しています。
+地図・国旗を使って世界の国や地域を学ぶクイズ。**PCブラウザ向けWeb版を公開中**で、Androidアプリ化と**Google Play公開**を次の開発目標としています。197か国・地域、4題型・6回答形式、日本語／英語、全世界＋6地域に対応します。
 
 **本番:** https://naoiw.github.io/geo-quiz/　|　[Issues](https://github.com/naoiw/geo-quiz/issues)
 
@@ -21,7 +21,7 @@
 
 ## 開発・検証
 
-**技術:** React 19、TypeScript 5、Vite 7、SVG／Three.js（Natural Earth 1:50m）、flag-icons。Node.js 26推奨（必要バージョン: 22.12以上、27未満）。GitHub Pagesを `main` から自動公開。将来のAndroid版はCapacitorでのコード共有を検討しています。
+**技術:** React 19、TypeScript 5、Vite 7、SVG／Three.js（Natural Earth 1:50m）、flag-icons。Node.js 26推奨（必要バージョン: 22.12以上、27未満）。GitHub Pagesを `main` から自動公開。Android版はCapacitor 8を第一候補とし、Webとゲームエンジン・国データ・地図・UIを共有する予定です（Androidネイティブプロジェクトは未導入）。PC WebとAndroidアプリを正式な対象とし、モバイルブラウザの動作保証は必須としません。
 
 ```bash
 git clone https://github.com/naoiw/geo-quiz.git
@@ -63,7 +63,7 @@ npm run preview
 | `src/i18n` | UIの日英翻訳、国名表示言語の設定・保存 |
 | `tests` | エンジン・データ・出題形式・画面接続・共通化の回帰テスト |
 
-主要な国データ・国旗・地図の照合に加え、全7地域×6回答形式×3ゲームルール×日英の回帰テストをCIで実施します。PC・スマホの実機確認項目は [品質検証チェックリスト](docs/QA_CHECKLIST.md) にまとめています。
+主要な国データ・国旗・地図の照合に加え、全7地域×6回答形式×3ゲームルール×日英の回帰テストをCIで実施します。PCブラウザ・Androidアプリの実機確認項目は [品質検証チェックリスト](docs/QA_CHECKLIST.md) にまとめています。
 
 詳細は [設計](docs/ARCHITECTURE.md)、[共通エンジン](docs/GAME_ENGINE.md)、[UI/UX](docs/UI_UX.md) を参照してください。
 
@@ -82,12 +82,13 @@ npm run preview
 - [スマホ・PC UIとアクセシビリティ](docs/UI_UX.md)
 - [品質検証チェックリスト](docs/QA_CHECKLIST.md)
 - [PWA・オフライン動作](docs/PWA.md)
+- [Androidアプリ・Google Play公開計画](docs/ANDROID.md)
 - [2D世界地図と小国の表示](docs/MAP.md)
 - [データ・アセットとライセンス](docs/DATA.md)
 
 ## 今後
 
-3D地球儀（Issue #19）は初期版を実装済みで、2D/3D切替も可能です。3Dの実機検証・小国選択精度の最終確認は未完了です。Android版（Issue #15）はWeb版の品質・性能・実機検証を経て検討します。PC／スマホの実機タッチ・スクリーンリーダー検証も未完了です。
+3D地球儀（Issue #19）は初期版を実装済みで、2D/3D切替も可能です。3Dの実機検証・小国選択精度の最終確認は未完了です。Android版（Issue #15）は次の開発対象です。Capacitor導入、Android端末での4題型・6形式および2D/3Dの動作検証、署名済みAABの作成、Google Playへの審査・公開を段階的に行います。PCブラウザとAndroid実機の検証は未完了です。
 
 ## ライセンス
 

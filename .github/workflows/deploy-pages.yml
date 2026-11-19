@@ -1,9 +1,9 @@
 name: Deploy GitHub Pages
 
-# One Pages artifact contains main (/geo-quiz/) and develop (/geo-quiz/develop/).
+# Publish the latest main revision at /geo-quiz/.
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -18,53 +18,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: main
-          path: production
-      - uses: actions/checkout@v4
-        with:
-          ref: develop
-          path: preview
       - uses: actions/setup-node@v4
         with:
           node-version: "26"
-
-      - name: Assemble production
-        shell: bash
-        run: |
-          mkdir -p publish/develop
-          if [ -f production/package.json ]; then
-            (
-              cd production
-              npm install --no-audit --no-fund
-              npm run lint
-              npm run build -- --base=/geo-quiz/
-            )
-            cp -a production/dist/. publish/
-          else
-            cat > publish/index.html <<'HTML'
-          <!doctype html>
-          <html lang="en"><head><meta charset="utf-8"><title>Geo Quiz</title></head>
-          <body><h1>Geo Quiz</h1><p>Production release is not available yet.</p>
-          <p><a href="./develop/">Open develop preview</a></p></body></html>
-          HTML
-          fi
-
-      - name: Assemble develop preview
-        shell: bash
-        run: |
-          cd preview
-          npm install --no-audit --no-fund
-          npm run lint
-          npm run build -- --base=/geo-quiz/develop/
-          cp -a dist/. ../publish/develop/
-
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Lint
+        run: npm run lint
+      - name: Validate country master
+        run: npm test
+      - name: Build production
+        run: npm run build:pages:main
       - name: Disable Jekyll
-        run: touch publish/.nojekyll
+        run: touch dist/.nojekyll
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: publish
+          path: dist
 
   deploy:
     needs: build

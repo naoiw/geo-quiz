@@ -302,3 +302,39 @@
     gap: 8px 12px;
   }
 }
+
+/* The flag's source SVG defines the artwork: contain, never crop or stretch it. */
+.quiz__flag-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 290px;
+  padding: 20px;
+  border: 1px solid #d9e5f1;
+  border-radius: 12px;
+  background: #f7f9fc;
+}
+
+.quiz__flag-prompt .country-flag {
+  width: min(100%, 360px);
+  height: auto;
+  object-fit: contain;
+  border: 1px solid #e2e8f0;
+  border-radius: 3px;
+  background: transparent;
+}
+
+.quiz__region-hint {
+  font-size: 12px;
+  font-weight: 700;
+  color: #526782;
+}
+
+@media (max-width: 480px) {
+  .quiz__flag-prompt {
+    min-height: 220px;
+    padding: 14px;
+  }
+}

@@ -6,12 +6,14 @@ import "./CountryFlag.css";
 export interface CountryFlagProps {
   country: Country;
   locale: Locale;
+  /** Override the accessible label in quiz prompts to avoid leaking the answer. */
+  alt?: string;
 }
 
 /** Loads a bundled SVG with the Vite base path (GitHub Pages or future Android). */
-export function CountryFlag({ country, locale }: CountryFlagProps) {
+export function CountryFlag({ country, locale, alt: altOverride }: CountryFlagProps) {
   const countryName = getCountryName(country, locale);
-  const alt = locale === "ja" ? countryName + "の国旗" : "Flag of " + countryName;
+  const alt = altOverride ?? (locale === "ja" ? countryName + "の国旗" : "Flag of " + countryName);
 
   return (
     <img

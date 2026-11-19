@@ -12,7 +12,7 @@ export interface Country {
   readonly names: Readonly<Record<Locale, string>>;
   readonly aliases: Readonly<Record<Locale, readonly string[]>>;
   readonly regionIds: readonly RegionId[];
-  /** Logical identifier; actual SVG flag files are implemented in Issue #4. */
+  /** Logical flag ID, resolved to a bundled 4:3 SVG by CountryFlag (Issue #4). */
   readonly flagId: string;
   /** Logical identifier; actual polygons are implemented in Issue #3. */
   readonly geometryId: string;

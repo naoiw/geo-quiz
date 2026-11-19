@@ -9,3 +9,6 @@ coverage/
 *.log
 .vscode/
 .idea/
+
+# Generated locally from the pinned flag-icons package
+public/flags/

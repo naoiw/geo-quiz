@@ -2,7 +2,7 @@
 
 地図と国旗で世界の国々を学ぶWebクイズアプリです。React + TypeScriptでWebを先行開発し、将来のAndroid版はCapacitorによるコード共通化を目指します。
 
-**現在の状態:** Reactアプリ基盤、197件の国・地域マスタ、選択・強調・ズームできる2D世界地図を実装済み。国旗画像・自動出題・採点は未実装です。
+**現在の状態:** Reactアプリ基盤、197件の国・地域マスタ、2D世界地図、197件の国旗SVGとプレビューを実装済み。自動出題・採点は未実装です。
 
 ## クイズの構想
 
@@ -24,7 +24,7 @@
 
 ## 技術スタック
 
-React 19 / TypeScript 5 / Vite 7 / CSS / ESLint / Node.js 26推奨 / GitHub Actions・Pages。2D地図はNatural Earth 1:50mのSVG描画を採用し、将来の3DはThree.jsを候補とします。
+React 19 / TypeScript 5 / Vite 7 / CSS / ESLint / Node.js 26推奨 / GitHub Actions・Pages。2D地図はNatural Earth 1:50mのSVG描画、国旗はflag-icons v7.6.0のSVGを採用し、将来の3DはThree.jsを候補とします。
 
 ## 開発方法
 
@@ -45,7 +45,7 @@ npm test
 npm run preview
 ~~~
 
-Node.js 22.12以上が必要です。初期段階はlockfile未作成のためnpm installを使用します。依存バージョン確定後はlockfileを追加し、npm ciに切り替える方針です。
+Node.js 22.12以上が必要です。国旗SVG197件はnpm installで導入したflag-iconsから`npm run dev`/`npm test`/`npm run build` 時に自動生成され、`public/flags`から配信されます。CDNへの常時接続は不要です。初期段階はlockfile未作成のためnpm installを使用します。依存バージョン確定後はlockfileを追加し、npm ciに切り替える方針です。
 
 ## GitHub Flow運用（Web版）
 
@@ -67,6 +67,8 @@ Web版が主要4題型・スマホUI・日英対応・データ整合性・テ�
 - src/game-engine: 出題・採点の型と純粋ロジック
 - src/country-data: 197件の国マスタ、共通ID・日英名・論理アセットID
 - src/map: Natural Earthの2D世界地図、国ID対応、選択/ズーム/パン
+- src/flags: 国旗SVGを国IDから表示
+- scripts/sync-flags.mjs: ビルド時に197件の国旗をローカル生成
 - src/i18n: 日本語と英語
 - docs: 設計・開発・データ・配信の説明
 
@@ -78,7 +80,8 @@ Web版が主要4題型・スマホUI・日英対応・データ整合性・テ�
 - [デプロイ](docs/DEPLOYMENT.md)
 - [データとライセンス](docs/DATA.md)
 - [2D地図の設計・操作](docs/MAP.md)
+- [国旗アセット・利用条件](docs/FLAGS.md)
 
 ## ライセンス
 
-このリポジトリのコードは既存の [Apache License 2.0](LICENSE) で公開されています。国マスタにはODbL 1.0とUnicode License V3のデータを含みます。詳しくは[データ仕様](docs/DATA.md)を参照してください。地図の境界はパブリックドメインのNatural Earthを使用しています。国旗素材の権利条件は採用時に確認します。
+このリポジトリのコードは既存の [Apache License 2.0](LICENSE) で公開されています。国マスタにはODbL 1.0とUnicode License V3のデータを含みます。詳しくは[データ仕様](docs/DATA.md)を参照してください。地図の境界はパブリックドメインのNatural Earthを使用しています。国旗素材はflag-icons（MIT License）から取得し、配布時もライセンスを同梱しています。詳細は[国旗アセット](docs/FLAGS.md)を参照してください。

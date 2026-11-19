@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ModeCard } from "../components/ModeCard";
 import { countries, findCountry, getCountryName } from "../country-data";
 import { quizModes } from "../features/quiz/modes";
+import { CountryFlag } from "../flags/CountryFlag";
 import { translate, type MessageKey } from "../i18n/messages";
 import { useLocale } from "../i18n/useLocale";
 import { WorldMap } from "../map/WorldMap";
@@ -14,8 +15,10 @@ export function App() {
   const [mapMode, setMapMode] = useState<MapDemoMode>("explore");
   const [targetId, setTargetId] = useState("JP");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [previewFlagId, setPreviewFlagId] = useState("JP");
   const target = findCountry(targetId);
   const selection = selectedId ? findCountry(selectedId) : undefined;
+  const previewFlagCountry = findCountry(previewFlagId);
 
   const selectMode = (mode: MapDemoMode) => {
     setMapMode(mode);
@@ -117,6 +120,33 @@ export function App() {
             {selectionText}
           </div>
           <p className="map-demo__notice">{t("mapNotice")}</p>
+        </section>
+
+        <section className="flag-demo" aria-labelledby="flag-title">
+          <div className="section-heading">
+            <div>
+              <h2 id="flag-title">{t("flagSection")}</h2>
+              <p>{t("flagSectionBody")}</p>
+            </div>
+            <span className="section-count">197 FLAGS</span>
+          </div>
+          <div className="flag-demo__panel">
+            <label className="flag-demo__control">
+              {t("flagTarget")}
+              <select value={previewFlagId} onChange={(event) => setPreviewFlagId(event.target.value)}>
+                {countries.map((country) => (
+                  <option key={country.id} value={country.id}>{getCountryName(country, locale)}</option>
+                ))}
+              </select>
+            </label>
+            {previewFlagCountry && (
+              <div className="flag-demo__sample">
+                <CountryFlag country={previewFlagCountry} locale={locale} />
+                <p>{getCountryName(previewFlagCountry, locale)}</p>
+              </div>
+            )}
+          </div>
+          <p className="flag-demo__notice">{t("flagNotice")}</p>
         </section>
 
         <section aria-labelledby="modes-title">

@@ -27,7 +27,7 @@ src/country-data/countries.json に197件の国・地域データを収録して
 
 XKはUnicode CLDRで使用される慣用コードですが、ISO 3166-1の正式な割当ではないため、内部IDをXK、isoAlpha2とisoAlpha3をnullにしています。
 
-flagId、geometryIdは国IDと同じ論理キーです。地図ポリゴンはIssue #3でNatural Earth由来のデータと全197件の対応を実装済みです。国旗画像はIssue #4で別途実装します。国旗のファイル欠落検証は#17に残します。
+flagId、geometryIdは国IDと同じ論理キーです。地図ポリゴンはIssue #3でNatural Earth由来のデータと全197件の対応を実装済みです。国旗画像はIssue #4でflag-icons v7.6.0から全197件分をビルド時に同梱します（詳細：[FLAGS.md](FLAGS.md)）。
 
 ## 地域区分
 
@@ -51,10 +51,10 @@ flagId、geometryIdは国IDと同じ論理キーです。地図ポリゴンはIs
 
 取得時点のライセンス本文は data/licenses/ODbL-1.0.txt と data/licenses/UNICODE-LICENSE-V3.txt に収録しています。国マスタはODbL 1.0に基づく派生データベースとして扱い、必要な表示・ライセンス条件を維持します。広告収益化やAndroid同梱に際しても、この条件を確認します。
 
-地図ポリゴンはパブリックドメインのNatural Earth 1:50mデータから軽量化したSVGパスを同梱しています（詳細：[MAP.md](MAP.md)）。国旗画像は未収録のため採用時に利用条件を確認します。
+地図ポリゴンはパブリックドメインのNatural Earth 1:50mデータから軽量化したSVGパスを同梱しています（詳細：[MAP.md](MAP.md)）。国旗SVGはflag-icons v7.6.0（MIT License）から197件をローカル同梱します。ライセンス原文はdata/licenses/FLAG-ICONS-MIT.txt、ブラウザ配布物内ではflags/LICENSE.txtに含みます。国旗の意匠と縦横比については[FLAGS.md](FLAGS.md)を参照してください。
 
 ## 品質検証
 
 npm test で197件の内訳、ID/論理アセットキーの重複、日英の名称欠落、地域コード、ISO例外、越境例、別名配列を検査します。CIとPages公開時のビルドにも組み込みます。
 
-検証対象はマスタの内部整合性のみです。地図の197件すべての対応はtests/world-map.test.mjsで検証します。国旗ファイルの実在チェックはアセットを追加した段階で行います。
+検証対象はマスタの内部整合性のみです。地図の197件すべての対応はtests/world-map.test.mjsで検証します。国旗197件の実在チェック・SVG形式・ライセンス同梱確認はtests/flag-assets.test.mjsで実行します。

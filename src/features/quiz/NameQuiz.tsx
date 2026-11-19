@@ -6,7 +6,7 @@ import type { AnswerFormat, SessionRule } from "../../game-engine/types";
 import type { Locale } from "../../i18n/messages";
 import { quizText, type QuizTextKey } from "../../i18n/quizMessages";
 import { QuizFeedback, QuizProgress, QuizResultSummary } from "./QuizStatus";
-import { WorldMap } from "../../map/WorldMap";
+import { WorldView } from "../../map/WorldView";
 import { CountryFlag } from "../../flags/CountryFlag";
 import { createCountryNameChoices, type NameChoiceScope } from "./name-choices";
 import { CountryChoiceGrid } from "./CountryChoiceGrid";
@@ -188,7 +188,7 @@ export function NameQuiz({ locale, kind }: Props) {
               )}
             </div>
           ) : (
-            <WorldMap
+            <WorldView
               locale={locale}
               mode="highlight"
               highlightedCountryId={question?.countryId ?? null}

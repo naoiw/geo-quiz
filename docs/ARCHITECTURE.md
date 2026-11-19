@@ -15,7 +15,8 @@ App (モード選択・言語設定・プレビュー)
          ├─ QuizRuleFields / RegionSelector ── 共通ルール・地域
          ├─ QuizStatus ─────────────────────── 共通進捗・正誤・結果
          ├─ CountryChoiceGrid ─────────────── 国名/国旗四択
-         ├─ WorldMap / CountryFlag ─────────── 表示アセット
+         ├─ WorldView → WorldMap / WorldGlobe ─ 2D SVG / 3D Three.js表示と国選択
+         ├─ CountryFlag ────────────────────── 国旗表示
          └─ i18n + country-data ────────────── 日英UI・国別名称
 ```
 
@@ -37,7 +38,7 @@ App (モード選択・言語設定・プレビュー)
 | `src/features/quiz/name-choices.ts`, `flag-choices.ts` | 題型別の正解・誤答候補生成。出題地域は固定し、四択の誤答候補を地域内／全世界から選択可能 |
 | `src/game-engine/types.ts`, `engine.ts` | Reactに依存しないセッション型と純粋関数 |
 | `src/country-data` | 全197件の国ID、名称・別名・読み、所属地域、国旗/ジオメトリID |
-| `src/map`, `src/flags` | 2D SVG地図（Natural Earth）とローカル国旗SVG |
+| `src/map`, `src/flags` | 2D SVG地図（Natural Earth）／3D地球儀（Three.js/同一形状データ）とローカル国旗SVG |
 | `src/i18n/messages.ts`, `quizMessages.ts`, `useLocale.ts` | 画面文言と表示言語設定・保存 |
 | `scripts/sync-flags.mjs` | 必要な国旗197件をローカルアセットとして生成 |
 
@@ -66,7 +67,7 @@ App (モード選択・言語設定・プレビュー)
 
 `npm test` は純粋エンジン・各題型・197件国マスタ・国旗・地域・言語に加え、セッションコントローラーの重複防止契約（`tests/quiz-refactor.test.mjs`）を検証します。CIはLint／Typecheck／テスト／Buildを必須にします。
 
-実装済み: #3～#13の地図、旗、題型、地域、文字回答、言語、UI統一。今後: 3D地球儀（#19）、Android（#15）、品質・実機検証。現状は2D地図のみで3D切替は未実装です。
+実装済み: #3～#13の地図、旗、題型、地域、文字回答、言語、UI統一と、3D地球儀の初期版／2D・3D切替（#19）。今後: 3Dの実機品質検証、Android（#15）、ブラウザ別性能検証。
 
 ## 小国の位置表示
 

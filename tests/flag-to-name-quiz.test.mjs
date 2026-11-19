@@ -75,7 +75,7 @@ test("flag prompt hides the country name in alt while both quizzes share the sam
   assert.ok(localized.includes('"questionFlag": "問題の国旗"'));
   assert.ok(localized.includes('"questionFlag": "Question flag"'));
   assert.ok(quiz.includes("flagRegion.names[locale]"));
-  assert.ok(quiz.includes("<CountryFlag") && quiz.includes("<WorldMap"));
+  assert.ok(quiz.includes("<CountryFlag") && quiz.includes("<WorldView"));
   assert.ok(quiz.includes("useQuizSession(locale)") && quiz.includes("startRound("));
   assert.ok(quiz.includes("submit({ format: \"text\", value: answerText })"));
   assert.ok(flagComponent.includes("altOverride ??"));

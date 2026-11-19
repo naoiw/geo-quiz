@@ -19,6 +19,21 @@
 
 ヘッダーの「設定 / Settings」で表示言語を切り替えられます。ブラウザの優先言語から初期値を選び、変更はブラウザに保存します。表示名・テキスト正答判定は選択言語に連動します。地図・国旗の単体プレビューは画面下部の折りたたみから利用できます。地図を使うクイズでは **2D地図／3D地球儀をプレイ中に切替可能**で、切替えても問題・点数・時間は維持されます。初期表示は2Dです。2D地図は**左右に何周でもスクロールできる経度方向のループ**に対応しており、太平洋を中心に表示しても切れません。3Dは描画方式の追加段階であり、実機での選択精度と性能検証は継続します。PWAとしてホーム画面への追加に対応し、初回オンライン読み込み後はアプリ本体・国旗・地図を端末にキャッシュする構成です（オフライン実機確認は別途必要）。
 
+## Android（Capacitor 8・デバッグAPK）
+
+Androidアプリ向けに既存Reactコードを共有します。PC Webは従来どおりGitHub Pagesで公開し、AndroidではWebViewに同梱したアセットからオフラインで起動する構成です。
+
+```bash
+npm ci
+npm run build:android
+npm run android:add       # 初回のみAndroidネイティブプロジェクト生成
+npm run android:sync      # 以降、Webコードを更新したとき
+cd android
+./gradlew assembleDebug  # Windows: gradlew.bat assembleDebug
+```
+
+デバッグAPKの出力先は `android/app/build/outputs/apk/debug/app-debug.apk`。GitHub Actionsの **Android Debug APK** ワークフローでもビルドし、APKをアーティファクトとして保存します。現段階ではAndroidプロジェクトの生成をCI/ローカルで行い、ネイティブソースの固定と実機動作検証は後続の作業です。Play Store向けの署名済みAABはまだ作っていません。
+
 ## 開発・検証
 
 **技術:** React 19、TypeScript 5、Vite 7、SVG／Three.js（Natural Earth 1:50m）、flag-icons。Node.js 26推奨（必要バージョン: 22.12以上、27未満）。GitHub Pagesを `main` から自動公開。Android版はCapacitor 8を第一候補とし、Webとゲームエンジン・国データ・地図・UIを共有する予定です（Androidネイティブプロジェクトは未導入）。PC WebとAndroidアプリを正式な対象とし、モバイルブラウザの動作保証は必須としません。
@@ -88,7 +103,7 @@ npm run preview
 
 ## 今後
 
-3D地球儀（Issue #19）は初期版を実装済みで、2D/3D切替も可能です。3Dの実機検証・小国選択精度の最終確認は未完了です。Android版（Issue #15）は次の開発対象です。Capacitor導入、Android端末での4題型・6形式および2D/3Dの動作検証、署名済みAABの作成、Google Playへの審査・公開を段階的に行います。PCブラウザとAndroid実機の検証は未完了です。
+3D地球儀（Issue #19）は初期版を実装済みで、2D/3D切替も可能です。3Dの実機検証・小国選択精度の最終確認は未完了です。Android版（Issue #15）はCapacitorビルド基盤とデバッグAPKのCI生成を整備中です。Android端末での4題型・6形式および2D/3Dの動作検証、署名済みAABの作成、Google Playへの審査・公開は後続で行います。PCブラウザとAndroid実機の検証は未完了です。
 
 ## ライセンス
 

@@ -46,7 +46,10 @@ export function normalizeTextAnswer(value: string): string {
     .replace(/\s+/gu, " ")
     .replace(/\s*([()・])\s*/gu, "$1")
     .replace(/[ぁ-ゖ]/gu, (kana) => String.fromCharCode(kana.charCodeAt(0) + 0x60))
-    .toLocaleLowerCase("en");
+    // Turkish dotted capital İ lowercases to "i" + combining dot in English locale.
+    // Treat that as the same written letter as plain i, without fuzzy matching.
+    .toLocaleLowerCase("en")
+    .replace(/\u0307/gu, "");
 }
 
 /** Normalize the localized canonical name, explicit aliases and registered readings. */

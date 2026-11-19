@@ -214,7 +214,7 @@ export function WorldMap({
     }
   };
 
-  const focusId = mode === "answer" ? null : selectedCountryId ?? focusCountryId;
+  const focusId = mode === "answer" ? null : focusCountryId ?? selectedCountryId;
   const focusFeature = focusId ? featureById.get(focusId) : null;
   const instructions = readOnly
     ? locale === "ja"

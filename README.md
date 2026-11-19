@@ -57,7 +57,7 @@ npm run preview
 | `src/features/quiz/NameToFlagQuiz.tsx` | 国名→国旗。4択候補と画像表示 |
 | `src/features/quiz/RegionSelector.tsx`、`CountryChoiceGrid.tsx` | 地域・四択の共通UI |
 | `src/game-engine` | React・DOM非依存の出題・判定・採点・時間制限・結果集計 |
-| `src/country-data`、`src/map`、`src/flags` | 197件の国マスタ、2D世界地図、国旗SVG |
+| `src/country-data`、`src/map`、`src/flags` | 197件の国マスタ、2D世界地図・小国用位置ピン、国旗SVG |
 | `src/i18n` | UIの日英翻訳、国名表示言語の設定・保存 |
 | `tests` | エンジン・データ・出題形式・画面接続・共通化の回帰テスト |
 
@@ -76,6 +76,7 @@ npm run preview
 - [国名入力と表記ゆれ](docs/TEXT_ANSWER.md)
 - [日英ローカライズ](docs/LOCALIZATION.md)
 - [スマホ・PC UIとアクセシビリティ](docs/UI_UX.md)
+- [2D世界地図と小国の表示](docs/MAP.md)
 - [データ・アセットとライセンス](docs/DATA.md)
 
 ## 今後

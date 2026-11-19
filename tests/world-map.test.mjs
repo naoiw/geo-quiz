@@ -41,14 +41,15 @@ test("known naming mismatches and tiny countries are mapped", () => {
   assert.ok(world.features.some((f) => f.id === null), "Background polygons should remain visible");
 });
 
-test("tiny-country hit targets do not draw markers over the map", () => {
+test("tiny-country hit targets stay invisible and separate from visible location pins", () => {
   const mapComponent = readFileSync("src/map/WorldMap.tsx", "utf8");
   const mapStyles = readFileSync("src/map/WorldMap.css", "utf8");
   assert.match(mapComponent, /className="world-map__microstate-hit-area"/);
   assert.match(mapStyles, /\.world-map__microstate-hit-area\s*\{\s*fill: transparent;\s*stroke: transparent;/);
   assert.match(mapStyles, /stroke-width: 18px;/);
   assert.match(mapComponent, /vectorEffect="non-scaling-stroke"/);
-  assert.doesNotMatch(mapComponent, /world-map__pin/);
+  assert.match(mapComponent, /className="world-map__location-pins" pointerEvents="none"/);
+  assert.match(mapComponent, /needsLocationPin\(feature, view\.width\)/);
 });
 
 test("country selection and focus do not draw a black SVG focus frame", () => {

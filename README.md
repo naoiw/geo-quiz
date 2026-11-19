@@ -15,14 +15,12 @@
 
 地域選択、10問制・タイムアタック、2D/3D地図（2Dから実装）、日本語・英語に対応する計画です。詳細は [Issues](https://github.com/naoiw/geo-quiz/issues) を参照してください。
 
-## 公開先（GitHub Pages設定後）
+## Web版の公開先
 
-| 環境 | ブランチ | URL |
-| --- | --- | --- |
-| 本番 | main | https://naoiw.github.io/geo-quiz/ |
-| 開発プレビュー | develop | https://naoiw.github.io/geo-quiz/develop/ |
-
-初回はGitHubのSettings → PagesでSourceをGitHub Actionsに設定する必要があります。mainが未リリースの間、本番URLには案内ページのみを表示します。
+- **本番:** https://naoiw.github.io/geo-quiz/
+- 公開ブランチ: `main`。PRをマージするとGitHub Actionsで自動公開します。
+- 旧`develop`プレビュー（`/geo-quiz/develop/`）は終了。PRごとのオンラインプレビューは今後必要に応じて検討します。
+- 未完成のクイズはUIで「開発予定」と示し、遊べる機能として公開しません。
 
 ## 技術スタック
 
@@ -33,7 +31,6 @@ React 19 / TypeScript 5 / Vite 7 / CSS / ESLint / Node.js 26推奨 / GitHub Acti
 ~~~bash
 git clone https://github.com/naoiw/geo-quiz.git
 cd geo-quiz
-git switch develop
 npm install
 npm run dev
 ~~~
@@ -49,15 +46,17 @@ npm run preview
 
 Node.js 22.12以上が必要です。初期段階はlockfile未作成のためnpm installを使用します。依存バージョン確定後はlockfileを追加し、npm ciに切り替える方針です。
 
-## Gitflow運用
+## GitHub Flow運用（Web版）
 
-- main: 本番リリース済みコード。
-- develop: 次期リリースの統合・開発プレビュー。
-- feature/*: developから分岐し、PRでdevelopへ統合。
-- release/*: developから分岐し、検証後mainへ統合してdevelopへ変更を戻す。
-- hotfix/*: mainから分岐し、mainとdevelopの両方へ反映。
+1. Issueごとに`main`から`feature/<issue>-<topic>`ブランチ（不具合は`fix/*`）を作成。
+2. AIが実装し、`main`にPRを作成してCI・レビュー・必要な動作確認を実施。
+3. 問題なければ`main`へマージし、Issueをクローズ。GitHub Pagesへ即時自動公開。
+4. 未完成機能はFeature Flagなどで無効にして`main`を常に公開可能に保つ。
+5. 重要な節目でバージョンタグを付ける。Webでは`release/*`や常設`develop`は不要。
 
-featureからmainへの直接マージはしません。
+## Android版（将来）
+
+Web版が主要4題型・スマホUI・日英対応・データ整合性・テスト・性能面で十分安定した段階で移植を検討します（[Issue #15](https://github.com/naoiw/geo-quiz/issues/15)）。CapacitorでUI/ゲーム/データを共通化する方針ですが、Androidのストア申請・バージョン管理・公開サイクルはWebから独立させます。
 
 ## ディレクトリ
 
@@ -73,7 +72,7 @@ featureからmainへの直接マージはしません。
 
 - [一覧](docs/README.md)
 - [設計](docs/ARCHITECTURE.md)
-- [開発・Gitflow](docs/DEVELOPMENT.md)
+- [開発・GitHub Flow](docs/DEVELOPMENT.md)
 - [デプロイ](docs/DEPLOYMENT.md)
 - [データとライセンス](docs/DATA.md)
 

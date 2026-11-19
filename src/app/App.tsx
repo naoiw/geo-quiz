@@ -49,10 +49,40 @@ export function App() {
           <span className="brand__mark" aria-hidden="true">◎</span>
           <span>GEO QUIZ</span>
         </a>
-        <div className="language-switch" role="group" aria-label={t("language")}>
-          <button type="button" className={locale === "ja" ? "is-active" : ""} aria-pressed={locale === "ja"} onClick={() => setLocale("ja")}>JP</button>
-          <button type="button" className={locale === "en" ? "is-active" : ""} aria-pressed={locale === "en"} onClick={() => setLocale("en")}>EN</button>
-        </div>
+        <details className="language-settings">
+          <summary>
+            <span aria-hidden="true">⚙</span>
+            {t("settings")}
+            <span className="language-settings__current">{locale.toUpperCase()}</span>
+          </summary>
+          <div className="language-settings__panel">
+            <fieldset>
+              <legend>{t("language")}</legend>
+              <p className="language-settings__help">{t("languageHelp")}</p>
+              <label>
+                <input
+                  type="radio"
+                  name="geo-quiz-language"
+                  value="ja"
+                  checked={locale === "ja"}
+                  onChange={() => setLocale("ja")}
+                />
+                {t("languageJapanese")}
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="geo-quiz-language"
+                  value="en"
+                  checked={locale === "en"}
+                  onChange={() => setLocale("en")}
+                />
+                {t("languageEnglish")}
+              </label>
+              <p className="language-settings__hint">{t("languageSaved")}</p>
+            </fieldset>
+          </div>
+        </details>
       </header>
 
       <main className="page-container">

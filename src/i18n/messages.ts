@@ -41,6 +41,13 @@ const messages = {
     flagTarget: "表示する国・地域",
     flagNotice: "これは国旗データのプレビューです。国旗クイズは上のクイズ画面から遊べます。",
     language: "表示言語",
+    settings: "設定",
+    languageHelp: "表示言語を選択してください。国名表示と文字回答の判定にも反映されます。",
+    languageJapanese: "日本語",
+    languageEnglish: "English",
+    languageSaved: "選択した言語はこのブラウザに保存されます。",
+    metaTitle: "Geo Quiz｜世界の国と国旗クイズ",
+    metaDescription: "地図と国旗で世界197か国・地域を学ぶ4種類のクイズ。",
   },
   en: {
     tagline: "GEOGRAPHY · FLAGS · QUIZ",
@@ -82,6 +89,13 @@ const messages = {
     flagTarget: "Country or region",
     flagNotice: "This is the asset preview. Play the flag quizzes in the quiz sections above.",
     language: "Language",
+    settings: "Settings",
+    languageHelp: "Choose the display language. It also applies to country names and typed-answer checking.",
+    languageJapanese: "日本語",
+    languageEnglish: "English",
+    languageSaved: "Your language preference is saved in this browser.",
+    metaTitle: "Geo Quiz | Countries and Flags",
+    metaDescription: "Explore 197 countries and regions through four map and flag quizzes.",
   },
 };
 

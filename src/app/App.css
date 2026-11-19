@@ -17,9 +17,36 @@ a { color: inherit; }
 .site-header { min-height: 80px; border-bottom: 1px solid #dbe4ef; }
 .brand { display: inline-flex; align-items: center; gap: 11px; font-size: 19px; font-weight: 850; letter-spacing: .07em; text-decoration: none; }
 .brand__mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: #1d4ed8; color: #fff; font-size: 25px; }
-.language-switch { display: inline-flex; gap: 4px; padding: 4px; border-radius: 11px; background: #e9eef5; }
-.language-switch button { min-width: 46px; min-height: 34px; border: 0; border-radius: 8px; color: #61738d; background: transparent; cursor: pointer; font-size: 13px; font-weight: 700; }
-.language-switch button.is-active { color: #1d4ed8; background: #fff; box-shadow: 0 2px 8px #10294712; }
+.language-settings { position: relative; z-index: 15; }
+.language-settings > summary {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 40px;
+  padding: 8px 12px; list-style: none; border: 1px solid #d4e0ef; border-radius: 10px;
+  background: #fff; color: #1e3a5f; font-size: 13px; font-weight: 700;
+  cursor: pointer; user-select: none;
+}
+.language-settings > summary::-webkit-details-marker { display: none; }
+.language-settings[open] > summary { border-color: #1d4ed8; }
+.language-settings__current {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 32px;
+  padding: 3px 6px; border-radius: 5px; background: #e8f0fe; color: #1d4ed8; font-size: 11px;
+}
+.language-settings__panel {
+  position: absolute; right: 0; top: calc(100% + 8px); width: min(320px, calc(100vw - 32px));
+  border: 1px solid #d4e0ef; border-radius: 12px; background: #fff;
+  box-shadow: 0 12px 32px #10294720; padding: 17px;
+}
+.language-settings__panel fieldset { min-width: 0; border: 0; padding: 0; margin: 0; }
+.language-settings__panel legend { font-weight: 800; font-size: 15px; margin-bottom: 8px; }
+.language-settings__panel label {
+  display: flex; align-items: center; gap: 10px; min-height: 43px; padding: 8px 10px;
+  cursor: pointer; font-size: 14px; border-radius: 7px;
+}
+.language-settings__panel label:has(input:checked) { color: #1d4ed8; background: #eff5ff; font-weight: 700; }
+.language-settings__panel input { width: 17px; height: 17px; margin: 0; accent-color: #1d4ed8; }
+.language-settings__help, .language-settings__hint { color: #60738e; font-size: 12px; line-height: 1.7; }
+.language-settings__help { margin: 0 0 10px; }
+.language-settings__hint { margin: 12px 0 0; }
+
 main.page-container { flex: 1; }
 .hero { padding: 66px 0 47px; }
 .eyebrow { margin: 0 0 14px; color: #2563eb; font-size: 12px; font-weight: 800; letter-spacing: .16em; }

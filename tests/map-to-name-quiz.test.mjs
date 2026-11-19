@@ -76,7 +76,7 @@ test("every tiny island and microstate remains in the playable world map", () =>
   }
 });
 
-test("quiz map hides country labels and adds no marker overlay", () => {
+test("quiz map hides country labels while helping locate small highlighted countries", () => {
   const map = readFileSync("src/map/WorldMap.tsx", "utf8");
   const styles = readFileSync("src/map/WorldMap.css", "utf8");
   const quiz = readFileSync("src/features/quiz/NameQuiz.tsx", "utf8");
@@ -85,6 +85,9 @@ test("quiz map hides country labels and adds no marker overlay", () => {
   assert.ok(map.includes("aria-label={!readOnly ? country?.names[locale] : undefined}"));
   assert.ok(map.includes('!readOnly && <g className="world-map__microstate-hit-areas"'));
   assert.ok(styles.includes('world-map--quiz .world-map__country--highlighted[data-tiny="true"]'));
+  assert.ok(map.includes("needsLocationPin(feature, view.width)"));
+  assert.ok(map.includes("countryId: highlightedCountryId"));
+  assert.ok(map.includes('className="world-map__location-pins" pointerEvents="none"'));
   assert.ok(quiz.includes("<WorldMap"));
   assert.ok(quiz.includes("readOnly"));
   assert.ok(quiz.includes("useQuizSession(locale)"));

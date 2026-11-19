@@ -85,7 +85,7 @@
 
 .world-map__country--selected {
   fill: #2563eb;
-  stroke: none;
+  stroke: #1e40af;
   cursor: pointer;
 }
 
@@ -95,36 +95,16 @@
   cursor: pointer;
 }
 
-.world-map__pin {
-  fill: #2364a9;
-  stroke: white;
-  stroke-width: 0.65;
-  paint-order: stroke;
+.world-map__microstate-hit-area {
+  fill: transparent;
+  stroke: none;
   cursor: pointer;
 }
 
-.world-map__pin--highlighted {
-  fill: #f59e0b;
-  stroke: #8a4b08;
-}
-
-.world-map__pin--selected {
-  fill: #1d4ed8;
-  stroke: none;
-}
-
-.world-map__country:focus-visible,
-.world-map__pin:focus-visible {
+.world-map__country:focus-visible {
   outline: none;
   stroke: #0f172a;
   stroke-width: 2;
-}
-
-/* A selected country keeps its fill, without an extra selection border. */
-.world-map__country--selected:focus-visible,
-.world-map__pin--selected:focus-visible {
-  stroke: none;
-  filter: brightness(0.85);
 }
 
 .world-map__bottom {

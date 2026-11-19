@@ -25,6 +25,8 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Lint
         run: npm run lint
+      - name: Validate country master
+        run: npm test
       - name: Build production
         run: npm run build:pages:main
       - name: Disable Jekyll

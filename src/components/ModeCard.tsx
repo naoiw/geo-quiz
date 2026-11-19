@@ -11,13 +11,11 @@ export function ModeCard({ mode, t }: Props) {
     <article className="mode-card">
       <div className="mode-card__top">
         <span className="mode-card__icon" aria-hidden="true">{mode.symbol}</span>
-        <span className="mode-card__status">{t(mode.id !== "name-to-flag" ? "available" : "planned")}</span>
+        <span className="mode-card__status">{t("available")}</span>
       </div>
       <h3>{t(mode.titleKey)}</h3>
       <p>{t(mode.bodyKey)}</p>
-      {(mode.id !== "name-to-flag") && (
-        <a className="mode-card__play" href={"#" + mode.id + "-quiz"}>{t("play")}</a>
-      )}
+      <a className="mode-card__play" href={"#" + mode.id + "-quiz"}>{t("play")}</a>
     </article>
   );
 }

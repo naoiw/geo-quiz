@@ -6,7 +6,7 @@ import type { SessionRule } from "../../game-engine/types";
 import type { Locale } from "../../i18n/messages";
 import { quizText, type QuizTextKey } from "../../i18n/quizMessages";
 import { QuizFeedback, QuizProgress, QuizResultSummary } from "./QuizStatus";
-import { WorldMap } from "../../map/WorldMap";
+import { WorldView } from "../../map/WorldView";
 import { RegionSelector, countRegionCountries, type RegionSelection } from "./RegionSelector";
 import "./NameQuiz.css";
 import "./NameToMapQuiz.css";
@@ -117,7 +117,7 @@ export function NameToMapQuiz({ locale }: { locale: Locale }) {
               : (qt("mapSelectHelp"))}
           </p>
 
-          <WorldMap
+          <WorldView
             locale={locale}
             mode={review ? "highlight" : "answer"}
             selectedCountryId={mapSelectedId}

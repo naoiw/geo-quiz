@@ -89,7 +89,7 @@ test("quiz map hides country labels while helping locate small highlighted count
   assert.ok(map.includes("needsLocationPin(feature, view.width)"));
   assert.ok(map.includes("countryId: highlightedCountryId"));
   assert.ok(map.includes('className="world-map__location-pins" pointerEvents="none"'));
-  assert.ok(quiz.includes("<WorldMap"));
+  assert.ok(quiz.includes("<WorldView"));
   assert.ok(quiz.includes("readOnly"));
   assert.ok(quiz.includes("useQuizSession(locale)"));
   assert.ok(quiz.includes("submit({ format: \"text\", value: answerText })"));

@@ -1,0 +1,57 @@
+:root {
+  font-family: "Helvetica Neue", Arial, "Hiragino Sans", Meiryo, sans-serif;
+  color: #172b47;
+  background: #f7f9fc;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+* { box-sizing: border-box; }
+body { min-width: 320px; margin: 0; }
+button { font: inherit; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid #2563eb; outline-offset: 3px; }
+.app-shell { min-height: 100vh; display: flex; flex-direction: column; }
+.page-container { width: min(1120px, calc(100% - 40px)); margin-inline: auto; }
+.site-header, .site-footer { display: flex; justify-content: space-between; align-items: center; }
+.site-header { min-height: 80px; border-bottom: 1px solid #dbe4ef; }
+.brand { display: inline-flex; align-items: center; gap: 11px; font-size: 19px; font-weight: 850; letter-spacing: .07em; text-decoration: none; }
+.brand__mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: #1d4ed8; color: #fff; font-size: 25px; }
+.language-switch { display: inline-flex; gap: 4px; padding: 4px; border-radius: 11px; background: #e9eef5; }
+.language-switch button { min-width: 46px; min-height: 34px; border: 0; border-radius: 8px; color: #61738d; background: transparent; cursor: pointer; font-size: 13px; font-weight: 700; }
+.language-switch button.is-active { color: #1d4ed8; background: #fff; box-shadow: 0 2px 8px #10294712; }
+main.page-container { flex: 1; }
+.hero { padding: 66px 0 47px; }
+.eyebrow { margin: 0 0 14px; color: #2563eb; font-size: 12px; font-weight: 800; letter-spacing: .16em; }
+.hero h1 { margin: 0; font-size: clamp(34px, 5vw, 54px); line-height: 1.28; letter-spacing: -.045em; }
+.hero__description { margin: 14px 0 0; color: #60738e; font-size: 17px; line-height: 1.9; }
+.foundation-note { display: flex; align-items: flex-start; gap: 13px; width: fit-content; max-width: 100%; margin-top: 34px; padding: 17px 20px; border: 1px solid #dce7f5; border-radius: 13px; background: #fff; }
+.foundation-note__dot { flex: 0 0 9px; height: 9px; margin-top: 7px; border-radius: 50%; background: #2563eb; }
+.foundation-note strong { font-size: 14px; }
+.foundation-note p { margin: 5px 0 0; color: #60738e; font-size: 13px; line-height: 1.7; }
+.section-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 20px; }
+.section-heading h2 { margin: 0; font-size: 24px; }
+.section-heading p { margin: 7px 0 0; color: #687b94; font-size: 14px; }
+.section-count { flex-shrink: 0; color: #9bacbe; font-size: 13px; font-weight: 750; }
+.mode-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.mode-card { min-height: 192px; padding: 25px; border: 1px solid #dbe4ef; border-radius: 16px; background: #fff; box-shadow: 0 6px 22px #223c5b06; }
+.mode-card__top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.mode-card__icon { font-size: 27px; line-height: 1.2; }
+.mode-card__status { padding: 6px 9px; border-radius: 7px; background: #f1f5f9; color: #657a98; font-size: 11px; font-weight: 700; }
+.mode-card h3 { margin: 15px 0 7px; font-size: 18px; }
+.mode-card p { margin: 0; color: #60738e; font-size: 13px; line-height: 1.8; }
+.next-step { margin: 30px 0 60px; padding: 24px 26px; border-radius: 14px; background: #e9f0fb; }
+.next-step h2 { margin: 0 0 7px; font-size: 16px; }
+.next-step p { margin: 0; color: #526c8b; font-size: 14px; line-height: 1.8; }
+.site-footer { min-height: 67px; border-top: 1px solid #dbe4ef; color: #7a8ca2; font-size: 12px; }
+.site-footer a { color: #4a607f; text-decoration: none; }
+.site-footer a:hover { color: #1d4ed8; text-decoration: underline; }
+@media (max-width: 620px) {
+  .page-container { width: min(1120px, calc(100% - 32px)); }
+  .site-header { min-height: 70px; }
+  .hero { padding: 48px 0 36px; }
+  .hero__description { font-size: 15px; }
+  .mode-grid { grid-template-columns: 1fr; gap: 12px; }
+  .mode-card { min-height: 168px; padding: 21px; }
+  .next-step { margin-bottom: 36px; }
+}

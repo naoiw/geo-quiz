@@ -93,7 +93,11 @@ Web版が主要4題型・スマホUI・日英対応・データ整合性・テ�
 - [国旗 → 国名クイズ](docs/FLAG_TO_NAME_QUIZ.md)
 - [国名 → 地図クイズ](docs/NAME_TO_MAP_QUIZ.md)
 - [国名 → 国旗クイズ](docs/NAME_TO_FLAG_QUIZ.md)
+- [国名テキスト入力・表記ゆれの判定規則](docs/TEXT_ANSWER.md)
 
 ## ライセンス
 
 このリポジトリのコードは既存の [Apache License 2.0](LICENSE) で公開されています。国マスタにはODbL 1.0とUnicode License V3のデータを含みます。詳しくは[データ仕様](docs/DATA.md)を参照してください。地図の境界はパブリックドメインのNatural Earthを使用しています。国旗素材はflag-icons（MIT License）から取得し、配布時もライセンスを同梱しています。詳細は[国旗アセット](docs/FLAGS.md)を参照してください。
+
+## 国名テキスト回答（Issue #10）
+日本語ではひらがな／カタカナ、全角／半角、登録済みの正式名・通称・読みを同等に判定します。英語は表示言語に合った別名と文字の大小を考慮します。曖昧な部分一致や誤字の自動補正はしません。入力変換中のEnterは送信しないよう調整済みです。詳しくは [国名テキスト回答仕様](docs/TEXT_ANSWER.md) を参照してください。

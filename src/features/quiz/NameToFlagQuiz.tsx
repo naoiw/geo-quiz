@@ -251,8 +251,8 @@ export function NameToFlagQuiz({ locale }: { locale: Locale }) {
           <p className="quiz__note">
             {result.finishReason === "timeout"
               ? (isJa ? "時間切れです。" : "Time is up.")
-              : (isJa ? session.questionLimit + "問終了しました。" :
-                "All " + session.questionLimit + " questions completed.")}
+              : (isJa ? result.answered + "問終了しました。" :
+                "All " + result.answered + " questions completed.")}
           </p>
           <ol className="quiz__history">
             {result.history.map((record) => {

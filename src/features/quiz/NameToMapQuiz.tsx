@@ -86,7 +86,7 @@ export function NameToMapQuiz({ locale }: { locale: Locale }) {
               onDurationChange={setDurationSeconds}
             />
           </div>
-          <p className="quiz__note">{qt("select_a_country_then_confirm_to_prevent_accidental_taps")}</p>
+          <p className="quiz__note">{qt("mapSelectionNote")}</p>
           <button type="button" className="quiz__primary" onClick={start}
             disabled={insufficientCountries}>
             {qt("startQuiz")}
@@ -113,8 +113,8 @@ export function NameToMapQuiz({ locale }: { locale: Locale }) {
           </p>
           <p className="quiz__map-help">
             {review
-              ? (qt("yellow_marks_the_correct_country_blue_marks_your_choice"))
-              : (qt("tap_a_country_to_select_it_zoom_drag_or"))}
+              ? (qt("mapReviewHelp"))
+              : (qt("mapSelectHelp"))}
           </p>
 
           <WorldMap

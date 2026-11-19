@@ -85,7 +85,7 @@ export function NameToFlagQuiz({ locale }: { locale: Locale }) {
               onDurationChange={setDurationSeconds}
             />
           </div>
-          <p className="quiz__note">{qt("tap_a_flag_to_submit_provisional_scoring_100_correct")}</p>
+          <p className="quiz__note">{qt("flagSelectionNote")}</p>
           <button type="button" className="quiz__primary" onClick={start}
             disabled={insufficientCountries}>
             {qt("startQuiz")}

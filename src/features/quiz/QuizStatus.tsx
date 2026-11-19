@@ -109,7 +109,7 @@ export function QuizResultSummary({ locale, result }: { locale: Locale; result: 
         <span>{quizText(locale, "answered")}: {result.answered}</span>
         <span>{quizText(locale, "correctCount")}: {result.correct}</span>
         <span>{quizText(locale, "incorrectNotice")}: {result.incorrect}</span>
-        <span>{quizText(locale, "skippedNotice_2")}: {result.skipped}</span>
+        <span>{quizText(locale, "skippedCount")}: {result.skipped}</span>
         <span>{quizText(locale, "accuracy")}: {result.accuracyPercent.toFixed(1)}%</span>
         <span>{quizText(locale, "elapsed")}: {formatQuizTime(result.elapsedMs)}</span>
       </div>

@@ -136,7 +136,7 @@ export function NameQuiz({ locale, kind }: Props) {
               onDurationChange={setDurationSeconds}
             />
           </div>
-          <p className="quiz__note">{qt("scoring_is_provisional_100_for_correct_0_otherwise_time")}</p>
+          <p className="quiz__note">{qt("scoringNote")}</p>
           <button type="button" className="quiz__primary" onClick={start}
             disabled={insufficientCountries}>
             {qt("startQuiz")}
@@ -157,8 +157,8 @@ export function NameQuiz({ locale, kind }: Props) {
           />
           <p className="quiz__prompt">
             {isFlag
-              ? (qt("which_country_does_this_flag_represent"))
-              : (qt("which_country_is_highlighted"))}
+              ? (qt("flagQuestion"))
+              : (qt("mapQuestion"))}
           </p>
           {isFlag ? (
             <div className="quiz__flag-prompt">
@@ -193,7 +193,7 @@ export function NameQuiz({ locale, kind }: Props) {
                 {qt("enterCountry")}
               </label>
               <p className="quiz__input-help" id={kind + "-answer-help"}>
-                {qt("official_and_accepted_alternative_names_are_supported_confirm_your")}
+                {qt("textAnswerHelp")}
               </p>
               <div className="quiz__answer-input-row">
                 <input

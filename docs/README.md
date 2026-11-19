@@ -11,3 +11,4 @@
 - [FLAG_TO_NAME_QUIZ.md](FLAG_TO_NAME_QUIZ.md): 国旗 → 国名の出題・入力・四択UI・類似国旗の方針
 - [NAME_TO_MAP_QUIZ.md](NAME_TO_MAP_QUIZ.md): 国名 → 地図の回答操作、地域切替と小国対応
 - [NAME_TO_FLAG_QUIZ.md](NAME_TO_FLAG_QUIZ.md): 国名 → 国旗の四択、地域別誤答候補、重複対策
+- [TEXT_ANSWER.md](TEXT_ANSWER.md): 正答判定、日本語の読み、IME入力

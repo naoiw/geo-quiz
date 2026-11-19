@@ -50,8 +50,9 @@ test("draw only tiles visible in the viewport, including cross-antimeridian view
   assert.deepEqual(tiles(10, 360), [0, 360]);
   assert.deepEqual(tiles(-10, 80), [-360, 0]);
   assert.deepEqual(tiles(-180, 360), [-360, 0]);
-  assert.deepEqual(tiles(179, 100), [0, 360]);
-  assert.deepEqual(tiles(-179, 100), [-360, 0]);
+  assert.deepEqual(tiles(179, 100), [0]);
+  assert.deepEqual(tiles(299, 100), [0, 360]);
+  assert.deepEqual(tiles(-179, 100), [-360]);
   assert.ok(tiles(-1, 8).length <= 2);
 });
 

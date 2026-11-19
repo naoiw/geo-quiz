@@ -9,3 +9,4 @@
 - [GAME_ENGINE.md](GAME_ENGINE.md): 出題・採点・時間制限・結果集計と呼び出し契約
 - [MAP_TO_NAME_QUIZ.md](MAP_TO_NAME_QUIZ.md): 地図 → 国名の出題・入力・四択UI・結果表示
 - [FLAG_TO_NAME_QUIZ.md](FLAG_TO_NAME_QUIZ.md): 国旗 → 国名の出題・入力・四択UI・類似国旗の方針
+- [NAME_TO_MAP_QUIZ.md](NAME_TO_MAP_QUIZ.md): 国名 → 地図の回答操作、地域切替と小国対応

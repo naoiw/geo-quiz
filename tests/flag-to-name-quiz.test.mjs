@@ -70,7 +70,10 @@ test("flag prompt hides the country name in alt while both quizzes share the sam
   const app = readFileSync("src/app/App.tsx", "utf8");
   const flagComponent = readFileSync("src/flags/CountryFlag.tsx", "utf8");
   assert.ok(quiz.includes('kind === "flag-to-name"'));
-  assert.ok(quiz.includes('alt={isJa ? "問題の国旗" : "Question flag"}'));
+  assert.ok(quiz.includes('alt={qt("questionFlag")}'));
+  const localized = readFileSync("src/i18n/quizMessages.ts", "utf8");
+  assert.ok(localized.includes('"questionFlag": "問題の国旗"'));
+  assert.ok(localized.includes('"questionFlag": "Question flag"'));
   assert.ok(quiz.includes("flagRegion.names[locale]"));
   assert.ok(quiz.includes("<CountryFlag") && quiz.includes("<WorldMap"));
   assert.ok(quiz.includes("startSession(") && quiz.includes("submitAnswer("));

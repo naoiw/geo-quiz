@@ -42,7 +42,8 @@ export function NameToFlagQuiz({ locale }: { locale: Locale }) {
   // when the timer ticks. Only the question number/ID or fixed game pool changes it.
   const options = useMemo(() => {
     if (!question || !session) return [];
-    return createFlagChoices(question.countryId, session.countryPool, countries, { scope });
+    return createFlagChoices(question.countryId, session.countryPool, countries, { scope })
+      .map((country) => ({ countryId: country.id, country }));
   }, [question?.number, question?.countryId, session?.countryPool, scope]);
 
   useEffect(() => {
@@ -197,7 +198,7 @@ export function NameToFlagQuiz({ locale }: { locale: Locale }) {
             onSelect={answer}
             renderChoice={(country, index) => (
               <CountryFlag
-                country={country}
+                country={country.country}
                 locale={locale}
                 alt={(isJa ? "選択肢" : "Option ") +
                   String.fromCharCode(65 + index) + (isJa ? "の国旗" : " flag")}

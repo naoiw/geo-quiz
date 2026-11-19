@@ -40,3 +40,11 @@ test("known naming mismatches and tiny countries are mapped", () => {
   assert.equal(byId.get("NR").tiny, true);
   assert.ok(world.features.some((f) => f.id === null), "Background polygons should remain visible");
 });
+
+test("tiny-country hit targets do not draw markers over the map", () => {
+  const mapComponent = readFileSync("src/map/WorldMap.tsx", "utf8");
+  const mapStyles = readFileSync("src/map/WorldMap.css", "utf8");
+  assert.match(mapComponent, /className="world-map__microstate-hit-area"/);
+  assert.match(mapStyles, /\.world-map__microstate-hit-area\s*\{\s*fill: transparent;\s*stroke: none;/);
+  assert.doesNotMatch(mapComponent, /world-map__pin/);
+});

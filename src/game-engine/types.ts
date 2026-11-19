@@ -1,5 +1,3 @@
-import type { RegionId } from "../country-data/regions";
-
 /** Question format and answer format are separate by design. */
 export type QuizKind =
   | "map-to-name"
@@ -14,5 +12,5 @@ export interface GameConfiguration {
   quizKind: QuizKind;
   answerFormat: AnswerFormat;
   sessionRule: SessionRule;
-  regionId: RegionId | null;
+  regionId: string | null;
 }

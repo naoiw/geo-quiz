@@ -10,7 +10,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "build:pages:main": "npm run build -- --base=/geo-quiz/",
-    "test": "node --test tests/*.test.mjs"
+    "build:pages:develop": "npm run build -- --base=/geo-quiz/develop/"
   },
   "dependencies": {
     "react": "19.2.0",

@@ -2,7 +2,7 @@
 
 地図と国旗で世界の国々を学ぶWebクイズアプリです。React + TypeScriptでWebを先行開発し、将来のAndroid版はCapacitorによるコード共通化を目指します。
 
-**現在の状態:** Reactアプリ基盤と197件の国・地域マスタ（日本語・英語）を実装済み。地図・国旗画像・実際の出題と採点は未実装です。
+**現在の状態:** Issue #1のアプリ基盤と画面プレビュー。国データ・地図・国旗・実際の出題と採点は未実装です。
 
 ## クイズの構想
 
@@ -15,12 +15,14 @@
 
 地域選択、10問制・タイムアタック、2D/3D地図（2Dから実装）、日本語・英語に対応する計画です。詳細は [Issues](https://github.com/naoiw/geo-quiz/issues) を参照してください。
 
-## Web版の公開先
+## 公開先（GitHub Pages設定後）
 
-- **本番:** https://naoiw.github.io/geo-quiz/
-- 公開ブランチ: `main`。PRをマージするとGitHub Actionsで自動公開します。
-- 旧`develop`プレビュー（`/geo-quiz/develop/`）は終了。PRごとのオンラインプレビューは今後必要に応じて検討します。
-- 未完成のクイズはUIで「開発予定」と示し、遊べる機能として公開しません。
+| 環境 | ブランチ | URL |
+| --- | --- | --- |
+| 本番 | main | https://naoiw.github.io/geo-quiz/ |
+| 開発プレビュー | develop | https://naoiw.github.io/geo-quiz/develop/ |
+
+初回はGitHubのSettings → PagesでSourceをGitHub Actionsに設定する必要があります。mainが未リリースの間、本番URLには案内ページのみを表示します。
 
 ## 技術スタック
 
@@ -31,6 +33,7 @@ React 19 / TypeScript 5 / Vite 7 / CSS / ESLint / Node.js 26推奨 / GitHub Acti
 ~~~bash
 git clone https://github.com/naoiw/geo-quiz.git
 cd geo-quiz
+git switch develop
 npm install
 npm run dev
 ~~~
@@ -41,23 +44,20 @@ npm run dev
 npm run lint
 npm run typecheck
 npm run build
-npm test
 npm run preview
 ~~~
 
 Node.js 22.12以上が必要です。初期段階はlockfile未作成のためnpm installを使用します。依存バージョン確定後はlockfileを追加し、npm ciに切り替える方針です。
 
-## GitHub Flow運用（Web版）
+## Gitflow運用
 
-1. Issueごとに`main`から`feature/<issue>-<topic>`ブランチ（不具合は`fix/*`）を作成。
-2. AIが実装し、`main`にPRを作成してCI・レビュー・必要な動作確認を実施。
-3. 問題なければ`main`へマージし、Issueをクローズ。GitHub Pagesへ即時自動公開。
-4. 未完成機能はFeature Flagなどで無効にして`main`を常に公開可能に保つ。
-5. 重要な節目でバージョンタグを付ける。Webでは`release/*`や常設`develop`は不要。
+- main: 本番リリース済みコード。
+- develop: 次期リリースの統合・開発プレビュー。
+- feature/*: developから分岐し、PRでdevelopへ統合。
+- release/*: developから分岐し、検証後mainへ統合してdevelopへ変更を戻す。
+- hotfix/*: mainから分岐し、mainとdevelopの両方へ反映。
 
-## Android版（将来）
-
-Web版が主要4題型・スマホUI・日英対応・データ整合性・テスト・性能面で十分安定した段階で移植を検討します（[Issue #15](https://github.com/naoiw/geo-quiz/issues/15)）。CapacitorでUI/ゲーム/データを共通化する方針ですが、Androidのストア申請・バージョン管理・公開サイクルはWebから独立させます。
+featureからmainへの直接マージはしません。
 
 ## ディレクトリ
 
@@ -65,7 +65,7 @@ Web版が主要4題型・スマホUI・日英対応・データ整合性・テ�
 - src/components: 共通UI
 - src/features/quiz: クイズの題型定義
 - src/game-engine: 出題・採点の型と純粋ロジック
-- src/country-data: 197件の国マスタ、共通ID・日英名・論理アセットID
+- src/country-data: 共通国ID・国名・国旗・地理データ
 - src/i18n: 日本語と英語
 - docs: 設計・開発・データ・配信の説明
 
@@ -73,10 +73,10 @@ Web版が主要4題型・スマホUI・日英対応・データ整合性・テ�
 
 - [一覧](docs/README.md)
 - [設計](docs/ARCHITECTURE.md)
-- [開発・GitHub Flow](docs/DEVELOPMENT.md)
+- [開発・Gitflow](docs/DEVELOPMENT.md)
 - [デプロイ](docs/DEPLOYMENT.md)
 - [データとライセンス](docs/DATA.md)
 
 ## ライセンス
 
-このリポジトリのコードは既存の [Apache License 2.0](LICENSE) で公開されています。国マスタにはODbL 1.0とUnicode License V3のデータを含みます。詳しくは[データ仕様](docs/DATA.md)を参照してください。地図・国旗素材の権利条件は採用時に確認します。
+このリポジトリのコードは既存の [Apache License 2.0](LICENSE) で公開されています。地図・国旗等の外部素材のライセンスは採用時に別途確認します。

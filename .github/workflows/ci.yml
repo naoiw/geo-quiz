@@ -11,19 +11,11 @@ permissions:
 
 jobs:
   validate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "26"
-      - name: Install
-        run: npm ci --no-audit --no-fund
-      - name: Lint
-        run: npm run lint
-      - name: Typecheck
-        run: npm run typecheck
-      - name: Validate country master
-        run: npm test
-      - name: Build
-        run: npm run build
+    uses: naoiw/.github/.github/workflows/reusable-node-ci.yml@3f1b5f2dedeca0bbdd2cf640b4ab189fa28b77fb
+    with:
+      package-manager: npm
+      node-version: "26"
+      run-lint: true
+      run-typecheck: true
+      run-tests: true
+      run-build: true

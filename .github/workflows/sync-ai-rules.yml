@@ -3,6 +3,8 @@ name: Sync naoiw AI rules
 # Manual-only rollout. workflow_dispatch is available from the repository default branch.
 on:
   workflow_dispatch:
+  push:
+    branches: [feature/shared-ai-guidance-ci-trial]
 
 permissions:
   contents: write

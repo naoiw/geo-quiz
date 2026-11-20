@@ -25,14 +25,12 @@ Androidアプリ向けに既存Reactコードを共有します。PC Webは従�
 
 ```bash
 npm ci
-npm run build:android
-npm run android:add       # 初回のみAndroidネイティブプロジェクト生成
-npm run android:sync      # 以降、Webコードを更新したとき
+npm run android:sync      # Android向けビルド・ネイティブ同期      # 以降、Webコードを更新したとき
 cd android
 ./gradlew assembleDebug  # Windows: gradlew.bat assembleDebug
 ```
 
-デバッグAPKの出力先は `android/app/build/outputs/apk/debug/app-debug.apk`。GitHub Actionsの **Android Debug APK** ワークフローでもビルドし、APKをアーティファクトとして保存します。現段階ではAndroidプロジェクトの生成をCI/ローカルで行い、ネイティブソースの固定と実機動作検証は後続の作業です。Play Store向けの署名済みAABはまだ作っていません。
+デバッグAPKの出力先は `android/app/build/outputs/apk/debug/app-debug.apk`。GitHub Actionsの **Android Debug APK** ワークフローでもビルドし、APKをアーティファクトとして保存します。Androidネイティブプロジェクトはリポジトリ管理し、Androidシステムの戻るボタンはクイズ中ならモード選択へ、トップ画面ならアプリ終了へ移動します。実機動作検証は未実施です。Play Store向けの署名済みAABはまだ作っていません。
 
 ## 開発・検証
 

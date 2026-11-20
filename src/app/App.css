@@ -11,7 +11,14 @@ body { min-width: 320px; margin: 0; }
 button { font: inherit; }
 a { color: inherit; }
 :focus-visible { outline: 3px solid #2563eb; outline-offset: 3px; }
-.app-shell { min-height: 100vh; display: flex; flex-direction: column; }
+.app-shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
 .page-container { width: min(1120px, calc(100% - 40px)); margin-inline: auto; }
 .site-header, .site-footer { display: flex; justify-content: space-between; align-items: center; }
 .site-header { min-height: 80px; border-bottom: 1px solid #dbe4ef; }

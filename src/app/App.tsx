@@ -134,13 +134,6 @@ export function App() {
           <p className="eyebrow">{t("tagline")}</p>
           <h1 id="hero-title">{t("heading")}</h1>
           <p className="hero__description">{t("intro")}</p>
-          <div className="foundation-note">
-            <span className="foundation-note__dot" aria-hidden="true" />
-            <div>
-              <strong>{t("foundation")}</strong>
-              <p>{t("foundationBody")}</p>
-            </div>
-          </div>
         </section>
         )}
 
@@ -240,7 +233,6 @@ export function App() {
               <div className="map-demo__feedback" role="status" aria-live="polite">
                 {selectionText}
               </div>
-              <p className="map-demo__notice">{t("mapNotice")}</p>
             </section>
     
             <section className="flag-demo" aria-labelledby="flag-title">
@@ -272,10 +264,6 @@ export function App() {
           </div>}
         </details>
 
-        <aside className="next-step">
-          <h2>{t("nextStep")}</h2>
-          <p>{t("nextStepBody")}</p>
-        </aside>
         </>
         )}
       </main>

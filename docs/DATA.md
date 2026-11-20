@@ -50,7 +50,7 @@ flagId、geometryIdは国IDと同じ論理キーです。地図ポリゴンはIs
 - https://github.com/unicode-org/cldr-json
 - https://www.un.org/en/about-us/non-member-states
 
-取得時点のライセンス本文は data/licenses/ODbL-1.0.txt と data/licenses/UNICODE-LICENSE-V3.txt に収録しています。国マスタはODbL 1.0に基づく派生データベースとして扱い、必要な表示・ライセンス条件を維持します。広告収益化やAndroid同梱に際しても、この条件を確認します。
+取得時点のライセンス本文は data/licenses/ODbL-1.0.txt と data/licenses/UNICODE-LICENSE-V3.txt に収録しています。国マスタはODbL 1.0に基づく派生データベースとして扱い、必要な表示・ライセンス条件を維持します。広告収益化などの商用利用に際しても、この条件を確認します。
 
 地図ポリゴンはパブリックドメインのNatural Earth 1:50mデータから軽量化したSVGパスを同梱しています（詳細：[MAP.md](MAP.md)）。国旗SVGはflag-icons v7.6.0（MIT License）から197件をローカル同梱します。ライセンス原文はdata/licenses/FLAG-ICONS-MIT.txt、ブラウザ配布物内ではflags/LICENSE.txtに含みます。国旗の意匠と縦横比については[FLAGS.md](FLAGS.md)を参照してください。
 

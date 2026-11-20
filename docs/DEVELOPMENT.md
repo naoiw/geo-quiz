@@ -32,21 +32,7 @@ npm run preview
 - 完了条件を満たし、テストがすべて成功した変更を `main` に統合
 - `main` へのpushで GitHub Actions `Deploy GitHub Pages` が公開
 - PRマージ後に`main`のCIとPagesワークフローの成功を確認する
-- Web版の節目にタグを付ける。AndroidはGoogle Playの審査・署名・バージョン管理を伴う別の公開サイクルで管理
-
-## 対象プラットフォームとAndroid展開
-
-- **PC Web**：GitHub Pages上のブラウザ版を維持し、PCの主要ブラウザで確認する。
-- **Androidアプリ**：Capacitor 8を第一候補に、同じReact/TypeScript・国データ・ゲームエンジンを同梱してGoogle Playで公開する。現段階ではAndroidプロジェクトと署名済みAABは未作成。
-- **スマホの一般ブラウザ**：正式な動作保証対象ではない。既存のレスポンシブ対応は削除せず、AndroidのWebView内UIで再利用する。
-- Androidでは2D/3D描画、タップ・ピンチ、IME、端末戻る、状態復帰、オフライン動作を検証する。PWAのService Workerはブラウザ配信用であり、Androidにはアセットをアプリに内包する方式を優先する。
-- Play Store公開の前提（アプリID、target SDK、Android App Bundle、署名、ストア情報・プライバシー申告・テスト）は [ANDROID.md](ANDROID.md) を参照。
-
-## Androidの初期ビルド
-
-`npm ci`でCapacitor 8依存も取得します。Androidネイティブプロジェクトは `android/` に固定してGit管理し、通常の開発では `npm run android:sync` でAndroid用アセットとネイティブ依存を同期します。初回生成手順の `npm run android:add` は既存プロジェクトがある場合には実行しません。
-
-CIの別ワークフロー「Android Debug APK」ではAndroid SDK 36/JDK 21を準備してGit管理済みのAndroidネイティブプロジェクトを同期し、デバッグAPKをアーティファクトとして保存します。Androidの実機操作やPlay Store公開を保証するものではありません。詳細は [ANDROID.md](ANDROID.md)。
+- Web版の節目にタグを付ける。
 
 ## コードの追加・変更
 
@@ -78,4 +64,4 @@ CIの別ワークフロー「Android Debug APK」ではAndroid SDK 36/JDK 21を�
 
 ## 未実施の確認
 
-GitHub Actionsで静的/ロジック検証および全題型・全地域の回帰マトリクスは確認できますが、PCブラウザとAndroidアプリのIME・タップ・縦横表示・スクリーンリーダー実機テストは別途必要です。実機で確認すべき手順・結果の記録方法は [QA_CHECKLIST.md](QA_CHECKLIST.md) に記載しています（品質Issue #17等）。2D/3D切替は3D地球儀（#19）実装後に確認します。
+GitHub Actionsで静的/ロジック検証および全題型・全地域の回帰マトリクスは確認できますが、ブラウザのIME・タップ・縦横表示・スクリーンリーダー実機テストは別途必要です。実機で確認すべき手順・結果の記録方法は [QA_CHECKLIST.md](QA_CHECKLIST.md) に記載しています（品質Issue #17等）。2D/3D切替は3D地球儀（#19）実装後に確認します。

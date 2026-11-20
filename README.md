@@ -25,9 +25,7 @@ Androidアプリ向けに既存Reactコードを共有します。PC Webは従�
 
 ```bash
 npm ci
-npm run build:android
-npm run android:add       # 初回のみ。android/が存在する場合は不要
-npm run android:sync      # 以降、Webコードを更新したとき
+npm run android:sync      # Android向けビルド・ネイティブ同期      # 以降、Webコードを更新したとき
 cd android
 ./gradlew assembleDebug  # Windows: gradlew.bat assembleDebug
 ```

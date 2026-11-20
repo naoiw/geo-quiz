@@ -32,7 +32,6 @@ Node.js 26、JDK 21、Android SDK 36（Capacitor 8）を使用します。Androi
 ```bash
 npm ci
 npm run build:android           # Vite --base=./ でAndroid向けにビルド
-npm run android:add             # android/未生成時のみ
 npm run android:sync            # build:android + cap sync android
 npm run android:open            # Android Studioで開く
 cd android

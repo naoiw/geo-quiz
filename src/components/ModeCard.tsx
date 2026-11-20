@@ -11,10 +11,7 @@ interface Props {
 export function ModeCard({ mode, t, onPlay }: Props) {
   return (
     <article className="mode-card">
-      <div className="mode-card__top">
-        <span className="mode-card__icon" aria-hidden="true">{mode.symbol}</span>
-        <span className="mode-card__status">{t("available")}</span>
-      </div>
+      <span className="mode-card__icon" aria-hidden="true">{mode.symbol}</span>
       <h3>{t(mode.titleKey)}</h3>
       <p>{t(mode.bodyKey)}</p>
       <a

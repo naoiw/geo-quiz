@@ -1,5 +1,5 @@
 <!-- naoiw:managed:start -->
-# STALE RULE - sync smoke test
+# naoiw 共通AI開発規約（管理領域）
 
 **特別な指示がない場合は naoiw/.github の開発規約を既定値として適用する。**
 優先順位は (1)今回のユーザー指示 (2)このリポジトリ固有のREADME/docs/設定/既存実装 (3)naoiw/.githubの標準。すべて確認できない場合は推測せず未確認と報告する。

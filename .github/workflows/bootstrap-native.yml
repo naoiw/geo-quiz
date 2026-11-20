@@ -19,7 +19,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "26"
-      - name: Resolve Capacitor App plugin
+      - name: Resolve compatible Capacitor App 8 plugin
         run: npm install --no-audit --no-fund
       - name: Generate native Android source
         run: |

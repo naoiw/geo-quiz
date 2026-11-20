@@ -7,7 +7,7 @@
 - **スマホのWebブラウザ**：Chrome/Safari等でのWeb版の動作保証は不要。ただし、AndroidアプリはWebViewを使うため、狭い画面への対応・タッチ・ソフトキーボードの検証は必須。
 - iOS版は今回の対象外。Androidを公開後、必要なら別Issueで検討する。
 
-**現在地（2026-11-20）**：Web版の4題型・6回答形式、日本語/英語、2D/3D表示は実装済み。Capacitor 8の設定・Android用ビルド・デバッグAPK生成CIの導入段階。ネイティブプロジェクトは現状CI/ローカルで生成し、ソース固定と実機検証は後続。署名済みAABとPlay Console公開は未実施。
+**現在地（2026-11-20）**：Web版の4題型・6回答形式、日本語/英語、2D/3D表示は実装済み。Capacitor 8の設定・Android用ビルド・デバッグAPK生成CIの導入段階。ネイティブプロジェクトをGit管理し、Androidシステム戻るボタンとセーフエリアへ対応する段階。実機検証は後続。署名済みAABとPlay Console公開は未実施。
 
 ## 共通化方針
 
@@ -32,7 +32,7 @@ Node.js 26、JDK 21、Android SDK 36（Capacitor 8）を使用します。Androi
 ```bash
 npm ci
 npm run build:android           # Vite --base=./ でAndroid向けにビルド
-npm run android:add             # 初回のみ npx cap add android
+npm run android:add             # android/未生成時のみ
 npm run android:sync            # build:android + cap sync android
 npm run android:open            # Android Studioで開く
 cd android
@@ -41,10 +41,12 @@ cd android
 
 デバッグAPKは `android/app/build/outputs/apk/debug/app-debug.apk` に生成されます。GitHub Actionsの `Android Debug APK` ジョブも同じ手順でビルドし、APKをアーティファクトとして保存します。
 
-- **この段階ではandroid/ソースはGit管理に含めず**、CI/ローカルで`cap add android`を実行します。APKが生成できたら、ネイティブプロジェクトを固定・差分管理する次段階に進みます。
+- `android/` をGit管理し、Gradle Wrapper・Activity・Manifest・ビルド設定の差分をレビューします。初回生成済みなので通常の開発では `cap add` を繰り返しません。CIは既存プロジェクトに `cap sync` を行います。
 - GitHub Pagesのビルドbase `/geo-quiz/` とAndroidの相対base `./` を分離します。
 - `Capacitor.isNativePlatform()` でAndroid WebView内のPWA Service Worker登録を防止。必要な地図・国旗はアプリ内の静的アセットとして配置します。
 - 暫定IDは `io.github.naoiw.geoquiz`。**Play Console初回公開前に正式なアプリIDを確定**します。
+- Androidの戻るボタンはクイズ中にモード選択へ戻り（途中のセッションは破棄）、トップ画面ではアプリを終了します。
+- `viewport-fit=cover` とCSSの `safe-area-inset` でステータスバー・ナビゲーションバーの表示領域を確保します。実機のedge-to-edge挙動は別途検証します。
 - デバッグ用ビルドはPlay公開用の署名済みAABではありません。keystore・署名鍵はリポジトリに保存しません。
 
 ## 開発フェーズ

@@ -32,13 +32,10 @@ jobs:
           "$SDKMANAGER" --install "platforms;android-36" "build-tools;36.0.0"
       - name: Install locked npm dependencies
         run: npm ci --no-audit --no-fund
-      - name: Build Android bundle and generate native project
-        run: |
-          npm run build:android
-          if [ ! -f android/gradlew ]; then
-            npm run android:add
-          fi
-          npx cap sync android
+      - name: Verify Android project is checked in
+        run: test -f android/gradlew && test -f android/app/build.gradle
+      - name: Build Android bundle and sync native project
+        run: npm run android:sync
       - name: Assemble debug APK
         working-directory: android
         run: |

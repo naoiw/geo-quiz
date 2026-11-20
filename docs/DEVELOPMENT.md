@@ -44,9 +44,9 @@ npm run preview
 
 ## Androidの初期ビルド
 
-`npm ci`でCapacitor 8依存も取得します。Androidへの初回追加は `npm run build:android && npm run android:add`。その後は `npm run android:sync` でAndroid用アセットを同期します。
+`npm ci`でCapacitor 8依存も取得します。Androidネイティブプロジェクトは `android/` に固定してGit管理し、通常の開発では `npm run android:sync` でAndroid用アセットとネイティブ依存を同期します。初回生成手順の `npm run android:add` は既存プロジェクトがある場合には実行しません。
 
-CIの別ワークフロー「Android Debug APK」ではAndroid SDK 36/JDK 21を準備してAndroidネイティブプロジェクトを生成し、デバッグAPKをアーティファクトとして保存します。Androidの実機操作やPlay Store公開を保証するものではありません。詳細は [ANDROID.md](ANDROID.md)。
+CIの別ワークフロー「Android Debug APK」ではAndroid SDK 36/JDK 21を準備してGit管理済みのAndroidネイティブプロジェクトを同期し、デバッグAPKをアーティファクトとして保存します。Androidの実機操作やPlay Store公開を保証するものではありません。詳細は [ANDROID.md](ANDROID.md)。
 
 ## コードの追加・変更
 

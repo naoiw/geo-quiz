@@ -11,6 +11,7 @@ import { CountryFlag } from "../flags/CountryFlag";
 import { translate, type MessageKey } from "../i18n/messages";
 import { useLocale } from "../i18n/useLocale";
 import { WorldMap } from "../map/WorldMap";
+import { useAndroidBackButton } from "../android/useAndroidBackButton";
 
 type MapDemoMode = "explore" | "highlight" | "answer";
 
@@ -53,6 +54,9 @@ export function App() {
     setActiveMode(null);
     window.location.hash = "modes";
   };
+
+  // Android system back follows the same navigation as the visible back button.
+  useAndroidBackButton(activeMode !== null, backToModes);
 
   const [mapMode, setMapMode] = useState<MapDemoMode>("explore");
   const [targetId, setTargetId] = useState("JP");

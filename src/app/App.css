@@ -55,7 +55,7 @@ a { color: inherit; }
 .language-settings__hint { margin: 12px 0 0; }
 
 main.page-container { flex: 1; }
-.hero { padding: 66px 0 47px; }
+.hero { padding: 33px 0 47px; }
 .eyebrow { margin: 0 0 14px; color: #2563eb; font-size: 12px; font-weight: 800; letter-spacing: .16em; }
 .hero h1 { margin: 0; font-size: clamp(34px, 5vw, 54px); line-height: 1.28; letter-spacing: -.045em; }
 .hero__description { margin: 14px 0 0; color: #60738e; font-size: 17px; line-height: 1.9; }
@@ -91,7 +91,7 @@ main.page-container { flex: 1; }
 @media (max-width: 620px) {
   .page-container { width: min(1120px, calc(100% - 32px)); }
   .site-header { min-height: 70px; }
-  .hero { padding: 48px 0 36px; }
+  .hero { padding: 24px 0 36px; }
   .hero__description { font-size: 15px; }
   .mode-grid { grid-template-columns: 1fr; gap: 12px; }
   .mode-card { min-height: 168px; padding: 21px; }
@@ -273,7 +273,7 @@ main.page-container { flex: 1; }
   border-top: 0; border-radius: 0 0 12px 12px; background: #fff;
 }
 @media (max-width: 620px) {
-  .hero { padding: 36px 0 28px; }
+  .hero { padding: 18px 0 28px; }
   .mode-grid { gap: 12px; }
   .mode-card { min-height: auto; padding: 18px; }
   .active-quiz__mode-name { display: none; }

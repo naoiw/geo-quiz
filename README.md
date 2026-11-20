@@ -1,6 +1,6 @@
 # Geo Quiz
 
-地図・国旗を使って世界の国や地域を学ぶクイズ。**PCブラウザ向けWeb版を公開中**で、Androidアプリ化と**Google Play公開**を次の開発目標としています。197か国・地域、4題型・6回答形式、日本語／英語、全世界＋6地域に対応します。
+地図・国旗を使って世界の国や地域を学ぶWebクイズ。197か国・地域、4題型・6回答形式、日本語／英語、全世界＋6地域に対応します。
 
 **本番:** https://naoiw.github.io/geo-quiz/　|　[Issues](https://github.com/naoiw/geo-quiz/issues)
 
@@ -19,22 +19,9 @@
 
 ヘッダーの「設定 / Settings」で表示言語を切り替えられます。ブラウザの優先言語から初期値を選び、変更はブラウザに保存します。表示名・テキスト正答判定は選択言語に連動します。地図・国旗の単体プレビューは画面下部の折りたたみから利用できます。地図を使うクイズでは **2D地図／3D地球儀をプレイ中に切替可能**で、切替えても問題・点数・時間は維持されます。初期表示は2Dです。2D地図は**左右に何周でもスクロールできる経度方向のループ**に対応しており、太平洋を中心に表示しても切れません。3Dは描画方式の追加段階であり、実機での選択精度と性能検証は継続します。PWAとしてホーム画面への追加に対応し、初回オンライン読み込み後はアプリ本体・国旗・地図を端末にキャッシュする構成です（オフライン実機確認は別途必要）。
 
-## Android（Capacitor 8・デバッグAPK）
-
-Androidアプリ向けに既存Reactコードを共有します。PC Webは従来どおりGitHub Pagesで公開し、AndroidではWebViewに同梱したアセットからオフラインで起動する構成です。
-
-```bash
-npm ci
-npm run android:sync      # Android向けビルド・ネイティブ同期      # 以降、Webコードを更新したとき
-cd android
-./gradlew assembleDebug  # Windows: gradlew.bat assembleDebug
-```
-
-デバッグAPKの出力先は `android/app/build/outputs/apk/debug/app-debug.apk`。GitHub Actionsの **Android Debug APK** ワークフローでもビルドし、APKをアーティファクトとして保存します。Androidネイティブプロジェクトはリポジトリ管理し、Androidシステムの戻るボタンはクイズ中ならモード選択へ、トップ画面ならアプリ終了へ移動します。実機動作検証は未実施です。Play Store向けの署名済みAABはまだ作っていません。
-
 ## 開発・検証
 
-**技術:** React 19、TypeScript 5、Vite 7、SVG／Three.js（Natural Earth 1:50m）、flag-icons。Node.js 26推奨（必要バージョン: 22.12以上、27未満）。GitHub Pagesを `main` から自動公開。Android版はCapacitor 8を第一候補とし、Webとゲームエンジン・国データ・地図・UIを共有する予定です（Androidネイティブプロジェクトは未導入）。PC WebとAndroidアプリを正式な対象とし、モバイルブラウザの動作保証は必須としません。
+**技術:** React 19、TypeScript 5、Vite 7、SVG／Three.js（Natural Earth 1:50m）、flag-icons。Node.js 26推奨（必要バージョン: 22.12以上、27未満）。GitHub Pagesを `main` から自動公開します。
 
 ```bash
 git clone https://github.com/naoiw/geo-quiz.git
@@ -76,7 +63,7 @@ npm run preview
 | `src/i18n` | UIの日英翻訳、国名表示言語の設定・保存 |
 | `tests` | エンジン・データ・出題形式・画面接続・共通化の回帰テスト |
 
-主要な国データ・国旗・地図の照合に加え、全7地域×6回答形式×3ゲームルール×日英の回帰テストをCIで実施します。PCブラウザ・Androidアプリの実機確認項目は [品質検証チェックリスト](docs/QA_CHECKLIST.md) にまとめています。
+主要な国データ・国旗・地図の照合に加え、全7地域×6回答形式×3ゲームルール×日英の回帰テストをCIで実施します。ブラウザでの手動確認項目は [品質検証チェックリスト](docs/QA_CHECKLIST.md) にまとめています。
 
 詳細は [設計](docs/ARCHITECTURE.md)、[共通エンジン](docs/GAME_ENGINE.md)、[UI/UX](docs/UI_UX.md) を参照してください。
 
@@ -95,13 +82,12 @@ npm run preview
 - [スマホ・PC UIとアクセシビリティ](docs/UI_UX.md)
 - [品質検証チェックリスト](docs/QA_CHECKLIST.md)
 - [PWA・オフライン動作](docs/PWA.md)
-- [Androidアプリ・Google Play公開計画](docs/ANDROID.md)
 - [2D世界地図と小国の表示](docs/MAP.md)
 - [データ・アセットとライセンス](docs/DATA.md)
 
 ## 今後
 
-3D地球儀（Issue #19）は初期版を実装済みで、2D/3D切替も可能です。3Dの実機検証・小国選択精度の最終確認は未完了です。Android版（Issue #15）はCapacitorビルド基盤とデバッグAPKのCI生成を整備中です。Android端末での4題型・6形式および2D/3Dの動作検証、署名済みAABの作成、Google Playへの審査・公開は後続で行います。PCブラウザとAndroid実機の検証は未完了です。
+3D地球儀（Issue #19）は初期版を実装済みで、2D/3D切替も可能です。3Dの実機検証・小国選択精度の最終確認や、ブラウザでの動作確認は継続します。
 
 ## ライセンス
 

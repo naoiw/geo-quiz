@@ -12,12 +12,3 @@ coverage/
 
 # Generated locally from the pinned flag-icons package
 public/flags/
-
-# Local Android outputs and signing materials
-android/.gradle/
-android/local.properties
-android/app/build/
-android/build/
-android/.idea/
-*.jks
-*.keystore
